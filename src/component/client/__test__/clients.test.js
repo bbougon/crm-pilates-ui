@@ -1,10 +1,8 @@
 import React from "react";
-import Enzyme, {mount} from "enzyme";
+import Enzyme from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {Input} from "@material-ui/core";
 import {Clients} from "../clients";
 import {render} from "react-dom";
-import {prettyDOM} from "@testing-library/react";
 
 Enzyme.configure({adapter: new Adapter()});
 

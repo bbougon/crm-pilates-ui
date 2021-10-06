@@ -6,7 +6,6 @@ export class Home extends React.Component {
     render() {
         return (
             <MainContainer>
-
             </MainContainer>
         );
     }
