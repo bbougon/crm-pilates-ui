@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import {Home} from "./component/home";
-import {Client} from "./component/client/client";
+import {Clients} from "./component/client/clients";
 import {
     BrowserRouter as Router,
     Switch,
@@ -19,7 +19,7 @@ function App() {
             <Sidebar />
             <Switch>
                 <Route path="/" component={Home}/>
-                <Route path="/clients" component={Client}/>
+                <Route path="/clients" component={Clients}/>
             </Switch>
         </Router>
     </div>
