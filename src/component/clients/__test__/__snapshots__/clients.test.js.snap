@@ -195,7 +195,7 @@ exports[`Clients should display the client page 1`] = `
         [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-11\\"[39m
       [36m>[39m
         [36m<div[39m
-          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m
+          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1\\"[39m
         [36m/>[39m
       [36m</div>[39m
     [36m</div>[39m

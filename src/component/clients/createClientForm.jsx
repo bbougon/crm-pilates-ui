@@ -109,7 +109,9 @@ export const CreateClientForm = () => {
                                 <InputLabel htmlFor="client-name">Client's name</InputLabel>
                                 <Input id="client-name" className="sizeSmall"
                                        onChange={onLastnameChanged}
-                                       aria-describedby="client-name-help"/>
+                                       aria-describedby="client-name-help"
+                                       value={lastname}
+                                />
                                 <FormHelperText id="client-name-help">Provide a client's name</FormHelperText>
                             </FormControl>
                         </Grid>
@@ -120,7 +122,9 @@ export const CreateClientForm = () => {
                                 <InputLabel htmlFor="client-first-name">Client's firstname</InputLabel>
                                 <Input id="client-first-name" className="sizeSmall"
                                        onChange={onFirstnameChanged}
-                                       aria-describedby="client-first-name-help"/>
+                                       aria-describedby="client-first-name-help"
+                                       value={firstname}
+                                />
                                 <FormHelperText id="client-first-name-help">Provide a client's
                                     firstname</FormHelperText>
                             </FormControl>

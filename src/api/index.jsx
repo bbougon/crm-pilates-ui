@@ -1,6 +1,4 @@
 
-const API_URL = "http://localhost:8081"
-
 export async function api(endpoint, { body, ...customConfig } = {}) {
     const headers = { 'Content-Type': 'application/json' }
 

@@ -58,9 +58,12 @@ describe('Clients', function () {
         it('should display the client list', async() => {
             render(<Clients />)
 
-            expect(await screen.findByText(/Doe John/i)).toBeInTheDocument()
-            expect(await screen.findByText(/Martin Pierre/i)).toBeInTheDocument()
-            expect(await screen.findByText(/Verneuil Henri/i)).toBeInTheDocument()
+            expect(await screen.findByText("Doe", {selector: 'h6'})).toBeInTheDocument()
+            expect(await screen.findByText("John")).toBeInTheDocument()
+            expect(await screen.findByText("Martin", {selector: 'h6'})).toBeInTheDocument()
+            expect(await screen.findByText("Pierre")).toBeInTheDocument()
+            expect(await screen.findByText("Verneuil", {selector: 'h6'})).toBeInTheDocument()
+            expect(await screen.findByText("Henri")).toBeInTheDocument()
         })
     })
 
@@ -92,7 +95,10 @@ describe('Clients', function () {
             userEvent.type(screen.getByText("Client's firstname"), "John")
             userEvent.click(screen.getByRole("button", { name: /submit/i }))
 
-            expect(await screen.findByText(/Doe John/i)).toBeInTheDocument()
+            expect(await screen.queryByDisplayValue("Doe")).toBeInTheDocument()
+            expect(await screen.queryByDisplayValue("John")).toBeInTheDocument()
+            expect(await screen.getByLabelText("Client's name", {selector: 'input'})).toBeEmptyDOMElement()
+            expect(await screen.getByLabelText("Client's firstname", {selector: 'input'})).toBeEmptyDOMElement()
         })
     })
 })
