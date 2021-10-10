@@ -1,0 +1,204 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Clients should display the client page 1`] = `
+"[36m<div>[39m
+  [36m<div[39m
+    [33mclass[39m=[32m\\"sc-bdfBQB gOWVrL\\"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-11\\"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m\\"MuiPaper-root MuiAccordion-root MuiAccordion-rounded MuiPaper-elevation1 MuiPaper-rounded\\"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-controls[39m=[32m\\"panel1c-content\\"[39m
+            [33maria-disabled[39m=[32m\\"false\\"[39m
+            [33maria-expanded[39m=[32m\\"false\\"[39m
+            [33mclass[39m=[32m\\"MuiButtonBase-root MuiAccordionSummary-root\\"[39m
+            [33mid[39m=[32m\\"panel1c-header\\"[39m
+            [33mrole[39m=[32m\\"button\\"[39m
+            [33mtabindex[39m=[32m\\"0\\"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m\\"MuiAccordionSummary-content\\"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m\\"makeStyles-column-6\\"[39m
+              [36m>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m\\"MuiTypography-root makeStyles-heading-2 MuiTypography-body1\\"[39m
+                [36m>[39m
+                  [0mClient[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m\\"makeStyles-column-6\\"[39m
+              [36m>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m\\"MuiTypography-root makeStyles-secondaryHeading-3 MuiTypography-body1\\"[39m
+                [36m>[39m
+                  [0mAdd a new client[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-disabled[39m=[32m\\"false\\"[39m
+              [33maria-hidden[39m=[32m\\"true\\"[39m
+              [33mclass[39m=[32m\\"MuiButtonBase-root MuiIconButton-root MuiAccordionSummary-expandIcon MuiIconButton-edgeEnd\\"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m\\"MuiIconButton-label\\"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m\\"true\\"[39m
+                  [33mclass[39m=[32m\\"MuiSvgIcon-root\\"[39m
+                  [33mfocusable[39m=[32m\\"false\\"[39m
+                  [33mviewBox[39m=[32m\\"0 0 24 24\\"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m\\"M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z\\"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m\\"MuiTouchRipple-root\\"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m\\"MuiCollapse-root MuiCollapse-hidden\\"[39m
+            [33mstyle[39m=[32m\\"min-height: 0px;\\"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m\\"MuiCollapse-wrapper\\"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m\\"MuiCollapse-wrapperInner\\"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mrole[39m=[32m\\"region\\"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m\\"MuiAccordionDetails-root\\"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m\\"sc-gsTEea leDWjB\\"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m
+                      [36m>[39m
+                        [36m<div[39m
+                          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3\\"[39m
+                        [36m>[39m
+                          [36m<div[39m
+                            [33mclass[39m=[32m\\"MuiFormControl-root\\"[39m
+                          [36m>[39m
+                            [36m<label[39m
+                              [33mclass[39m=[32m\\"MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated\\"[39m
+                              [33mdata-shrink[39m=[32m\\"false\\"[39m
+                              [33mfor[39m=[32m\\"client-name\\"[39m
+                            [36m>[39m
+                              [0mClient's name[0m
+                            [36m</label>[39m
+                            [36m<div[39m
+                              [33mclass[39m=[32m\\"MuiInputBase-root MuiInput-root MuiInput-underline sizeSmall MuiInputBase-formControl MuiInput-formControl\\"[39m
+                            [36m>[39m
+                              [36m<input[39m
+                                [33maria-describedby[39m=[32m\\"client-name-help\\"[39m
+                                [33maria-invalid[39m=[32m\\"false\\"[39m
+                                [33mclass[39m=[32m\\"MuiInputBase-input MuiInput-input\\"[39m
+                                [33mid[39m=[32m\\"client-name\\"[39m
+                                [33mtype[39m=[32m\\"text\\"[39m
+                                [33mvalue[39m=[32m\\"\\"[39m
+                              [36m/>[39m
+                            [36m</div>[39m
+                            [36m<p[39m
+                              [33mclass[39m=[32m\\"MuiFormHelperText-root\\"[39m
+                              [33mid[39m=[32m\\"client-name-help\\"[39m
+                            [36m>[39m
+                              [0mProvide a client's name[0m
+                            [36m</p>[39m
+                          [36m</div>[39m
+                        [36m</div>[39m
+                      [36m</div>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m
+                      [36m>[39m
+                        [36m<div[39m
+                          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3\\"[39m
+                        [36m>[39m
+                          [36m<div[39m
+                            [33mclass[39m=[32m\\"MuiFormControl-root\\"[39m
+                          [36m>[39m
+                            [36m<label[39m
+                              [33mclass[39m=[32m\\"MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated\\"[39m
+                              [33mdata-shrink[39m=[32m\\"false\\"[39m
+                              [33mfor[39m=[32m\\"client-first-name\\"[39m
+                            [36m>[39m
+                              [0mClient's firstname[0m
+                            [36m</label>[39m
+                            [36m<div[39m
+                              [33mclass[39m=[32m\\"MuiInputBase-root MuiInput-root MuiInput-underline sizeSmall MuiInputBase-formControl MuiInput-formControl\\"[39m
+                            [36m>[39m
+                              [36m<input[39m
+                                [33maria-describedby[39m=[32m\\"client-first-name-help\\"[39m
+                                [33maria-invalid[39m=[32m\\"false\\"[39m
+                                [33mclass[39m=[32m\\"MuiInputBase-input MuiInput-input\\"[39m
+                                [33mid[39m=[32m\\"client-first-name\\"[39m
+                                [33mtype[39m=[32m\\"text\\"[39m
+                                [33mvalue[39m=[32m\\"\\"[39m
+                              [36m/>[39m
+                            [36m</div>[39m
+                            [36m<p[39m
+                              [33mclass[39m=[32m\\"MuiFormHelperText-root\\"[39m
+                              [33mid[39m=[32m\\"client-first-name-help\\"[39m
+                            [36m>[39m
+                              [0mProvide a client's firstname[0m
+                            [36m</p>[39m
+                          [36m</div>[39m
+                        [36m</div>[39m
+                      [36m</div>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                  [36m<hr[39m
+                    [33mclass[39m=[32m\\"MuiDivider-root\\"[39m
+                  [36m/>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m\\"MuiAccordionActions-root MuiAccordionActions-spacing\\"[39m
+                  [36m>[39m
+                    [36m<button[39m
+                      [33mclass[39m=[32m\\"MuiButtonBase-root MuiButton-root MuiButton-text\\"[39m
+                      [33mtabindex[39m=[32m\\"0\\"[39m
+                      [33mtype[39m=[32m\\"button\\"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m\\"MuiButton-label\\"[39m
+                      [36m>[39m
+                        [0mSubmit[0m
+                      [36m</span>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m\\"MuiTouchRipple-root\\"[39m
+                      [36m/>[39m
+                    [36m</button>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-11\\"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m
+        [36m/>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</div>[39m"
+`;
