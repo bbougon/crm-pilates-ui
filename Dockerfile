@@ -7,7 +7,7 @@ COPY package.json .
 COPY yarn.lock .
 RUN yarn install
 
-COPY .. .
+COPY . .
 
 EXPOSE 3000
 
@@ -21,7 +21,7 @@ WORKDIR /app
 COPY package.json .
 COPY yarn.lock .
 RUN yarn install --production
-COPY .. .
+COPY . .
 RUN yarn build
 
 # Bundle static assets with nginx
