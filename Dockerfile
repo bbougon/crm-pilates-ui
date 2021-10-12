@@ -3,8 +3,8 @@ ENV NODE_ENV development
 
 WORKDIR /app
 
-COPY ../package.json .
-COPY ../yarn.lock .
+COPY package.json .
+COPY yarn.lock .
 RUN yarn install
 
 COPY .. .
@@ -18,8 +18,8 @@ ENV NODE_ENV production
 
 WORKDIR /app
 
-COPY ../package.json .
-COPY ../yarn.lock .
+COPY package.json .
+COPY yarn.lock .
 RUN yarn install --production
 COPY .. .
 RUN yarn build
@@ -30,7 +30,7 @@ ENV NODE_ENV production
 # Copy built assets from builder
 COPY --from=builder /app/build /usr/share/nginx/html
 # Add your nginx.conf
-COPY ../nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port
 EXPOSE 80
 # Start nginx
