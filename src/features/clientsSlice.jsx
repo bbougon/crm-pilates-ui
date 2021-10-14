@@ -34,7 +34,7 @@ const clientsSlice = createSlice({
             })
             .addCase(fetchClients.fulfilled, (state, action) => {
                 state.status = 'succeeded'
-                state.clients = state.clients.concat(action.payload)
+                state.clients = state.clients = action.payload
             })
             .addCase(fetchClients.rejected, (state, action) => {
                 state.status = 'failed'
