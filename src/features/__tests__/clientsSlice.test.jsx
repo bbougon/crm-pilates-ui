@@ -1,6 +1,6 @@
 import reducer, {fetchClients} from "../clientsSlice";
 
-describe('clientsSlice', () => {
+describe('ClientsSlice', () => {
 
     it('it should override previous state with fetched clients', async () => {
         const previousState = {
