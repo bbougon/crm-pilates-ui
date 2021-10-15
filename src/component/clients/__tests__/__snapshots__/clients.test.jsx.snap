@@ -74,13 +74,13 @@ exports[`Clients should display the client page 1`] = `
                     [33mclass[39m=[32m\\"MuiAccordionDetails-root\\"[39m
                   [36m>[39m
                     [36m<div[39m
-                      [33mclass[39m=[32m\\"sc-gsTEea leDWjB\\"[39m
+                      [33mclass[39m=[32m\\"sc-gsTEea iKEupo\\"[39m
                     [36m>[39m
                       [36m<div[39m
                         [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m
                       [36m>[39m
                         [36m<div[39m
-                          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3\\"[39m
+                          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-md-3\\"[39m
                         [36m>[39m
                           [36m<div[39m
                             [33mclass[39m=[32m\\"MuiFormControl-root\\"[39m
@@ -131,7 +131,7 @@ exports[`Clients should display the client page 1`] = `
                         [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m
                       [36m>[39m
                         [36m<div[39m
-                          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3\\"[39m
+                          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-md-3\\"[39m
                         [36m>[39m
                           [36m<div[39m
                             [33mclass[39m=[32m\\"MuiFormControl-root\\"[39m
