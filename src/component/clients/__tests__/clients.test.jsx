@@ -90,15 +90,15 @@ describe('Clients', function () {
         it('should create John Doe', async () => {
             render(<Clients/>)
 
-            userEvent.click(screen.getByRole("button", {name: /client add a new client/i}))
+            userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
             userEvent.type(screen.getByText("Client's name"), "Doe")
             userEvent.type(screen.getByText("Client's firstname"), "John")
             userEvent.click(screen.getByRole("button", { name: /submit/i }))
 
             expect(await screen.queryByDisplayValue("Doe")).toBeInTheDocument()
             expect(await screen.queryByDisplayValue("John")).toBeInTheDocument()
-            expect(await screen.getByLabelText("Client's name", {selector: 'input'})).toBeEmptyDOMElement()
-            expect(await screen.getByLabelText("Client's firstname", {selector: 'input'})).toBeEmptyDOMElement()
+            expect(await screen.getByLabelText("Client's name *", {selector: 'input'})).toBeEmptyDOMElement()
+            expect(await screen.getByLabelText("Client's firstname *", {selector: 'input'})).toBeEmptyDOMElement()
         })
     })
 })
