@@ -23,7 +23,6 @@ const Wrapper = styled.div`
     flex-direction: column;
     flex: auto;
     width: 100%;
-    padding-left: 100px;
 `;
 
 
@@ -61,7 +60,7 @@ export const CreateClientForm = () => {
             <AccordionDetails>
                 <Wrapper>
                     <Grid container>
-                        <Grid item xs={3}>
+                        <Grid item xs={12} md={3}>
                             <FormControl>
                                 <TextField id="client-name" className="sizeSmall"
                                            label="Client's name"
@@ -75,7 +74,7 @@ export const CreateClientForm = () => {
                         </Grid>
                     </Grid>
                     <Grid container>
-                        <Grid item xs={3}>
+                        <Grid item xs={12} md={3}>
                             <FormControl>
                                 <TextField id="client-first-name" className="sizeSmall"
                                            label="Client's firstname"
