@@ -1,12 +1,8 @@
 version: "3.8"
 
 services:
-  app:
+  crm-pilates-ui:
+    image: crm-pilates-ui:latest
     container_name: crm-pilates-ui
-    image: crm-pilates-ui
-    build:
-      target: development
-    volumes:
-      - ./src:/app/src
     ports:
       - 3000:3000

@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {fetchClients, selectAllClients} from "../../features/clientsSlice";
 import {Avatar, CardContent, Stack} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
+import {DisplayError} from "../errors/displayError";
 
 
 const Client = ({client}) => {
@@ -29,32 +30,6 @@ const Client = ({client}) => {
     )
 };
 
-export const displayError = (error) => {
-    let errorMessage
-    errorMessage = error.map((error) => {
-        return (
-            <div key={Math.random()}>
-                <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>
-                    <Typography>{error.message}</Typography>
-                </Stack>
-                <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>
-                    <Typography>{error.type}</Typography>
-                </Stack>
-            </div>
-        )
-    })
-    return <Grid>
-        <Card>
-            <CardContent>
-                <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>
-                    <Typography variant="h5">An error occurred (see message below):</Typography>
-                </Stack>
-                {errorMessage}
-            </CardContent>
-        </Card>
-    </Grid>
-}
-
 export const ClientsList = () => {
 
     const dispatch = useDispatch();
@@ -69,7 +44,7 @@ export const ClientsList = () => {
 
     content = clients.map((client) => (<Client key={client.id} client={client}/>))
     if (status === "failed") {
-        content = displayError(error);
+        content = <DisplayError error={error}/>
     }
 
     return (

@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {api} from "../api";
+import {map_action_thunk_error} from "./errors";
 
 const initialState = {
     clients: [],
@@ -28,12 +29,6 @@ export const fetchClients = createAsyncThunk(
     }
 )
 
-function map_error(action) {
-    return action.payload.detail.map(detail => {
-        return {message: detail.msg, type: detail.type}
-    })
-}
-
 const clientsSlice = createSlice({
     name: 'clients',
     initialState,
@@ -49,7 +44,7 @@ const clientsSlice = createSlice({
             })
             .addCase(fetchClients.rejected, (state, action) => {
                 state.status = 'failed'
-                state.error = map_error(action)
+                state.error = map_action_thunk_error(action)
             })
             .addCase(createClient.fulfilled, (state, action) => {
                 state.clients.push(action.payload)

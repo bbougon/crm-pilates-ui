@@ -4,6 +4,7 @@ ENV NODE_ENV development
 WORKDIR /app
 
 COPY package.json .
+COPY yarn.lock .
 RUN yarn install --network-timeout 600000
 
 COPY . .
@@ -18,6 +19,7 @@ ENV NODE_ENV production
 WORKDIR /app
 
 COPY package.json .
+COPY yarn.lock .
 RUN yarn install --production --network-timeout 600000
 COPY . .
 RUN yarn build

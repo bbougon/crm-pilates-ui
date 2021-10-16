@@ -41,31 +41,70 @@ describe('ClientsSlice', () => {
             })
         })
 
-        it("should handle errors", async () => {
-            const previousState = {
-                clients: [],
-                status: "loading",
-                error: null
-            }
-            const action = {
-                type: fetchClients.rejected.type,
-                payload: {
-                    detail: [
-                        {
-                            loc: [
-                                "a location"
-                            ],
-                            msg: "an error message",
-                            type: "an error type"
-                        }
-                    ]
-                }
-            };
+        describe("Errors", () => {
 
-            expect(reducer(previousState, action)).toEqual({
-                clients: [],
-                status: "failed",
-                error: [{message: "an error message", type: "an error type"}]
+            it("should handle errors from api", async () => {
+                const previousState = {
+                    clients: [],
+                    status: "loading",
+                    error: null
+                }
+                const action = {
+                    type: fetchClients.rejected.type,
+                    payload: {
+                        detail: [
+                            {
+                                loc: [
+                                    "a location"
+                                ],
+                                msg: "an error message",
+                                type: "an error type"
+                            }
+                        ]
+                    }
+                };
+
+                expect(reducer(previousState, action)).toEqual({
+                    clients: [],
+                    status: "failed",
+                    error: [{message: "an error message", type: "an error type"}]
+                })
+            })
+
+
+            it("should handle errors in payload", async () => {
+                const previousState = {
+                    clients: [],
+                    status: "loading",
+                    error: null
+                }
+                const action = {
+                    type: fetchClients.rejected.type,
+                    payload: "error"
+                };
+
+                expect(reducer(previousState, action)).toEqual({
+                    clients: [],
+                    status: "failed",
+                    error: [{message: "error"}]
+                })
+            })
+
+            it("should handle errors with no payload", async () => {
+                const previousState = {
+                    clients: [],
+                    status: "loading",
+                    error: null
+                }
+                const action = {
+                    type: fetchClients.rejected.type
+                };
+
+                expect(reducer(previousState, action)).toEqual({
+                    clients: [],
+                    status: "failed",
+                    error: [{message: "An error occurred"}]
+                })
             })
         })
     })
