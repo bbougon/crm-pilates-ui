@@ -27,7 +27,7 @@ export async function api(endpoint, { body, ...customConfig } = {}) {
                 url: response.url,
             }
         }
-        throw new Error(response.statusText)
+        throw new Error()
     } catch (err) {
         return Promise.reject(err.message ? err.message : data)
     }

@@ -17,11 +17,22 @@ export const createClient = createAsyncThunk(
 
 export const fetchClients = createAsyncThunk(
     'clients/fetch',
-    async () => {
-        const response = await api.fetchClients()
-        return response.data
+    async (_, { rejectWithValue, fulfillWithValue }) => {
+        try {
+            const response = await api.fetchClients()
+            return fulfillWithValue(response.data, null)
+        } catch (e) {
+            return rejectWithValue(e)
+        }
+
     }
 )
+
+function map_error(action) {
+    return action.payload.detail.map(detail => {
+        return {message: detail.msg, type: detail.type}
+    })
+}
 
 const clientsSlice = createSlice({
     name: 'clients',
@@ -34,11 +45,11 @@ const clientsSlice = createSlice({
             })
             .addCase(fetchClients.fulfilled, (state, action) => {
                 state.status = 'succeeded'
-                state.clients = state.clients = action.payload
+                state.clients = action.payload
             })
             .addCase(fetchClients.rejected, (state, action) => {
                 state.status = 'failed'
-                state.error = action.error.message
+                state.error = map_error(action)
             })
             .addCase(createClient.fulfilled, (state, action) => {
                 state.clients.push(action.payload)

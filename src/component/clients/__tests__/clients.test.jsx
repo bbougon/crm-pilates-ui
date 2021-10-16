@@ -27,44 +27,82 @@ describe('Clients', function () {
     })
 
     describe('Loading the client page', function () {
-        const server = setupServer(
-            rest.get('/clients', (req, res, ctx) => {
-                return res(ctx.json([
-                    {
-                        firstname: "John",
-                        lastname: "Doe",
-                        id: "33da6f12-efda-4c16-b8af-e5e822fc5459",
-                    },
-                    {
-                        firstname: "Pierre",
-                        lastname: "Martin",
-                        id: "33da6f24-efda-4c16-b8af-e5e822fc5860",
-                    },
-                    {
-                        firstname: "Henri",
-                        lastname: "Verneuil",
-                        id: "33da6bca-efda-4c16-b8af-e5e822fc5901",
-                    }
-                ]))
-            }),
-        )
+        describe("when retrieving the clients", () => {
+            const server = setupServer(
+                rest.get('/clients', (req, res, ctx) => {
+                    return res(ctx.json([
+                        {
+                            firstname: "John",
+                            lastname: "Doe",
+                            id: "33da6f12-efda-4c16-b8af-e5e822fc5459",
+                        },
+                        {
+                            firstname: "Pierre",
+                            lastname: "Martin",
+                            id: "33da6f24-efda-4c16-b8af-e5e822fc5860",
+                        },
+                        {
+                            firstname: "Henri",
+                            lastname: "Verneuil",
+                            id: "33da6bca-efda-4c16-b8af-e5e822fc5901",
+                        }
+                    ]))
+                }),
+            )
 
-        beforeAll(() => server.listen())
+            beforeAll(() => server.listen())
 
-        afterEach(() => server.resetHandlers())
+            afterEach(() => server.resetHandlers())
 
-        afterAll(() => server.close())
+            afterAll(() => server.close())
 
-        it('should display the client list', async() => {
-            render(<Clients />)
+            it('they should be displayed', async () => {
+                render(<Clients/>)
 
-            expect(await screen.findByText("Doe", {selector: 'h6'})).toBeInTheDocument()
-            expect(await screen.findByText("John")).toBeInTheDocument()
-            expect(await screen.findByText("Martin", {selector: 'h6'})).toBeInTheDocument()
-            expect(await screen.findByText("Pierre")).toBeInTheDocument()
-            expect(await screen.findByText("Verneuil", {selector: 'h6'})).toBeInTheDocument()
-            expect(await screen.findByText("Henri")).toBeInTheDocument()
+                expect(await screen.findByText("Doe", {selector: 'h6'})).toBeInTheDocument()
+                expect(await screen.findByText("John")).toBeInTheDocument()
+                expect(await screen.findByText("Martin", {selector: 'h6'})).toBeInTheDocument()
+                expect(await screen.findByText("Pierre")).toBeInTheDocument()
+                expect(await screen.findByText("Verneuil", {selector: 'h6'})).toBeInTheDocument()
+                expect(await screen.findByText("Henri")).toBeInTheDocument()
+            })
         })
+
+        describe("when getting an error", () => {
+            const server = setupServer(
+                rest.get('/clients', (req, res, ctx) => {
+                    return res(
+                        ctx.status(422),
+                        ctx.json({
+                            detail: [
+                                {
+                                    loc: [
+                                        "a location"
+                                    ],
+                                    msg: "an error message",
+                                    type: "an error type"
+                                }
+                            ]
+                        }),
+                    )
+                }),
+            )
+
+            beforeAll(() => server.listen())
+
+            afterEach(() => server.resetHandlers())
+
+            afterAll(() => server.close())
+
+            it("it should be displayed", async () => {
+                render(<Clients/>)
+
+                expect(await screen.findByText("An error occurred (see message below):", {selector: 'h5'})).toBeInTheDocument()
+                expect(await screen.findByText("an error message", {selector: 'p'})).toBeInTheDocument()
+                expect(await screen.findByText("an error type", {selector: 'p'})).toBeInTheDocument()
+            })
+        })
+
     })
 
     describe('Creating a client', function () {
@@ -93,7 +131,7 @@ describe('Clients', function () {
             userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
             userEvent.type(screen.getByText("Client's name"), "Doe")
             userEvent.type(screen.getByText("Client's firstname"), "John")
-            userEvent.click(screen.getByRole("button", { name: /submit/i }))
+            userEvent.click(screen.getByRole("button", {name: /submit/i}))
 
             expect(await screen.queryByDisplayValue("Doe")).toBeInTheDocument()
             expect(await screen.queryByDisplayValue("John")).toBeInTheDocument()
