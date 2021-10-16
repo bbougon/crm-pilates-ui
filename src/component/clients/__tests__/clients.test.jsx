@@ -5,14 +5,12 @@ import userEvent from "@testing-library/user-event";
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
 import {render} from "../../../test-utils/test-utils";
+import {client, ClientsBuilder} from "../../../test-utils/clients/clients";
+import {APIErrorBody, ServerBuilder} from "../../../test-utils/server/server";
 
 
 describe('Clients', function () {
-    const server = setupServer(
-        rest.get('/clients', (req, res, ctx) => {
-            return res(ctx.json([]))
-        }),
-    )
+    const server = new ServerBuilder("/clients", "get").withBody([]).build()
 
     beforeAll(() => server.listen())
 
@@ -28,27 +26,13 @@ describe('Clients', function () {
 
     describe('Loading the client page', function () {
         describe("when retrieving the clients", () => {
-            const server = setupServer(
-                rest.get('/clients', (req, res, ctx) => {
-                    return res(ctx.json([
-                        {
-                            firstname: "John",
-                            lastname: "Doe",
-                            id: "33da6f12-efda-4c16-b8af-e5e822fc5459",
-                        },
-                        {
-                            firstname: "Pierre",
-                            lastname: "Martin",
-                            id: "33da6f24-efda-4c16-b8af-e5e822fc5860",
-                        },
-                        {
-                            firstname: "Henri",
-                            lastname: "Verneuil",
-                            id: "33da6bca-efda-4c16-b8af-e5e822fc5901",
-                        }
-                    ]))
-                }),
-            )
+            const server = new ServerBuilder("/clients")
+                .withBody(new ClientsBuilder()
+                    .withClient(client())
+                    .withClient(client("Pierre", "Martin", "33da6f24-efda-4c16-b8af-e5e822fc5860"))
+                    .withClient(client("Henri", "Verneuil", "33da6bca-efda-4c16-b8af-e5e822fc5901"))
+                    .build())
+                .build()
 
             beforeAll(() => server.listen())
 
@@ -69,24 +53,13 @@ describe('Clients', function () {
         })
 
         describe("when getting an error", () => {
-            const server = setupServer(
-                rest.get('/clients', (req, res, ctx) => {
-                    return res(
-                        ctx.status(422),
-                        ctx.json({
-                            detail: [
-                                {
-                                    loc: [
-                                        "a location"
-                                    ],
-                                    msg: "an error message",
-                                    type: "an error type"
-                                }
-                            ]
-                        }),
-                    )
-                }),
-            )
+            const server = new ServerBuilder("/clients")
+                .withStatus(422)
+                .withBody(new APIErrorBody()
+                    .dummyMessage()
+                    .dummyType()
+                    .build())
+                .build()
 
             beforeAll(() => server.listen())
 
@@ -111,11 +84,7 @@ describe('Clients', function () {
                 return res(ctx.json([]))
             }),
             rest.post('/clients', (req, res, ctx) => {
-                return res(ctx.json({
-                    firstname: "John",
-                    lastname: "Doe",
-                    id: "33da6f12-efda-4c16-b8af-e5e822fc5459",
-                }))
+                return res(ctx.json(client()))
             }),
         )
 

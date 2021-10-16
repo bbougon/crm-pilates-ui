@@ -1,38 +1,19 @@
 import reducer, {fetchClients} from "../clientsSlice";
+import {LoadingState} from "../../test-utils/features/clients/clientStateFixtures";
+import {FulFilledAction, RejectedAction} from "../../test-utils/features/actionFixtures";
+import {client, ClientsBuilder} from "../../test-utils/clients/clients";
 
 describe('ClientsSlice', () => {
 
     describe("Fetching clients", () => {
         it('it should override previous state with fetched clients', async () => {
-            const previousState = {
-                clients: [
-                    {
-                        firstname: "John",
-                        lastname: "Doe",
-                        id: "33da6f12-efda-4c16-b8af-e5e822fc5459",
-                    }
-                ],
-                status: "loading",
-                error: null
-            }
-            let all_clients = [
-                {
-                    firstname: "John",
-                    lastname: "Doe",
-                    id: "33da6f12-efda-4c16-b8af-e5e822fc5459",
-                },
-                {
-                    firstname: "Pierre",
-                    lastname: "Martin",
-                    id: "33da6f24-efda-4c16-b8af-e5e822fc5860",
-                },
-                {
-                    firstname: "Henri",
-                    lastname: "Verneuil",
-                    id: "33da6bca-efda-4c16-b8af-e5e822fc5901",
-                }
-            ];
-            const action = {type: fetchClients.fulfilled.type, payload: all_clients};
+            const previousState = new LoadingState().withClient(client()).build()
+            let all_clients = new ClientsBuilder()
+                .withClient(client())
+                .withClient(client("Pierre", "Martin", "33da6f24-efda-4c16-b8af-e5e822fc5860"))
+                .withClient(client("Henri", "Verneuil", "33da6bca-efda-4c16-b8af-e5e822fc5901"))
+                .build()
+            const action = new FulFilledAction(fetchClients).withPayload(all_clients).build()
 
             expect(reducer(previousState, action)).toEqual({
                 clients: all_clients,
@@ -44,25 +25,8 @@ describe('ClientsSlice', () => {
         describe("Errors", () => {
 
             it("should handle errors from api", async () => {
-                const previousState = {
-                    clients: [],
-                    status: "loading",
-                    error: null
-                }
-                const action = {
-                    type: fetchClients.rejected.type,
-                    payload: {
-                        detail: [
-                            {
-                                loc: [
-                                    "a location"
-                                ],
-                                msg: "an error message",
-                                type: "an error type"
-                            }
-                        ]
-                    }
-                };
+                const previousState = new LoadingState().build()
+                const action = new RejectedAction(fetchClients).withStructuredPayload().build()
 
                 expect(reducer(previousState, action)).toEqual({
                     clients: [],
@@ -73,15 +37,8 @@ describe('ClientsSlice', () => {
 
 
             it("should handle errors in payload", async () => {
-                const previousState = {
-                    clients: [],
-                    status: "loading",
-                    error: null
-                }
-                const action = {
-                    type: fetchClients.rejected.type,
-                    payload: "error"
-                };
+                const previousState = new LoadingState().build()
+                const action = new RejectedAction(fetchClients).withErrorPayload().build()
 
                 expect(reducer(previousState, action)).toEqual({
                     clients: [],
@@ -91,14 +48,8 @@ describe('ClientsSlice', () => {
             })
 
             it("should handle errors with no payload", async () => {
-                const previousState = {
-                    clients: [],
-                    status: "loading",
-                    error: null
-                }
-                const action = {
-                    type: fetchClients.rejected.type
-                };
+                const previousState = new LoadingState().build()
+                const action = new RejectedAction(fetchClients).withoutPayload().build()
 
                 expect(reducer(previousState, action)).toEqual({
                     clients: [],
