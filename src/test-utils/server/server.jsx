@@ -31,24 +31,20 @@ export function ServerBuilder(path, httpVerb="get") {
 
 export function APIErrorBody(){
     this.body = {
-        detail: [
-            {
-                loc: [],
-                msg: undefined,
-                type: undefined
-            }
-        ]
+        detail: []
     }
 
-    this.dummyMessage = () => {
-        this.body.detail[0].msg = "an error message"
+    this.dummyDetail = () => {
+        this.body.detail.push(APIDetail())
         return this
     }
 
-    this.dummyType = () => {
-        this.body.detail[0].type = "an error type"
+    this.withDetail = (detail) => {
+        this.body.detail.push(detail)
         return this
     }
 
     this.build = () => this.body
 }
+
+export const APIDetail = (msg = "an error message", type = "an error type", loc = []) => ({loc: loc, msg: msg, type: type})

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Clients should display the client page 1`] = `
+exports[`Clients page should be displayed 1`] = `
 "[36m<div>[39m
   [36m<div[39m
     [33mclass[39m=[32m\\"sc-bdfBQB gOWVrL\\"[39m

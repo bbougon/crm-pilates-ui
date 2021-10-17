@@ -14,8 +14,9 @@ import * as React from "react";
 import {useState} from "react";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import styled from "styled-components";
-import {useDispatch} from "react-redux";
-import {createClient} from "../../features/clientsSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {clientStatuses, createClient} from "../../features/clientsSlice";
+import {DisplayError} from "../errors/displayError";
 
 
 const Wrapper = styled.div`
@@ -32,7 +33,7 @@ function ClientAccordionSummary() {
             expandIcon={<ExpandMoreIcon/>}
             aria-controls="panel1c-content"
             id="panel1c-header"
-        sx={{textAlign: "center"}}>
+            sx={{textAlign: "center"}}>
             <Typography variant="h6" color="textSecondary">Add a new client</Typography>
         </AccordionSummary>
     )
@@ -42,6 +43,10 @@ export const CreateClientForm = () => {
 
     const dispatch = useDispatch()
 
+    const error = useSelector((state => state.clients.error))
+    const status = useSelector((state => state.clients.status))
+    let errorContent = undefined
+
     const [firstname, setFirstname] = useState('')
     const [lastname, setLastname] = useState('')
 
@@ -49,9 +54,19 @@ export const CreateClientForm = () => {
     const onLastnameChanged = (e) => setLastname(e.target.value)
 
     const onSubmitClicked = async () => {
-        await dispatch(createClient({firstname, lastname})).unwrap()
+        await dispatch(createClient({firstname, lastname}))
         setLastname('')
         setFirstname('')
+    }
+
+    if (status === clientStatuses.CREATION_FAILED) {
+        errorContent = (
+            <Grid container>
+                <Grid item xs={12} md={12}>
+                    <DisplayError error={error}/>
+                </Grid>
+            </Grid>
+        )
     }
 
     return (
@@ -87,6 +102,7 @@ export const CreateClientForm = () => {
                             </FormControl>
                         </Grid>
                     </Grid>
+                    {errorContent}
                 </Wrapper>
             </AccordionDetails>
             <Divider/>

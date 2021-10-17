@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect} from "react";
 import {Card, Grid, Typography} from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
-import {fetchClients, selectAllClients} from "../../features/clientsSlice";
+import {clientStatuses, fetchClients, selectAllClients} from "../../features/clientsSlice";
 import {Avatar, CardContent, Stack} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import {DisplayError} from "../errors/displayError";
@@ -43,7 +43,7 @@ export const ClientsList = () => {
     }, [dispatch])
 
     content = clients.map((client) => (<Client key={client.id} client={client}/>))
-    if (status === "failed") {
+    if (status === clientStatuses.FAILED) {
         content = <DisplayError error={error}/>
     }
 
