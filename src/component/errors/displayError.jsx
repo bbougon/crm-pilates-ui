@@ -12,15 +12,10 @@ const theme = createTheme({
             lineHeight: 1.334,
             letterSpacing: "0em"
         },
-        fontSize: "0.7rem"
+        fontSize: 10
     },
 });
 
-const ErrorTypography = styled(Typography)(({theme}) => ({
-    h5: {
-        fontSize: theme.h5.fontSize
-    },
-}));
 
 export const DisplayError = ({error}) => {
 
@@ -28,7 +23,7 @@ export const DisplayError = ({error}) => {
     errorMessage = error.map((error) => {
         return (
             <Stack key={Math.random()}>
-                <Stack direction="row" spacing={2} sx={{alignItems: "center", fontSize: "small"}}>
+                <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>
                     <ThemeProvider theme={theme}>
                         <Typography>{error.message}</Typography>
                     </ThemeProvider>
