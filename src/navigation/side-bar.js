@@ -33,6 +33,12 @@ class SideNav extends React.Component {
                     css: 'fa fa-fw fa-user',
                     key: 2
                 },
+                {
+                    path: '/calendar',
+                    name: 'Calendar',
+                    css: 'fas fa-calendar-alt',
+                    key: 2
+                },
             ]
         }
     }

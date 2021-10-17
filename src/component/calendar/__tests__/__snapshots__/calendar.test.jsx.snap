@@ -1,0 +1,167 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Calendar page should be displayed 1`] = `
+"[36m<div>[39m
+  [36m<div[39m
+    [33mclass[39m=[32m\\"sc-bdfBQB gOWVrL\\"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-11\\"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m\\"rc-flex rc-justify-end rc-mb-4\\"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m\\"rc-cursor-pointer\\"[39m
+          [36m>[39m
+            [0mPrevious[0m
+          [36m</button>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m\\"Current Month\\"[39m
+            [33mclass[39m=[32m\\"rc-ml-4 rc-mr-4 rc-w-32 rc-text-center\\"[39m
+          [36m>[39m
+            [0mOctober[0m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m\\"rc-cursor-pointer\\"[39m
+          [36m>[39m
+            [0mNext[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m\\"rc-bg-white rc-border-l-2 rc-border-t-2\\"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m\\"rc-grid rc-grid-cols-1 sm:rc-grid-cols-2 md:rc-grid-cols-4 lg:rc-grid-cols-7\\"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Day of Week\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m>[39m
+              [0mSunday[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Day of Week\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m>[39m
+              [0mMonday[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Day of Week\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m>[39m
+              [0mTuesday[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Day of Week\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m>[39m
+              [0mWednesday[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Day of Week\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m>[39m
+              [0mThursday[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Day of Week\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m>[39m
+              [0mFriday[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Day of Week\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m>[39m
+              [0mSaturday[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Empty Day\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Empty Day\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Empty Day\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Empty Day\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Empty Day\\"[39m
+              [33mclass[39m=[32m\\"rc-border-b-2 rc-p-2 rc-border-r-2 lg:rc-block rc-hidden\\"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Events for day 1\\"[39m
+              [33mclass[39m=[32m\\"rc-h-48 rc-p-2 rc-border-b-2 rc-border-r-2\\"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m\\"rc-flex rc-justify-between\\"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m\\"rc-font-bold\\"[39m
+                [36m>[39m
+                  [0m1[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m\\"lg:rc-hidden rc-block\\"[39m
+                [36m>[39m
+                  [0mFriday[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<ul[39m
+                [33mclass[39m=[32m\\"rc-divide-gray-200 rc-divide-y rc-overflow-hidden rc-max-h-36 rc-overflow-y-auto\\"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Events for day 2\\"[39m
+              [33mclass[39m=[32m\\"rc-h-48 rc-p-2 rc-border-b-2 rc-border-r-2\\"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m\\"rc-flex rc-justify-between\\"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m\\"rc-font-bold\\"[39m
+                [36m>[39m
+                  [0m2[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m\\"lg:rc-hidden rc-block\\"[39m
+                [36m>[39m
+                  [0mSaturday[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<ul[39m
+                [33mclass[39m=[32m\\"rc-divide-gray-200 rc-divide-y rc-overflow-hidden rc-max-h-36 rc-overflow-y-auto\\"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m\\"Events for day 3\\"[39m
+              [33mclass[39m=[32m\\"rc-h-48 rc-p-2 rc-border-b-2 rc-border-r-2\\"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m\\"rc-flex rc-justify-between\\"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m\\"rc-font-bold\\"[39m
+                [36m>[39m
+                  [0m3[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m\\"lg:rc-hidden rc-block\\"[39m
+                [36m>[39m
+                  [0mSunday[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<ul[39m
+                [33mclass[39m=[32m\\"rc-divide-gray-200 rc-divide-y rc-overflow-hidden rc-max-h-36 rc-overflow-y-auto\\"[39m
+              ..."
+`;

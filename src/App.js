@@ -4,6 +4,7 @@ import {Clients} from "./component/clients/clients";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {NavigationBar} from "./navigation/navigation-bar";
 import Sidebar from "./navigation/side-bar";
+import Calendar from "./component/calendar/calendar";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
             <Switch>
                 <Route exact path="/" component={Home}/>
                 <Route path="/clients" component={Clients}/>
+                <Route path="/calendar" component={Calendar}/>
             </Switch>
         </Router>
     </div>

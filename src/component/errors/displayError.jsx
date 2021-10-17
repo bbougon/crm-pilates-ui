@@ -1,5 +1,5 @@
 import {CardContent, Stack, Typography} from "@mui/material";
-import {createTheme, styled, ThemeProvider} from '@mui/material/styles';
+import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {Card, Grid} from "@material-ui/core";
 import * as React from "react";
 
