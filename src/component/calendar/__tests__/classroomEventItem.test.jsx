@@ -16,7 +16,10 @@ describe('Classroom Event', function () {
 
         userEvent.click(screen.getByText("Cours tapis"))
 
-        expect(screen.findByText("Cours tapis", {selector: 'h5'})).toBeInTheDocument()
-        expect(screen.findByText("Heure de début", {selector: 'h6'})).toHaveValue(format(session.schedule.start, "yyyy-MM-dd H:mm"))
+        let tooltip = screen.getByRole("tooltip");
+        expect(tooltip).toBeInTheDocument()
+        expect(tooltip).toContain("Cours tapis")
+        //expect(screen.findByText("Cours tapis", {selector: 'span'})).toBeInTheDocument()
+        //expect(screen.findByText("Heure de début", {selector: 'h6'})).toHaveValue(format(session.schedule.start, "yyyy-MM-dd H:mm"))
     })
 })
