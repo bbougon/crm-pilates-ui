@@ -1,6 +1,6 @@
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {Grid} from "@material-ui/core";
-import {Box, Card, CardContent, CardHeader, Chip, Fade, Popper, Stack, Typography} from "@mui/material";
+import {Box, Card, CardContent, CardHeader, Chip, Fade, Popper, Stack, Switch, Typography} from "@mui/material";
 import {blue} from "@mui/material/colors";
 import {format} from "date-fns";
 import * as React from "react";
@@ -37,7 +37,7 @@ const theme = createTheme({
 });
 
 const Attendee = ({attendee}) => {
-    const [attendeeLabelStatus, setAttendeeLabelStatus] = useState(attendee.attendance === "REGISTERED" ? 'R': 'C')
+    const [attendeeLabelStatus, setAttendeeLabelStatus] = useState(attendee.attendance === "REGISTERED" ? 'R' : 'C')
     const [attendeeLabelColor, setAttendeeLabelColor] = useState(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
 
     return (
@@ -54,14 +54,24 @@ const Attendee = ({attendee}) => {
                     </Box>
                 </Grid>
                 <Grid item xs={4}>
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end'
-                    }}>
-                        <ThemeProvider theme={theme}>
-                            <Chip size="small" label={attendeeLabelStatus} color={attendeeLabelColor}/>
-                        </ThemeProvider>
-                    </Box>
+                    <Stack direction="row">
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end'
+                        }}>
+                            <ThemeProvider theme={theme}>
+                                <Switch size="small" defaultChecked={attendee.attendance === "CHECKED_IN"} color={attendeeLabelColor}/>
+                            </ThemeProvider>
+                        </Box>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end'
+                        }}>
+                            <ThemeProvider theme={theme}>
+                                <Chip size="small" label={attendeeLabelStatus} color={attendeeLabelColor}/>
+                            </ThemeProvider>
+                        </Box>
+                    </Stack>
                 </Grid>
             </Grid>
         </Stack>
