@@ -1,18 +1,5 @@
 import {addHours} from "date-fns";
 
-export function SessionsBuilder() {
-    this.sessions = []
-
-    this.withSession = (session) => {
-        this.sessions.push(session)
-        return this
-    }
-
-    this.build = () => {
-        return this.sessions
-    }
-}
-
 export function AttendeesBuilder() {
     this.attendees = []
 
@@ -37,15 +24,15 @@ export const schedule = (start= new Date(), stop = addHours(new Date(), 1)) => {
     }
 }
 
-export const session = (id = undefined, classrromId = 1, name = "Pilates avancé",
-                        date = new Date(), schedule = schedule(), position = 1,
+export const session = (id = undefined, classroomId = 1, name = "Pilates avancé",
+                        date = new Date(), schedule_ = schedule(), position = 1,
                         attendees = []) => {
     return {
         id: id,
-        classroomId: classrromId,
+        classroomId: classroomId,
         name: name,
         date: date,
-        schedule: schedule,
+        schedule: schedule_,
         position: position,
         attendees: attendees
     }

@@ -29,10 +29,11 @@ export const PilatesMonthlyCalendar = () => {
                             stop: subHours(new Date(), 4),
                         },
                         position: 3,
-                        attendees: [{id: 1, firstname: "Laurent", lastname: "Gas"}, {
+                        attendees: [{id: 1, firstname: "Laurent", lastname: "Gas", attendance: "CHECKED_IN"}, {
                             id: 2,
                             firstname: "Pierre",
-                            lastname: "Bernard"
+                            lastname: "Bernard",
+                            attendance: "REGISTERED"
                         }]
                     },
                     {
@@ -45,7 +46,7 @@ export const PilatesMonthlyCalendar = () => {
                             stop: subHours(new Date(), 3),
                         },
                         position: 3,
-                        attendees: [{id: 3, firstname: "Bertrand", lastname: "Bougon"}]
+                        attendees: [{id: 3, firstname: "Bertrand", lastname: "Bougon", attendance: "REGISTERED"}]
                     },
                     {
                         id: 2,
@@ -93,7 +94,7 @@ export const PilatesMonthlyCalendar = () => {
                             stop: addHours(new Date(), 1),
                         },
                         position: 1,
-                        attendees: [{id: 3, firstname: "Bertrand", lastname: "Bougon"}]
+                        attendees: [{id: 3, firstname: "Bertrand", lastname: "Bougon", attendance: "CHECKED_IN"}]
                     },
                 ]}
             >

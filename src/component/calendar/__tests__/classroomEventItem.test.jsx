@@ -9,17 +9,29 @@ import userEvent from "@testing-library/user-event";
 describe('Classroom Event', function () {
 
     it('should display classroom details when clicked', () => {
-        let attendees = new AttendeesBuilder().withAttendee(attendee(), attendee(2, "Bertrand", "Bougon")).build();
+        let attendees = new AttendeesBuilder().withAttendee(attendee()).withAttendee(attendee(2, "Bertrand", "Bougon")).build();
         let session_date = new Date();
         let classroomSession = session(1, 2, "Cours tapis", session_date, schedule(session_date, addHours(session_date, 1)), 3, attendees);
-        const {container} = render(<ClassroomEventItem classroom={classroomSession}/>)
+        render(<ClassroomEventItem classroom={classroomSession}/>)
 
         userEvent.click(screen.getByText("Cours tapis"))
 
-        let tooltip = screen.getByRole("tooltip");
-        expect(tooltip).toBeInTheDocument()
-        expect(tooltip).toContain("Cours tapis")
-        //expect(screen.findByText("Cours tapis", {selector: 'span'})).toBeInTheDocument()
-        //expect(screen.findByText("Heure de début", {selector: 'h6'})).toHaveValue(format(session.schedule.start, "yyyy-MM-dd H:mm"))
+        expect(screen.getByRole("tooltip")).toBeInTheDocument()
+        expect(screen.getByText("Cours tapis", {selector: 'span'})).toBeInTheDocument()
+        expect(screen.getByText(format(classroomSession.schedule.start, "yyyy-MM-dd H:mm").concat(" / ").concat(format(classroomSession.schedule.stop, "yyyy-MM-dd H:mm")), {selector: 'span'})).toBeInTheDocument()
+        expect(screen.getByText("Laurent Gas", {selector: 'p'})).toBeInTheDocument()
+        expect(screen.getByText("Bertrand Bougon", {selector: 'p'})).toBeInTheDocument()
+        expect(screen.getAllByText("R", {selector: 'span'})).toBeTruthy()
+    })
+
+    it('should display classroom details when clicked with expected attendee status', () => {
+        let attendees = new AttendeesBuilder().withAttendee(attendee(1, "Bruno", "Germain")).withAttendee(attendee(2, "Bertrand", "Bougon", "CHECKED_IN")).build();
+        let classroomSession = session(undefined, undefined, undefined, undefined, undefined, undefined,attendees);
+        render(<ClassroomEventItem classroom={classroomSession}/>)
+
+        userEvent.click(screen.getByText(classroomSession.name))
+
+        expect(screen.getByText("R", {selector: 'span'})).toBeInTheDocument()
+        expect(screen.getByText("C", {selector: 'span'})).toBeInTheDocument()
     })
 })
