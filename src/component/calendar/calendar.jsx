@@ -6,6 +6,7 @@ import {Grid} from "@material-ui/core";
 import {addHours, startOfMonth, subHours} from 'date-fns';
 import {MonthlyBody, MonthlyCalendar, MonthlyDay, MonthlyNav,} from '@zach.codes/react-calendar';
 import {ClassroomEventItem} from "./classroomEventItem";
+import {AddClassroomItem} from "./addClassroomItem";
 
 
 export const PilatesMonthlyCalendar = () => {
@@ -99,13 +100,18 @@ export const PilatesMonthlyCalendar = () => {
                 ]}
             >
                 <MonthlyDay
-                    renderDay={data =>
-                        data.map((item, index) => (
+                    renderDay={data => {
+                        let events = data.map((item, index) => (
                             <ClassroomEventItem
                                 key={index}
                                 classroom={item}
                             />
-                        ))
+                        ));
+                        events.push(<AddClassroomItem
+                            key={Math.random()}/>
+                        )
+                        return events
+                    }
                     }
                 />
             </MonthlyBody>
