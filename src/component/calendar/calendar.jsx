@@ -9,8 +9,8 @@ import {ClassroomEventItem} from "./classroomEventItem";
 import {AddClassroomItem} from "./addClassroomItem";
 
 
-export const PilatesMonthlyCalendar = () => {
-    let [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()))
+export const PilatesMonthlyCalendar = ({date}) => {
+    let [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
 
     return (
         <MonthlyCalendar
@@ -127,7 +127,7 @@ export class Calendar extends React.Component {
                 <Grid container>
                     <Grid item xs={11}>
                         <>
-                            <PilatesMonthlyCalendar/>
+                            <PilatesMonthlyCalendar date={this.props.date || new Date()}/>
                         </>
                     </Grid>
                 </Grid>

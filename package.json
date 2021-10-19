@@ -21,9 +21,6 @@
     "styled-components": "^5.3.1",
     "web-vitals": "^1.0.1"
   },
-  "jest": {
-    "coveragePathIgnorePatterns": ["<rootDir>/test-utils/","<rootDir>/test-utils/classroom/*.jsx"]
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
