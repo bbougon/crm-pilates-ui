@@ -2,6 +2,8 @@ import {render} from "../../../test-utils/test-utils";
 import {prettyDOM, screen} from "@testing-library/react";
 import React from "react";
 import Calendar from "../calendar";
+import userEvent from "@testing-library/user-event";
+import {format} from "date-fns";
 
 describe('Calendar page', function () {
 
@@ -17,5 +19,14 @@ describe('Calendar page', function () {
         expect(screen.getAllByTestId("AddIcon")).toHaveLength(31)
     })
 
+    describe('Creating a classroom', () => {
+        it('should open a classroom add form for October 6, 2021', () => {
+            render(<Calendar date={new Date("2021-10-21T14:00:00")}/>)
+
+            userEvent.click(screen.getAllByRole("button")[5])
+
+            expect(screen.getByText("Add a classroom on ".concat(format(new Date("2021-10-04"), "yyyy-MM-dd"))))
+        })
+    })
 
 })

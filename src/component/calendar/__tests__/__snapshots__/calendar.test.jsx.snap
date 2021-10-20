@@ -113,28 +113,32 @@ exports[`Calendar page should be displayed 1`] = `
                 [33mclass[39m=[32m\\"rc-divide-gray-200 rc-divide-y rc-overflow-hidden rc-max-h-36 rc-overflow-y-auto\\"[39m
               [36m>[39m
                 [36m<div[39m
-                  [33mclass[39m=[32m\\"MuiBox-root css-1bvc4cc\\"[39m
+                  [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-undefined css-11lq3yg-MuiGrid-root\\"[39m
                 [36m>[39m
-                  [36m<button[39m
-                    [33mclass[39m=[32m\\"MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root\\"[39m
-                    [33mtabindex[39m=[32m\\"0\\"[39m
-                    [33mtype[39m=[32m\\"button\\"[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m\\"MuiBox-root css-1bvc4cc\\"[39m
                   [36m>[39m
-                    [36m<svg[39m
-                      [33maria-hidden[39m=[32m\\"true\\"[39m
-                      [33mclass[39m=[32m\\"MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-ptiqhd-MuiSvgIcon-root\\"[39m
-                      [33mdata-testid[39m=[32m\\"AddIcon\\"[39m
-                      [33mfocusable[39m=[32m\\"false\\"[39m
-                      [33mviewBox[39m=[32m\\"0 0 24 24\\"[39m
+                    [36m<button[39m
+                      [33mclass[39m=[32m\\"MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root\\"[39m
+                      [33mtabindex[39m=[32m\\"0\\"[39m
+                      [33mtype[39m=[32m\\"button\\"[39m
                     [36m>[39m
-                      [36m<path[39m
-                        [33md[39m=[32m\\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z\\"[39m
+                      [36m<svg[39m
+                        [33maria-hidden[39m=[32m\\"true\\"[39m
+                        [33mclass[39m=[32m\\"MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-ptiqhd-MuiSvgIcon-root\\"[39m
+                        [33mdata-testid[39m=[32m\\"AddIcon\\"[39m
+                        [33mfocusable[39m=[32m\\"false\\"[39m
+                        [33mviewBox[39m=[32m\\"0 0 24 24\\"[39m
+                      [36m>[39m
+                        [36m<path[39m
+                          [33md[39m=[32m\\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z\\"[39m
+                        [36m/>[39m
+                      [36m</svg>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m\\"MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root\\"[39m
                       [36m/>[39m
-                    [36m</svg>[39m
-                    [36m<span[39m
-                      [33mclass[39m=[32m\\"MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root\\"[39m
-                    [36m/>[39m
-                  [36m</button>[39m
+                    [36m</button>[39m
+                  [36m</div>[39m
                 [36m</div>[39m
               [36m</ul>[39m
             [36m</div>[39m
@@ -152,11 +156,5 @@ exports[`Calendar page should be displayed 1`] = `
                 [36m</div>[39m
                 [36m<div[39m
                   [33mclass[39m=[32m\\"lg:rc-hidden rc-block\\"[39m
-                [36m>[39m
-                  [0mThursday[0m
-                [36m</div>[39m
-              [36m</div>[39m
-              [36m<ul[39m
-                [33mclass[39m=[32m\\"rc-divide-gray-200 rc-divide-y rc-overflow-hidden rc-max-h-36 rc-overflow-y-auto\\"[39m
-      ..."
+               ..."
 `;
