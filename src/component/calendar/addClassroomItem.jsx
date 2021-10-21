@@ -1,13 +1,36 @@
 import * as React from "react";
-import {Box, Grid, IconButton, Typography} from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
 import {useState} from "react";
+import {Box, Card, CardContent, CardHeader, Fade, Grid, IconButton, ThemeProvider} from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
 import {Popper} from "@material-ui/core";
 import {format} from "date-fns";
-import {useMonthlyBody, useMonthlyCalendar} from "@zach.codes/react-calendar";
+import {useMonthlyBody} from "@zach.codes/react-calendar";
+import {createTheme} from "@mui/material/styles";
+import {AddClassroomForm} from "../classroom/addClassroomForm";
+
+const theme = createTheme({
+    typography: {
+        h5: {
+            fontSize: "0.9rem",
+            fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+            fontWeight: 800,
+            lineHeight: 1.334,
+            letterSpacing: "0em",
+        },
+        body1: {
+            fontSize: "0.8rem",
+            fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: "0em",
+        },
+        fontSize: 12
+    },
+});
+
 
 export const AddClassroomItem = () => {
-    let { day } = useMonthlyBody();
+    let {day} = useMonthlyBody();
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false);
@@ -21,10 +44,20 @@ export const AddClassroomItem = () => {
         <Grid container>
             <Popper open={open} anchorEl={anchorEl} placement="right-start" transition>
                 {({TransitionProps}) => {
+                    const cardHeader = "Add a classroom on ".concat(format(day, "yyyy-MM-dd"))
                     return (
-                        <Grid container>
-                            <Typography>Add a classroom on {format(day, "yyyy-MM-dd")}</Typography>
-                        </Grid>
+                        <ThemeProvider theme={theme}>
+                            <Fade {...TransitionProps} timeout={350}>
+                                <Card sx={{minWidth: 450, maxWidth: 600, display: 'flex'}}>
+                                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                                        <CardHeader title={cardHeader} component="div"/>
+                                        <CardContent>
+                                            <AddClassroomForm date={day}/>
+                                        </CardContent>
+                                    </Box>
+                                </Card>
+                            </Fade>
+                        </ThemeProvider>
                     )
                 }}
             </Popper>
