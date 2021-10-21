@@ -10,7 +10,7 @@ import {APIDetail, APIErrorBody, ServerBuilder} from "../../../test-utils/server
 
 
 describe('Clients page', function () {
-    const server = new ServerBuilder("/clients", "get").withBody([]).build()
+    const server = new ServerBuilder().request("/clients", "get", []).build()
 
     beforeAll(() => server.listen())
 
@@ -26,8 +26,8 @@ describe('Clients page', function () {
 
     describe('fetches clients when loading', function () {
         describe("retrieve them", () => {
-            const server = new ServerBuilder("/clients")
-                .withBody(new ClientsBuilder()
+            const server = new ServerBuilder()
+                .request("/clients", "get", new ClientsBuilder()
                     .withClient(client())
                     .withClient(client("Pierre", "Martin", "33da6f24-efda-4c16-b8af-e5e822fc5860"))
                     .withClient(client("Henri", "Verneuil", "33da6bca-efda-4c16-b8af-e5e822fc5901"))
@@ -53,11 +53,9 @@ describe('Clients page', function () {
         })
 
         describe("faces an error", () => {
-            const server = new ServerBuilder("/clients")
-                .withStatus(422)
-                .withBody(new APIErrorBody()
-                    .dummyDetail()
-                    .build())
+            const server = new ServerBuilder().request("/clients", "get", new APIErrorBody()
+                .dummyDetail()
+                .build(), 422)
                 .build()
 
             beforeAll(() => server.listen())
@@ -78,14 +76,10 @@ describe('Clients page', function () {
     })
 
     describe('displays a form to create a client', function () {
-        const server = setupServer(
-            rest.get('/clients', (req, res, ctx) => {
-                return res(ctx.json([]))
-            }),
-            rest.post('/clients', (req, res, ctx) => {
-                return res(ctx.json(client()))
-            }),
-        )
+        const server = new ServerBuilder()
+            .request("/clients", "get", [])
+            .request("/clients", "post", client())
+            .build()
 
         beforeAll(() => server.listen())
 
@@ -107,22 +101,14 @@ describe('Clients page', function () {
             await waitFor(() => expect(screen.getByLabelText("Client's firstname *", {selector: 'input'})).toHaveValue(""))
         })
 
-        describe("faces an error when creating a client", function() {
-            const server = setupServer(
-                rest.get('/clients', (req, res, ctx) => {
-                    return res(ctx.json([]))
-                }),
-                rest.post('/clients', (req, res, ctx) => {
-                    let body = new APIErrorBody()
-                        .withDetail(APIDetail("You must provide the client firstname", "value_error"))
-                        .withDetail(APIDetail("You must provide the client lastname", "value_error"))
-                        .build();
-                    return res(
-                        ctx.status(422),
-                        ctx.json(body)
-                    )
-                }),
-            )
+        describe("faces an error when creating a client", function () {
+            const server = new ServerBuilder()
+                .request("/clients", "get", [])
+                .request("/clients", "post", new APIErrorBody()
+                    .withDetail(APIDetail("You must provide the client firstname", "value_error"))
+                    .withDetail(APIDetail("You must provide the client lastname", "value_error"))
+                    .build(), 422)
+                .build()
 
             beforeAll(() => server.listen())
 

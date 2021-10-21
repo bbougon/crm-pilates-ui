@@ -1,30 +1,33 @@
 import {setupServer} from "msw/node";
 import {rest} from "msw";
 
-export function ServerBuilder(path, httpVerb="get") {
-    this.body = undefined
-    this.status = 200
-    this.path = path
-    this.httpVerb = httpVerb
+export function ServerBuilder() {
+    this.requests = []
 
-    this.withBody = (body) => {
-        this.body = body
-        return this
-    }
-
-    this.withStatus = (status) => {
-        this.status = status
+    this.request = (path, method, body, status = 200) => {
+        this.requests.push({path: path, method: method, body: body, status: status})
         return this
     }
 
     this.build = () => {
-        return setupServer(
-            rest.get(this.path, (req, res, ctx) => {
+        const getRequests = this.requests.filter(request => request.method === "get").map(request => rest.get(
+            request.path, (req, res, ctx) => {
                 return res(
-                    ctx.status(this.status),
-                    ctx.json(this.body)
+                    ctx.status(request.status),
+                    ctx.json(request.body)
                 )
-            }),
+            }
+        ))
+        const postRequest = this.requests.filter(request => request.method === "post").map(request => rest.post(
+            request.path, (req, res, ctx) => {
+                return res(
+                    ctx.status(request.status),
+                    ctx.json(request.body)
+                )
+            }
+        ))
+        return setupServer(
+            ...getRequests.concat(postRequest)
         )
     }
 }
