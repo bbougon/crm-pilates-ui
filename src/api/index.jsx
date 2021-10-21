@@ -42,3 +42,8 @@ api.fetchClients = () => {
     const customConfig = {}
     return api("/clients", {...customConfig, method: 'GET'})
 }
+
+api.fetchSessions = () => {
+    const customConfig = {}
+    return api("/sessions", {...customConfig, method: 'GET'})
+}

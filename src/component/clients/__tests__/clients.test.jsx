@@ -2,8 +2,6 @@ import React from "react";
 import {Clients} from "../clients";
 import {prettyDOM, screen, waitFor} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
-import {rest} from 'msw'
-import {setupServer} from 'msw/node'
 import {render} from "../../../test-utils/test-utils";
 import {client, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {APIDetail, APIErrorBody, ServerBuilder} from "../../../test-utils/server/server";
