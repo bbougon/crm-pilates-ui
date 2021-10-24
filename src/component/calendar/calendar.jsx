@@ -1,38 +1,51 @@
 import '@zach.codes/react-calendar/dist/calendar-tailwind.css';
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {MainContainer} from "../../const/containers";
 import {Grid} from "@material-ui/core";
-import {startOfMonth} from 'date-fns';
+import {isAfter, startOfMonth} from 'date-fns';
 import {MonthlyBody, MonthlyCalendar, MonthlyDay, MonthlyNav,} from '@zach.codes/react-calendar';
 import {ClassroomEventItem} from "./classroomEventItem";
 import {AddClassroomItem} from "./addClassroomItem";
 import {useDispatch, useSelector} from "react-redux";
-import {fetchSessions, selectMonthlySessions} from "../../features/sessionsSlice";
+import {fetchSessions, selectMonthlySessions, sessionStatuses} from "../../features/sessionsSlice";
 
 
 export const PilatesMonthlyCalendar = ({date}) => {
 
     const dispatch = useDispatch();
     let [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
+    const link = useSelector((state => state.sessions.link))
     const sessions = useSelector(selectMonthlySessions)
+    const status = useSelector((state => state.sessions))
 
 
+    const handleCurrentMonth = (date, link) => {
+        const fetchSessionsForDate = async() => {
+            await dispatch(fetchSessions({date: date, link: link}))
+        }
+        setCurrentMonth(date)
+        fetchSessionsForDate().catch((error) => console.log(error)).then((result) => console.log(result))
+    }
 
     useEffect(() => {
-        dispatch(fetchSessions())
+        dispatch(fetchSessions({date: currentMonth})).then((res) => console.log(res))
+
     }, [dispatch])
+
+    if (status.status === sessionStatuses.SUCCEEDED) {
+        console.log(link)
+    }
 
 
     return (
         <MonthlyCalendar
             currentMonth={currentMonth}
-            onCurrentMonthChange={date => setCurrentMonth(date)}
-        >
+            onCurrentMonthChange={date => {
+                handleCurrentMonth(date, link)
+            }}>
             <MonthlyNav/>
-            <MonthlyBody
-                events={sessions}
-            >
+            <MonthlyBody events={sessions}>
                 <MonthlyDay
                     renderDay={data => {
                         let events = data.map((item, index) => (
@@ -41,9 +54,7 @@ export const PilatesMonthlyCalendar = ({date}) => {
                                 classroom={item}
                             />
                         ));
-                        events.push(<AddClassroomItem
-                            key={Math.random()}/>
-                        )
+                        events.push(<AddClassroomItem key={Math.random()}/>)
                         return events
                     }
                     }

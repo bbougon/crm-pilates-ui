@@ -46,5 +46,10 @@ export function FulFilledAction(type) {
         return this
     }
 
+    this.withMeta = (meta) => {
+        this.action.meta = meta
+        return this
+    }
+
     this.build = () => this.action
 }

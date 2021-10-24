@@ -41,40 +41,40 @@ const Attendee = ({attendee}) => {
     const [attendeeLabelColor, setAttendeeLabelColor] = useState(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
 
     return (
-        <Stack direction="row">
-            <Grid container>
-                <Grid item xs={8}>
-                    <Box sx={{
+        <Grid container direction="row">
+            <Grid item xs={8} md={8}>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-start'
+                }}>
+                    <Typography variant="body1">
+                        {attendee.firstname.concat(" ").concat(attendee.lastname)}
+                    </Typography>
+                </Box>
+            </Grid>
+            <Grid item xs={4} md={4}>
+                <Grid container direction="row" xs={12} md={12}>
+                    <Grid item xs={6} md={6} sx={{
                         display: 'flex',
-                        justifyContent: 'flex-start'
+                        justifyContent: 'flex-end'
                     }}>
-                        <Typography variant="body1">
-                            {attendee.firstname.concat(" ").concat(attendee.lastname)}
-                        </Typography>
-                    </Box>
-                </Grid>
-                <Grid item xs={4}>
-                    <Stack direction="row">
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-end'
-                        }}>
-                            <ThemeProvider theme={theme}>
-                                <Switch size="small" defaultChecked={attendee.attendance === "CHECKED_IN"} color={attendeeLabelColor}/>
-                            </ThemeProvider>
-                        </Box>
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-end'
-                        }}>
-                            <ThemeProvider theme={theme}>
-                                <Chip size="small" label={attendeeLabelStatus} color={attendeeLabelColor}/>
-                            </ThemeProvider>
-                        </Box>
-                    </Stack>
+                        <ThemeProvider theme={theme}>
+                            <Switch size="small" defaultChecked={attendee.attendance === "CHECKED_IN"}
+                                    color={attendeeLabelColor}/>
+                        </ThemeProvider>
+                    </Grid>
+                    <Grid item xs={6} md={6} sx={{
+                        display: 'flex',
+                        justifyContent: 'flex-end'
+                    }}>
+                        <ThemeProvider theme={theme}>
+                            <Chip size="small" label={attendeeLabelStatus} color={attendeeLabelColor}/>
+                        </ThemeProvider>
+                    </Grid>
+
                 </Grid>
             </Grid>
-        </Stack>
+        </Grid>
     )
 }
 
@@ -83,9 +83,9 @@ const Attendees = ({attendees}) => {
 
     const content = attendees.map((attendee) => (<Attendee key={attendee.id} attendee={attendee}/>))
     return (
-        <Stack direction="column" spacing={1}>
+        <Grid container>
             {content}
-        </Stack>
+        </Grid>
     )
 }
 
@@ -108,13 +108,15 @@ export const ClassroomEventItem = ({classroom: session}) => {
                     return (
                         <ThemeProvider theme={theme}>
                             <Fade {...TransitionProps} timeout={350}>
-                                <Card>
-                                    <CardHeader title={session.name}
-                                                subheader={subheader}
-                                                component="div"/>
-                                    <CardContent>
-                                        <Attendees attendees={session.attendees}/>
-                                    </CardContent>
+                                <Card sx={{minWidth: 450, maxWidth: 600, display: 'flex'}}>
+                                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                                        <CardHeader title={session.name}
+                                                    subheader={subheader}
+                                                    component="div"/>
+                                        <CardContent>
+                                            <Attendees attendees={session.attendees}/>
+                                        </CardContent>
+                                    </Box>
                                 </Card>
                             </Fade>
                         </ThemeProvider>

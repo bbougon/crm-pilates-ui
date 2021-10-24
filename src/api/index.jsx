@@ -9,6 +9,7 @@ export async function api(endpoint, { body, ...customConfig } = {}) {
             ...headers,
             ...customConfig.headers,
         },
+        mode: 'cors'
     }
 
     if (body) {
