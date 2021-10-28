@@ -1,5 +1,5 @@
 import {render} from "../../../test-utils/test-utils";
-import {prettyDOM, screen, waitFor} from "@testing-library/react";
+import {act, prettyDOM, screen, waitFor} from "@testing-library/react";
 import React from "react";
 import Calendar from "../calendar";
 import userEvent from "@testing-library/user-event";
@@ -51,7 +51,7 @@ describe('Calendar page', function () {
             )
             .build()),
         200,
-        {Link: `<http://localhost/sessions?month=${previousMonth}>; rel="previous", <http://localhost/sessions?month=${currentMonth}>; rel="current", <http://localhost/sessions?month=${nextMonth}>; rel="next"`}
+        {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`}
     )
         .build()
 
@@ -76,9 +76,9 @@ describe('Calendar page', function () {
     describe("Navigate through calendar", () => {
         const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, currentDate.getDate()).toISOString()
         const server = new ServerBuilder()
-            .request("/sessions", "get", [], 200, undefined, {Link: `<http://localhost/sessions?month=${previousMonth}>; rel="previous", <http://localhost/sessions?month=${currentMonth}>; rel="current", <http://localhost/sessions?month=${nextMonth}>; rel="next"`})
+            .request("/sessions", "get", [], 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
             .request(`/sessions`, "get",
-                JSON.stringify(new SessionsBuilder()
+                new SessionsBuilder()
                     .withSession(
                         new SessionBuilder().withId(13).withClassroom(1).withName('Stage 1')
                             .withSchedule(subHours(currentDate, 1)).withPosition(3)
@@ -90,8 +90,8 @@ describe('Calendar page', function () {
                             .withAttendee(attendee(3, "Bertrand", "Bougon", "CHECKED_IN"))
                             .build()
                     )
-                    .build()),
-                200, {month: nextMonth}, {Link: `<http://localhost/sessions?month=${currentMonth}>; rel="previous", <http://localhost/sessions?month=${nextMonth}>; rel="current", <http://localhost/sessions?month=${lastMonth}>; rel="next"`}
+                    .build(),
+                200, {month: nextMonth}, {"X-Link": `</sessions?month=${currentMonth}>; rel="previous", </sessions?month=${nextMonth}>; rel="current", </sessions?month=${lastMonth}>; rel="next"`}
             )
             .build()
 
@@ -102,9 +102,9 @@ describe('Calendar page', function () {
         afterAll(() => server.close())
 
         it("should display next month when clicking on 'next' month", async () => {
-            render(<Calendar date={new Date("2021-10-10T11:20:00")}/>)
+            act(() => {render(<Calendar date={new Date("2021-10-10T11:20:00")}/>)})
 
-            userEvent.click(screen.getByRole("button", {name: "Next"}))
+            await act(async () => userEvent.click(screen.getByRole("button", {name: "Next"})))
 
             await waitFor(() => expect(screen.getByText("Cours trio")).toBeInTheDocument())
             await waitFor(() => expect(screen.getByText("Cours privé")).toBeInTheDocument())

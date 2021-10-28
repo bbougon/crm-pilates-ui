@@ -44,7 +44,7 @@ api.fetchClients = () => {
     return api("/clients", {...customConfig, method: 'GET'})
 }
 
-api.fetchSessions = () => {
+api.fetchSessions = (link) => {
     const customConfig = {}
-    return api("/sessions", {...customConfig, method: 'GET'})
+    return api(link, {...customConfig, method: 'GET'})
 }

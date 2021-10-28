@@ -1,6 +1,6 @@
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {Grid} from "@material-ui/core";
-import {Box, Card, CardContent, CardHeader, Chip, Fade, Popper, Stack, Switch, Typography} from "@mui/material";
+import {Box, Card, CardContent, CardHeader, Chip, Fade, Popper, Switch, Typography} from "@mui/material";
 import {blue} from "@mui/material/colors";
 import {format} from "date-fns";
 import * as React from "react";
@@ -37,8 +37,8 @@ const theme = createTheme({
 });
 
 const Attendee = ({attendee}) => {
-    const [attendeeLabelStatus, setAttendeeLabelStatus] = useState(attendee.attendance === "REGISTERED" ? 'R' : 'C')
-    const [attendeeLabelColor, setAttendeeLabelColor] = useState(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
+    const [attendeeLabelStatus] = useState(attendee.attendance === "REGISTERED" ? 'R' : 'C')
+    const [attendeeLabelColor] = useState(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
 
     return (
         <Grid container direction="row">
@@ -53,7 +53,7 @@ const Attendee = ({attendee}) => {
                 </Box>
             </Grid>
             <Grid item xs={4} md={4}>
-                <Grid container direction="row" xs={12} md={12}>
+                <Grid container direction="row">
                     <Grid item xs={6} md={6} sx={{
                         display: 'flex',
                         justifyContent: 'flex-end'

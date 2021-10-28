@@ -1,4 +1,4 @@
-import {addHours} from "date-fns";
+import {addHours, format, formatISO} from "date-fns";
 
 export function AttendeesBuilder() {
     this.attendees = []
@@ -28,9 +28,8 @@ export function SessionsBuilder() {
 
 export function SessionBuilder() {
     this.id = undefined
-    this.classroomId = 1
+    this.classroom_id = 1
     this.name = "Cours tapis"
-    this.date = new Date()
     this.schedule = {
         start: this.date,
         stop: addHours(this.date, 1)
@@ -44,7 +43,7 @@ export function SessionBuilder() {
     }
 
     this.withClassroom = (classroomId) => {
-        this.classroomId = classroomId
+        this.classroom_id = classroomId
         return this
     }
 
@@ -54,9 +53,14 @@ export function SessionBuilder() {
     }
 
     this.withSchedule = (startDate) => {
-        this.date = startDate
         this.schedule.start = startDate
         this.schedule.stop = addHours(startDate, 1)
+        return this
+    }
+
+    this.withScheduleAsString = (startDate) => {
+        this.schedule.start = format(startDate, "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+        this.schedule.stop = format(addHours(startDate, 1), "yyyy-MM-dd'T'HH:mm:ss.SSSX")
         return this
     }
 
@@ -71,7 +75,7 @@ export function SessionBuilder() {
     }
 
     this.build = () => {
-        return session(this.id, this.classroomId, this.name, this.date, this.schedule, this.position, this.attendees)
+        return session(this.id, this.classroom_id, this.name, this.schedule, this.position, this.attendees)
     }
 }
 
@@ -87,13 +91,12 @@ export const schedule = (start= new Date(), stop = addHours(new Date(), 1)) => {
 }
 
 export const session = (id = undefined, classroomId = 1, name = "Pilates avancé",
-                        date = new Date(), schedule_ = schedule(), position = 1,
+                        schedule_ = schedule(), position = 1,
                         attendees = []) => {
     return {
         id: id,
-        classroomId: classroomId,
+        classroom_id: classroomId,
         name: name,
-        date: date,
         schedule: schedule_,
         position: position,
         attendees: attendees

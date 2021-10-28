@@ -12,24 +12,34 @@ exports[`Calendar page should be displayed 1`] = `
         [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-11\\"[39m
       [36m>[39m
         [36m<div[39m
-          [33mclass[39m=[32m\\"rc-flex rc-justify-end rc-mb-4\\"[39m
+          [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container MuiGrid-justify-content-xs-flex-end\\"[39m
         [36m>[39m
-          [36m<button[39m
-            [33mclass[39m=[32m\\"rc-cursor-pointer\\"[39m
-          [36m>[39m
-            [0mPrevious[0m
-          [36m</button>[39m
           [36m<div[39m
-            [33maria-label[39m=[32m\\"Current Month\\"[39m
-            [33mclass[39m=[32m\\"rc-ml-4 rc-mr-4 rc-w-32 rc-text-center\\"[39m
+            [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4 MuiGrid-grid-md-1\\"[39m
+            [33msx[39m=[32m\\"[object Object]\\"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m\\"cursor-pointer\\"[39m
+            [36m>[39m
+              [0mPrevious[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4 MuiGrid-grid-md-1\\"[39m
+            [33msx[39m=[32m\\"[object Object]\\"[39m
           [36m>[39m
             [0mSeptember[0m
           [36m</div>[39m
-          [36m<button[39m
-            [33mclass[39m=[32m\\"rc-cursor-pointer\\"[39m
+          [36m<div[39m
+            [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4 MuiGrid-grid-md-1\\"[39m
+            [33msx[39m=[32m\\"[object Object]\\"[39m
           [36m>[39m
-            [0mNext[0m
-          [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m\\"cursor-pointer\\"[39m
+            [36m>[39m
+              [0mNext[0m
+            [36m</button>[39m
+          [36m</div>[39m
         [36m</div>[39m
         [36m<div[39m
           [33mclass[39m=[32m\\"rc-bg-white rc-border-l-2 rc-border-t-2\\"[39m
@@ -139,17 +149,5 @@ exports[`Calendar page should be displayed 1`] = `
                             [36m<path[39m
                               [33md[39m=[32m\\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z\\"[39m
                             [36m/>[39m
-                          [36m</svg>[39m
-                          [36m<span[39m
-                            [33mclass[39m=[32m\\"MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root\\"[39m
-                          [36m/>[39m
-                        [36m</button>[39m
-                      [36m</div>[39m
-                    [36m</div>[39m
-                  [36m</div>[39m
-                [36m</div>[39m
-              [36m</ul>[39m
-            [36m</div>[39m
-            [36m<div[39m
-              [33maria-label[39m=[32m\\"..."
+                     ..."
 `;
