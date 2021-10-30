@@ -48,3 +48,8 @@ api.fetchSessions = (link) => {
     const customConfig = {}
     return api(link, {...customConfig, method: 'GET'})
 }
+
+api.addClassroom = (body) => {
+    const customConfig = {}
+    return api("/classrooms", {...customConfig, body})
+}

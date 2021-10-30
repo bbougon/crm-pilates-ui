@@ -29,7 +29,7 @@ const theme = createTheme({
 });
 
 
-export const AddClassroomItem = () => {
+export const AddClassroomItem = ({onClassroomAdd}) => {
     let {day} = useMonthlyBody();
 
     const [anchorEl, setAnchorEl] = useState(null);
@@ -52,7 +52,7 @@ export const AddClassroomItem = () => {
                                     <Box sx={{display: 'flex', flexDirection: 'column'}}>
                                         <CardHeader title={cardHeader} component="div"/>
                                         <CardContent>
-                                            <AddClassroomForm date={day}/>
+                                            <AddClassroomForm date={day} onSubmitClick={(classroom) => onClassroomAdd(classroom)}/>
                                         </CardContent>
                                     </Box>
                                 </Card>

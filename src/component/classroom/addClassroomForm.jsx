@@ -5,21 +5,44 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import * as React from "react";
 import {useState} from "react";
+import {useDispatch} from "react-redux";
 
-export const AddClassroomForm = (date) => {
+export const AddClassroomForm = ({date, onSubmitClick}) => {
+
+    const available_durations = [
+        {duration: 15, human: "0h15"},
+        {duration: 30, human: "Oh30"},
+        {duration: 45, human: "0h45"},
+        {duration: 60, human: "1h00"},
+        {duration: 75, human: "1h15"},
+        {duration: 90, human: "1h30"},
+        {duration: 105, human: "1h45"},
+        {duration: 120, human: "2h00"}];
+
+    const available_positions = [1, 2, 3, 4, 5, 6]
 
     const [classroomName, setClassroomName] = useState('')
-    const [classroomStartDateTime, setClassroomStartDateTime] = useState(date.date)
-    const [classroomEndDateTime, setClassroomEndDateTime] = useState(date.date)
+    const [classroomStartDateTime, setClassroomStartDateTime] = useState(date)
+    const [classroomEndDateTime, setClassroomEndDateTime] = useState(date)
     const [position, setPosition] = useState(1)
     const [duration, setDuration] = useState(60)
+    const [attendees, setAttendees] = useState([])
 
     const onClassroomNameChanged = (e) => setClassroomName(e.target.value)
     const onPositionChanged = (e) => setPosition(e.target.value);
     const onDurationChanged = (e) => setDuration(e.target.value)
 
-    const dayStart = new Date(date.date.getFullYear(), date.date.getMonth(), date.date.getDate(), 0, 0, 0)
-    const dayEnd = new Date(date.date.getFullYear(), date.date.getMonth(), date.date.getDate(), 23, 59, 59)
+    const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
+    const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)
+    const fieldsAreNotFilled = () => {
+        return classroomName === ""
+            || position === null || position < 1
+            || !(available_durations.map(duration => duration.duration).includes(duration))
+    }
+
+    const onSubmitClicked = () => {
+        onSubmitClick({classroomName, classroomStartDateTime, classroomEndDateTime, position, duration, attendees})
+    }
 
     return (
         <Grid container>
@@ -47,12 +70,7 @@ export const AddClassroomForm = (date) => {
                             onChange={onPositionChanged}
                             size="small"
                         >
-                            <MenuItem value={1}>1</MenuItem>
-                            <MenuItem value={2}>2</MenuItem>
-                            <MenuItem value={3}>3</MenuItem>
-                            <MenuItem value={4}>4</MenuItem>
-                            <MenuItem value={5}>5</MenuItem>
-                            <MenuItem value={6}>6</MenuItem>
+                            {available_positions.map(position => <MenuItem key={position} value={position}>{position}</MenuItem> )}
                         </Select>
                     </FormControl>
                 </Grid>
@@ -102,14 +120,7 @@ export const AddClassroomForm = (date) => {
                             size="small"
                             aria-labelledby="duration-select-label"
                         >
-                            <MenuItem value={15}>0h15</MenuItem>
-                            <MenuItem value={30}>0h30</MenuItem>
-                            <MenuItem value={45}>0h45</MenuItem>
-                            <MenuItem value={60}>1h00</MenuItem>
-                            <MenuItem value={75}>1h15</MenuItem>
-                            <MenuItem value={90}>1h30</MenuItem>
-                            <MenuItem value={105}>1h45</MenuItem>
-                            <MenuItem value={120}>2h00</MenuItem>
+                            {available_durations.map(duration => <MenuItem key={duration.duration} value={duration.duration}>{duration.human}</MenuItem> )}
                         </Select>
                     </FormControl>
                 </Grid>
@@ -120,9 +131,9 @@ export const AddClassroomForm = (date) => {
                     display: 'flex',
                     justifyContent: 'flex-end'
                 }}>
-                    <Button>Submit</Button>
+                    <Button onClick={onSubmitClicked} disabled={fieldsAreNotFilled()}>Submit</Button>
                 </Grid>
             </Grid>
         </Grid>
-    )
+)
 }

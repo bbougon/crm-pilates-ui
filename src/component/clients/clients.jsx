@@ -1,7 +1,7 @@
 import * as React from "react";
 import {MainContainer} from "../../const/containers";
 import {Grid} from "@material-ui/core";
-import {CreateClientForm} from "./createClientForm";
+import {AddClientForm} from "./addClientForm";
 import {ClientsList} from "./clientsList";
 
 
@@ -14,7 +14,7 @@ export class Clients extends React.Component {
                 <Grid container>
                     <Grid item xs={11}>
                         <>
-                            <CreateClientForm />
+                            <AddClientForm />
                         </>
                     </Grid>
                     <Grid item xs={11}>

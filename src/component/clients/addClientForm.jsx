@@ -39,7 +39,7 @@ function ClientAccordionSummary() {
     )
 }
 
-export const CreateClientForm = () => {
+export const AddClientForm = () => {
 
     const dispatch = useDispatch()
 

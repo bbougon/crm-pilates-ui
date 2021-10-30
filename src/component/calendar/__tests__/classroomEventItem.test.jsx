@@ -1,10 +1,10 @@
 import {render} from "../../../test-utils/test-utils";
 import {screen} from "@testing-library/react";
 import React from "react";
-import {ClassroomEventItem} from "../classroomEventItem";
 import {attendee, AttendeesBuilder, schedule, session} from "../../../test-utils/classroom/session";
 import {addHours, format} from "date-fns";
 import userEvent from "@testing-library/user-event";
+import {ClassroomEventItem} from "../classroomEventItem";
 
 describe('Classroom Event', function () {
 
