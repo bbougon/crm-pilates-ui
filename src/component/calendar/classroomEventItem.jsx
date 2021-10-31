@@ -124,62 +124,62 @@ export const ClassroomEventItem = ({classroom: session}) => {
                         <ThemeProvider theme={theme}>
                             <Fade {...TransitionProps} timeout={350}>
                                 <Card sx={{minWidth: 450, maxWidth: 600, display: 'flex'}}>
-                                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
-                                        <CardHeader title={session.name}
-                                                    subheader={subheader}
-                                                    component="div"/>
-                                        <CardContent>
-                                            <Attendees attendees={session.attendees}/>
-                                        </CardContent>
-                                    </Box>
+                                    <ClickAwayListener onClickAway={closeSessionDisplay}>
+                                        <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                                            <CardHeader title={session.name}
+                                                        subheader={subheader}
+                                                        component="div"/>
+                                            <CardContent>
+                                                <Attendees attendees={session.attendees}/>
+                                            </CardContent>
+                                        </Box>
+                                    </ClickAwayListener>
                                 </Card>
                             </Fade>
                         </ThemeProvider>
                     );
                 }}
             </Popper>
-            <ClickAwayListener onClickAway={closeSessionDisplay}>
-                <Grid container onClick={displaySession()}>
-                    <Grid item xs={6}>
-                        <ThemeProvider theme={theme}>
-                            <Box sx={{
-                                display: 'flex',
-                                justifyContent: 'flex-start'
-                            }}>
-                                <Typography variant="body1">
-                                    {session.name}
-                                </Typography>
-                            </Box>
-                        </ThemeProvider>
-                    </Grid>
-                    <Grid item xs={2}>
-
-                        <ThemeProvider theme={theme}>
-                            <Box sx={{
-                                display: 'flex',
-                                justifyContent: 'center'
-                            }}>
-                                <Typography color={blue[400]}>
-                                    {session.attendees.length} / {session.position}
-                                </Typography>
-                            </Box>
-                        </ThemeProvider>
-                    </Grid>
-                    <Grid item xs={4}>
-
-                        <ThemeProvider theme={theme}>
-                            <Box sx={{
-                                display: 'flex',
-                                justifyContent: 'flex-end'
-                            }}>
-                                <Typography>
-                                    {format(session.schedule.start, 'k:mm')}
-                                </Typography>
-                            </Box>
-                        </ThemeProvider>
-                    </Grid>
+            <Grid container onClick={displaySession()}>
+                <Grid item xs={6}>
+                    <ThemeProvider theme={theme}>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-start'
+                        }}>
+                            <Typography variant="body1">
+                                {session.name}
+                            </Typography>
+                        </Box>
+                    </ThemeProvider>
                 </Grid>
-            </ClickAwayListener>
+                <Grid item xs={2}>
+
+                    <ThemeProvider theme={theme}>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'center'
+                        }}>
+                            <Typography color={blue[400]}>
+                                {session.attendees.length} / {session.position}
+                            </Typography>
+                        </Box>
+                    </ThemeProvider>
+                </Grid>
+                <Grid item xs={4}>
+
+                    <ThemeProvider theme={theme}>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end'
+                        }}>
+                            <Typography>
+                                {format(session.schedule.start, 'k:mm')}
+                            </Typography>
+                        </Box>
+                    </ThemeProvider>
+                </Grid>
+            </Grid>
         </Grid>
     )
 };
