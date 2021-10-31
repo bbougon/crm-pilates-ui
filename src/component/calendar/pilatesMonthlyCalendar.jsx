@@ -14,6 +14,7 @@ export const PilatesMonthlyCalendar = ({date}) => {
     const dispatch = useDispatch();
     let [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
     const sessions = useSelector(selectMonthlySessions)
+    const link = useSelector((state => state.sessions.link))
 
     useEffect(() => {
         dispatch(fetchSessions())
@@ -21,12 +22,11 @@ export const PilatesMonthlyCalendar = ({date}) => {
 
     const onClassroomAdd = async (classroom) => {
         await dispatch(addClassroom(classroom))
-        await dispatch(fetchSessions())
+        await dispatch(fetchSessions(link))
     }
 
     const MonthlyNav = () => {
         let {currentMonth, onCurrentMonthChange} = useMonthlyCalendar();
-        const link = useSelector((state => state.sessions.link))
 
 
         const onPeriodClick = async (date, link) => {

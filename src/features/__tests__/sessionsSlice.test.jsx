@@ -1,6 +1,5 @@
 import {FulFilledAction} from "../../test-utils/features/actionFixtures";
-import reducer from "../sessionsSlice";
-import {fetchSessions} from "../sessionsSlice";
+import reducer, {fetchSessions} from "../sessionsSlice";
 import {LoadingState} from "../../test-utils/features/sessions/sessionsStateFixtures";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../test-utils/classroom/session";
 import {addHours, subHours} from "date-fns";

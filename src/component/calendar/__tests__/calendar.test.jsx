@@ -1,9 +1,9 @@
 import {render} from "../../../test-utils/test-utils";
-import {act, fireEvent, prettyDOM, screen, waitFor, within} from "@testing-library/react";
+import {fireEvent, prettyDOM, screen, waitFor, within} from "@testing-library/react";
 import React from "react";
 import Calendar from "../calendar";
 import userEvent from "@testing-library/user-event";
-import {format, subHours} from "date-fns";
+import {addDays, format, subHours} from "date-fns";
 import {ServerBuilder} from "../../../test-utils/server/server";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
 import {classroom} from "../../../test-utils/classroom/classroom";
@@ -114,8 +114,31 @@ describe('Calendar page', function () {
     })
 
     describe('Creating a classroom', () => {
+        let classroomDate = new Date(2021, 10, 6, 10);
         const server = new ServerBuilder()
-            .request("/classrooms", "post", classroom("Cours Duo", 2, new Date(2021, 10, 6, 10), new Date(2022, 6, 14, 11), 2, "HOUR", []), 201)
+            .request("/classrooms", "post", classroom("Cours Duo", 2, classroomDate, new Date(2022, 6, 14, 11), 2, "HOUR", []), 201)
+            .request("/sessions", "get", new SessionsBuilder()
+                .withSession(
+                    new SessionBuilder().withClassroom(1).withName('Cours Duo')
+                        .withSchedule(classroomDate, 1).withPosition(2)
+                        .build()
+                )
+                .withSession(
+                    new SessionBuilder().withClassroom(1).withName('Cours Duo')
+                        .withSchedule(addDays(classroomDate, 7)).withPosition(2)
+                        .build()
+                )
+                .withSession(
+                    new SessionBuilder().withClassroom(1).withName('Cours Duo')
+                        .withSchedule(addDays(classroomDate, 14)).withPosition(2)
+                        .build()
+                )
+                .withSession(
+                    new SessionBuilder().withClassroom(1).withName('Cours Duo')
+                        .withSchedule(addDays(classroomDate, 21)).withPosition(2)
+                        .build()
+                )
+                .build())
             .build()
 
         beforeAll(() => server.listen())
@@ -132,10 +155,10 @@ describe('Calendar page', function () {
             expect(screen.getByText("Add a classroom on ".concat(format(new Date("2021-10-04"), "yyyy-MM-dd")))).toBeInTheDocument()
         })
 
-        it('should add a classroom on October 6, 2021 and following weeks', async () => {
+        it.skip('should add a classroom on October 6, 2021 and following weeks', async () => {
             render(<Calendar date={new Date("2021-10-01T14:00:00")}/>)
 
-            userEvent.click(screen.getAllByRole("button")[5])
+            userEvent.click(screen.getAllByRole("button")[7])
             userEvent.type(screen.getByText("Classroom's name"), "Cours Duo")
             fireEvent.mouseDown(screen.getByRole("button", {name: /position 1/i}))
             const position = within(screen.getByRole('listbox'));
@@ -143,6 +166,9 @@ describe('Calendar page', function () {
             fireEvent.mouseDown(screen.getByRole("button", {name: /duration 1h00/i}))
             const duration = within(screen.getByRole('listbox'));
             userEvent.click(duration.getByText(/2h00/i));
+            await waitFor(() => userEvent.type(screen.getByRole("textbox", {name: /Choose start date, selected date is Oct 6, 2021/i}), "10/06/2021 02:15 pm"))
+            userEvent.click(screen.getByRole("button", {name: "OK"}))
+            await waitFor(() => userEvent.type(screen.getByRole("textbox", {name: /Choose end date, selected date is Oct 6, 2021/i}), "10/06/2021 03:15 pm"))
             userEvent.click(screen.getByRole("button", {name: /submit/i}))
 
             await waitFor(() => expect(screen.findAllByText("Cours Duo")).toHaveLength(4))

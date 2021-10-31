@@ -5,7 +5,6 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import * as React from "react";
 import {useState} from "react";
-import {useDispatch} from "react-redux";
 
 export const AddClassroomForm = ({date, onSubmitClick}) => {
 
@@ -81,6 +80,7 @@ export const AddClassroomForm = ({date, onSubmitClick}) => {
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DateTimePicker
                                 label="Classroom start time"
+                                getOpenDialogAriaText={(value, utils) => `Choose start date, selected date is ${utils.format(utils.date(value), 'fullDate')}`}
                                 value={classroomStartDateTime}
                                 onChange={(newValue) => {
                                     setClassroomStartDateTime(newValue);
@@ -97,6 +97,7 @@ export const AddClassroomForm = ({date, onSubmitClick}) => {
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DateTimePicker
                                 label="Classroom end time"
+                                getOpenDialogAriaText={(value, utils) => `Choose end date, selected date is ${utils.format(utils.date(value), 'fullDate')}`}
                                 value={classroomEndDateTime}
                                 onChange={(newValue) => {
                                     setClassroomEndDateTime(newValue);
