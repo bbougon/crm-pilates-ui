@@ -1,12 +1,22 @@
 import * as React from "react";
 import {useState} from "react";
-import {Box, Card, CardContent, CardHeader, Fade, Grid, IconButton, ThemeProvider} from "@mui/material";
+import {
+    Box,
+    Card,
+    CardContent,
+    CardHeader,
+    Fade,
+    Grid,
+    IconButton,
+    ThemeProvider
+} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import {Popper} from "@material-ui/core";
 import {format} from "date-fns";
 import {useMonthlyBody} from "@zach.codes/react-calendar";
 import {createTheme} from "@mui/material/styles";
 import {AddClassroomForm} from "../classroom/addClassroomForm";
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 
 const theme = createTheme({
     typography: {
@@ -40,36 +50,42 @@ export const AddClassroomItem = ({clients, onClassroomAdd}) => {
         setOpen((prev) => !prev);
     }
 
+    const closeClassroomForm = () => {
+        setOpen(false)
+    }
+
     return (
         <Grid container>
-            <Popper open={open} anchorEl={anchorEl} placement="right-start" transition>
-                {({TransitionProps}) => {
-                    const cardHeader = "Add a classroom on ".concat(format(day, "yyyy-MM-dd"))
-                    return (
-                        <ThemeProvider theme={theme}>
-                            <Fade {...TransitionProps} timeout={350}>
-                                <Card sx={{minWidth: 450, maxWidth: 600, display: 'flex'}}>
-                                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
-                                        <CardHeader title={cardHeader} component="div"/>
-                                        <CardContent>
-                                            <AddClassroomForm date={day} clients={clients} onSubmitClick={(classroom) => onClassroomAdd(classroom)}/>
-                                        </CardContent>
-                                    </Box>
-                                </Card>
-                            </Fade>
-                        </ThemeProvider>
-                    )
-                }}
-            </Popper>
+                <Popper open={open} anchorEl={anchorEl} placement="right-start" transition>
+                    {({TransitionProps}) => {
+                        const cardHeader = "Add a classroom on ".concat(format(day, "yyyy-MM-dd"))
+                        return (
+                            <ThemeProvider theme={theme}>
+                                <Fade {...TransitionProps} timeout={350}>
+                                    <Card sx={{minWidth: 450, maxWidth: 600, display: 'flex'}}>
+                                        <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                                            <CardHeader title={cardHeader} component="div"/>
+                                            <CardContent>
+                                                <AddClassroomForm date={day} clients={clients} onSubmitClick={(classroom) => onClassroomAdd(classroom)}/>
+                                            </CardContent>
+                                        </Box>
+                                    </Card>
+                                </Fade>
+                            </ThemeProvider>
+                        )
+                    }}
+                </Popper>
             <Grid container>
                 <Grid item xs={12}>
                     <Box sx={{
                         display: 'flex',
                         justifyContent: 'flex-end'
                     }}>
-                        <IconButton onClick={openAddClassRoomForm()}>
-                            <AddIcon fontSize="small"/>
-                        </IconButton>
+                        <ClickAwayListener onClickAway={closeClassroomForm}>
+                            <IconButton onClick={openAddClassRoomForm()}>
+                                <AddIcon fontSize="small"/>
+                            </IconButton>
+                        </ClickAwayListener>
                     </Box>
                 </Grid>
             </Grid>

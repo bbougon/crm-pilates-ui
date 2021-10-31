@@ -1,6 +1,17 @@
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {Grid} from "@material-ui/core";
-import {Box, Card, CardContent, CardHeader, Chip, Fade, Popper, Switch, Typography} from "@mui/material";
+import {
+    Box,
+    Card,
+    CardContent,
+    CardHeader,
+    Chip,
+    ClickAwayListener,
+    Fade,
+    Popper,
+    Switch,
+    Typography
+} from "@mui/material";
 import {blue} from "@mui/material/colors";
 import {format} from "date-fns";
 import * as React from "react";
@@ -100,6 +111,10 @@ export const ClassroomEventItem = ({classroom: session}) => {
         setOpen((prev) => !prev);
     }
 
+    const closeSessionDisplay = () => {
+        setOpen(false)
+    }
+
     return (
         <Grid container>
             <Popper open={open} anchorEl={anchorEl} placement="right-start" transition>
@@ -123,46 +138,48 @@ export const ClassroomEventItem = ({classroom: session}) => {
                     );
                 }}
             </Popper>
-            <Grid container onClick={displaySession()}>
-                <Grid item xs={6}>
-                    <ThemeProvider theme={theme}>
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-start'
-                        }}>
-                            <Typography variant="body1">
-                                {session.name}
-                            </Typography>
-                        </Box>
-                    </ThemeProvider>
-                </Grid>
-                <Grid item xs={2}>
+            <ClickAwayListener onClickAway={closeSessionDisplay}>
+                <Grid container onClick={displaySession()}>
+                    <Grid item xs={6}>
+                        <ThemeProvider theme={theme}>
+                            <Box sx={{
+                                display: 'flex',
+                                justifyContent: 'flex-start'
+                            }}>
+                                <Typography variant="body1">
+                                    {session.name}
+                                </Typography>
+                            </Box>
+                        </ThemeProvider>
+                    </Grid>
+                    <Grid item xs={2}>
 
-                    <ThemeProvider theme={theme}>
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'center'
-                        }}>
-                            <Typography color={blue[400]}>
-                                {session.attendees.length} / {session.position}
-                            </Typography>
-                        </Box>
-                    </ThemeProvider>
-                </Grid>
-                <Grid item xs={4}>
+                        <ThemeProvider theme={theme}>
+                            <Box sx={{
+                                display: 'flex',
+                                justifyContent: 'center'
+                            }}>
+                                <Typography color={blue[400]}>
+                                    {session.attendees.length} / {session.position}
+                                </Typography>
+                            </Box>
+                        </ThemeProvider>
+                    </Grid>
+                    <Grid item xs={4}>
 
-                    <ThemeProvider theme={theme}>
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-end'
-                        }}>
-                            <Typography>
-                                {format(session.schedule.start, 'k:mm')}
-                            </Typography>
-                        </Box>
-                    </ThemeProvider>
+                        <ThemeProvider theme={theme}>
+                            <Box sx={{
+                                display: 'flex',
+                                justifyContent: 'flex-end'
+                            }}>
+                                <Typography>
+                                    {format(session.schedule.start, 'k:mm')}
+                                </Typography>
+                            </Box>
+                        </ThemeProvider>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </ClickAwayListener>
         </Grid>
     )
 };
