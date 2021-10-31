@@ -1,12 +1,13 @@
-import {Button, Grid, InputLabel, MenuItem, Select} from "@mui/material";
+import {Autocomplete, Button, Grid, InputLabel, MenuItem, Select} from "@mui/material";
 import {FormControl, TextField} from "@material-ui/core";
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import * as React from "react";
 import {useState} from "react";
+import set from "date-fns/set";
 
-export const AddClassroomForm = ({date, onSubmitClick}) => {
+export const AddClassroomForm = ({date, clients, onSubmitClick}) => {
 
     const available_durations = [
         {duration: 15, human: "0h15"},
@@ -20,19 +21,24 @@ export const AddClassroomForm = ({date, onSubmitClick}) => {
 
     const available_positions = [1, 2, 3, 4, 5, 6]
 
+    const [currentDate] = useState(new Date())
     const [classroomName, setClassroomName] = useState('')
-    const [classroomStartDateTime, setClassroomStartDateTime] = useState(date)
-    const [classroomEndDateTime, setClassroomEndDateTime] = useState(date)
     const [position, setPosition] = useState(1)
     const [duration, setDuration] = useState(60)
+    const [classroomStartDateTime, setClassroomStartDateTime] = useState(set(date, {
+        hours: currentDate.getHours(),
+        minutes: currentDate.getMinutes()
+    }))
+    const [classroomEndDateTime, setClassroomEndDateTime] = useState(null)
     const [attendees, setAttendees] = useState([])
 
     const onClassroomNameChanged = (e) => setClassroomName(e.target.value)
-    const onPositionChanged = (e) => setPosition(e.target.value);
+    const onPositionChanged = (e) => setPosition(e.target.value)
     const onDurationChanged = (e) => setDuration(e.target.value)
 
     const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
     const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)
+
     const fieldsAreNotFilled = () => {
         return classroomName === ""
             || position === null || position < 1
@@ -44,7 +50,7 @@ export const AddClassroomForm = ({date, onSubmitClick}) => {
     }
 
     return (
-        <Grid container>
+        <Grid container rowSpacing={2}>
             <Grid container spacing={1} direction="row">
                 <Grid item xs={12} md={6}>
                     <FormControl>
@@ -66,10 +72,12 @@ export const AddClassroomForm = ({date, onSubmitClick}) => {
                             id="position-select"
                             value={position}
                             label="Position"
+                            variant="standard"
                             onChange={onPositionChanged}
                             size="small"
                         >
-                            {available_positions.map(position => <MenuItem key={position} value={position}>{position}</MenuItem> )}
+                            {available_positions.map(position => <MenuItem key={position}
+                                                                           value={position}>{position}</MenuItem>)}
                         </Select>
                     </FormControl>
                 </Grid>
@@ -96,14 +104,14 @@ export const AddClassroomForm = ({date, onSubmitClick}) => {
                     <FormControl>
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DateTimePicker
-                                label="Classroom end time"
-                                getOpenDialogAriaText={(value, utils) => `Choose end date, selected date is ${utils.format(utils.date(value), 'fullDate')}`}
-                                value={classroomEndDateTime}
+                                label="Recurrence"
                                 onChange={(newValue) => {
                                     setClassroomEndDateTime(newValue);
                                 }}
-                                renderInput={(params) => <TextField {...params} />}
+                                renderInput={(params) => <TextField  {...params}
+                                                                     helperText="Choose a date for recurrence"/>}
                                 minDateTime={dayStart}
+                                value={classroomEndDateTime}
                             />
                         </LocalizationProvider>
                     </FormControl>
@@ -119,15 +127,41 @@ export const AddClassroomForm = ({date, onSubmitClick}) => {
                             label="Duration"
                             onChange={onDurationChanged}
                             size="small"
+                            variant="standard"
                             aria-labelledby="duration-select-label"
                         >
-                            {available_durations.map(duration => <MenuItem key={duration.duration} value={duration.duration}>{duration.human}</MenuItem> )}
+                            {available_durations.map(duration => <MenuItem key={duration.duration}
+                                                                           value={duration.duration}>{duration.human}</MenuItem>)}
                         </Select>
                     </FormControl>
                 </Grid>
-
             </Grid>
-            <Grid container spacing={4}>
+            <Grid container spacing={1} direction="row">
+                <Grid item xs={12} md={12}>
+                    <FormControl fullWidth>
+                        <Autocomplete
+                            multiple
+                            id="attendees"
+                            options={clients}
+                            getOptionLabel={(option) => `${option.lastname} ${option.firstname}`}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    variant="standard"
+                                    label="Attendees"
+                                    placeholder="Attendees"
+                                />
+                            )}
+                            onChange={(event, value) => {
+                                setAttendees(value)
+                                if (value.length > position)
+                                    setPosition(value.length)
+                            }}
+                        />
+                    </FormControl>
+                </Grid>
+            </Grid>
+            <Grid container spacing={1}>
                 <Grid item xs={12} md={12} sx={{
                     display: 'flex',
                     justifyContent: 'flex-end'
@@ -136,5 +170,5 @@ export const AddClassroomForm = ({date, onSubmitClick}) => {
                 </Grid>
             </Grid>
         </Grid>
-)
+    )
 }

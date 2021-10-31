@@ -28,7 +28,11 @@ export const addClassroom = createAsyncThunk(
                         duration: classroom.duration,
                         unit: "MINUTE"
                     },
-                    attendees: classroom.attendees.map(attendee => attendee.id)
+                    attendees: classroom.attendees.map(attendee => {
+                        return {
+                            id: attendee.id
+                        }
+                    })
                 }
             }
             const response = await api.addClassroom(body(classroom))

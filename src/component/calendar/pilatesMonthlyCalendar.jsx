@@ -8,6 +8,7 @@ import {Grid} from "@material-ui/core";
 import {AddClassroomItem} from "./addClassroomItem";
 import * as React from "react";
 import {ClassroomEventItem} from "./classroomEventItem";
+import {fetchClients, selectAllClients} from "../../features/clientsSlice";
 
 export const PilatesMonthlyCalendar = ({date}) => {
 
@@ -15,14 +16,16 @@ export const PilatesMonthlyCalendar = ({date}) => {
     let [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
     const sessions = useSelector(selectMonthlySessions)
     const link = useSelector((state => state.sessions.link))
+    const clients = useSelector(selectAllClients);
 
     useEffect(() => {
         dispatch(fetchSessions())
+        dispatch(fetchClients())
     }, [dispatch])
 
     const onClassroomAdd = async (classroom) => {
         await dispatch(addClassroom(classroom))
-        await dispatch(fetchSessions(link))
+        await dispatch(fetchSessions(link.current.url))
     }
 
     const MonthlyNav = () => {
@@ -84,7 +87,7 @@ export const PilatesMonthlyCalendar = ({date}) => {
                                 classroom={item}
                             />
                         ));
-                        events.push(<AddClassroomItem key={Math.random()} onClassroomAdd={(classroom) => onClassroomAdd(classroom)}/>)
+                        events.push(<AddClassroomItem key={Math.random()} clients={clients} onClassroomAdd={(classroom) => onClassroomAdd(classroom)}/>)
                         return events
                     }
                     }
