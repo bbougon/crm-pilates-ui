@@ -1,14 +1,16 @@
 import {useDispatch, useSelector} from "react-redux";
+import * as React from "react";
 import {useEffect, useState} from "react";
-import {addMonths, format, getYear, startOfMonth, subMonths} from "date-fns";
+import {addMonths, format, getYear, isSameDay, startOfMonth, subMonths} from "date-fns";
 import {fetchSessions, selectMonthlySessions} from "../../features/sessionsSlice";
 import {addClassroom} from "../../features/classroomSlice";
 import {MonthlyBody, MonthlyCalendar, useMonthlyBody, useMonthlyCalendar} from "@zach.codes/react-calendar";
 import {Grid} from "@material-ui/core";
 import {AddClassroomItem} from "./addClassroomItem";
-import * as React from "react";
 import {ClassroomEventItem} from "./classroomEventItem";
 import {fetchClients, selectAllClients} from "../../features/clientsSlice";
+import {Box, List} from "@mui/material";
+import {blueGrey} from "@mui/material/colors";
 
 export const PilatesMonthlyCalendar = ({date}) => {
 
@@ -33,21 +35,25 @@ export const PilatesMonthlyCalendar = ({date}) => {
         let { day, events } = useMonthlyBody()
         let dayNumber = format(day, 'd', { locale });
 
+        const backgroundColor = isSameDay(day, new Date()) ? blueGrey[50] : "white"
+
         return (
-            <div
+            <Box direction="row"
                 aria-label={`Events for day ${dayNumber}`}
-                className="rc-h-48 rc-p-2 rc-border-b-2 rc-border-r-2"
+                className="rc-h-48 rc-p-2 rc-border-b-2 rc-border-r-2" sx={{bgcolor: backgroundColor}}
             >
-                <div className="rc-flex rc-justify-between">
-                    <div className="rc-font-bold">{dayNumber}</div>
-                    <div className="lg:rc-hidden rc-block">
+                <Grid className="rc-flex rc-justify-between">
+                    <Grid item className="rc-font-bold">{dayNumber}</Grid>
+                    <Grid item className="lg:rc-hidden rc-block">
                         {format(day, 'EEEE', { locale })}
-                    </div>
-                </div>
-                <ul className="rc-divide-gray-200 rc-divide-y rc-overflow-hidden rc-max-h-36 rc-overflow-y-auto">
-                    {renderDay(events)}
-                </ul>
-            </div>
+                    </Grid>
+                </Grid>
+                <Grid>
+                    <List className="rc-divide-gray-200 rc-divide-y rc-overflow-hidden rc-max-h-36 rc-overflow-y-auto">
+                        {renderDay(events)}
+                    </List>
+                </Grid>
+            </Box>
         );
     }
 

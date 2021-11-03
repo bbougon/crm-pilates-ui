@@ -71,7 +71,7 @@ describe('Calendar page', function () {
     it('should have a plus button on each day', () => {
         render(<Calendar date={new Date("2021-10-10T11:20:00")}/>)
 
-        expect(screen.getAllByTestId("AddIcon")).toHaveLength(31)
+        expect(screen.getAllByTestId("AddIcon")).toHaveLength(26)
     })
 
     describe("Navigate through calendar", () => {
@@ -150,7 +150,7 @@ describe('Calendar page', function () {
         it('should open a classroom add form for October 6, 2021', () => {
             render(<Calendar date={new Date("2021-10-21T14:00:00")}/>)
 
-            userEvent.click(screen.getAllByRole("button")[5])
+            userEvent.click(screen.getAllByRole("button")[4])
 
             expect(screen.getByText("Add a classroom on ".concat(format(new Date("2021-10-04"), "yyyy-MM-dd")))).toBeInTheDocument()
         })
