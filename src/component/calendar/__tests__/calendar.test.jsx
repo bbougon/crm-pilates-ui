@@ -7,6 +7,7 @@ import {addDays, format, subHours} from "date-fns";
 import {ServerBuilder} from "../../../test-utils/server/server";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
 import {classroom} from "../../../test-utils/classroom/classroom";
+import {checkin} from "../../../test-utils/classroom/checkin";
 
 describe('Calendar page', function () {
     let currentDate = new Date();
@@ -103,9 +104,9 @@ describe('Calendar page', function () {
         afterAll(() => server.close())
 
         it.skip("should display next month when clicking on 'next' month", async () => {
-            const {getByRole} = render(<Calendar date={new Date("2021-10-10T11:20:00")}/>)
+            await render(<Calendar date={new Date("2021-10-10T11:20:00")}/>)
 
-            fireEvent.click(getByRole("button", {name: "Next"}))
+            fireEvent.click(screen.getByRole("button", {name: "Next"}))
 
             await waitFor(() => expect(screen.getByText("Cours trio")).toBeInTheDocument())
             await waitFor(() => expect(screen.getByText("Cours privé")).toBeInTheDocument())
@@ -172,6 +173,36 @@ describe('Calendar page', function () {
             userEvent.click(screen.getByRole("button", {name: /submit/i}))
 
             await waitFor(() => expect(screen.findAllByText("Cours Duo")).toHaveLength(4))
+        })
+    })
+
+    describe("Interacting with session", () => {
+        let classroomDate = new Date(2021, 10, 6, 10);
+        const server = new ServerBuilder()
+            .request("/sessions", "get", new SessionsBuilder()
+                .withSession(
+                    new SessionBuilder().withClassroom(1).withName('Cours Duo')
+                        .withSchedule(classroomDate, 1).withPosition(2)
+                        .withAttendee(attendee(3, "Bertrand", "Bougon", "REGISTERED"))
+                        .build()
+                )
+                .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+            .request("/sessions/checkin", "post", checkin(), 201)
+            .build()
+
+        beforeAll(() => server.listen())
+
+        afterEach(() => server.resetHandlers())
+
+        afterAll(() => server.close())
+
+        it("should checkin attendee", async () => {
+            await render(<Calendar date={new Date("2021-10-06T10:00:00")} />)
+
+            await waitFor(() => userEvent.click(screen.getAllByText("Cours Duo")[0]))
+            userEvent.click(screen.getByRole("checkbox"))
+
+            expect(screen.getByText("C")).toBeInTheDocument()
         })
     })
 
