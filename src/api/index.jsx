@@ -1,3 +1,4 @@
+import {checkin} from "../test-utils/classroom/checkin";
 
 export async function api(endpoint, { body, ...customConfig } = {}) {
     const headers = { 'Content-Type': 'application/json' }
@@ -47,6 +48,16 @@ api.fetchClients = () => {
 api.fetchSessions = (link) => {
     const customConfig = {}
     return api(link, {...customConfig, method: 'GET'})
+}
+
+api.sessionCheckin = (checkin) => {
+    const customConfig = {}
+    const body = {
+        classroom_id: checkin.classroom_id,
+        session_date: checkin.schedule.start,
+        attendee: checkin.id
+    }
+    return api("/sessions/checkin", {...customConfig, body})
 }
 
 api.addClassroom = (body) => {

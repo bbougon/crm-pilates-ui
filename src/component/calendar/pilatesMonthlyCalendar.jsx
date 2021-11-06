@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {addMonths, format, getYear, isSameDay, startOfMonth, subMonths} from "date-fns";
-import {fetchSessions, selectMonthlySessions} from "../../features/sessionsSlice";
+import {fetchSessions, selectMonthlySessions, sessionCheckin} from "../../features/sessionsSlice";
 import {addClassroom} from "../../features/classroomSlice";
 import {MonthlyBody, MonthlyCalendar, useMonthlyBody, useMonthlyCalendar} from "@zach.codes/react-calendar";
 import {Grid} from "@material-ui/core";
@@ -28,6 +28,11 @@ export const PilatesMonthlyCalendar = ({date}) => {
     const onClassroomAdd = async (classroom) => {
         await dispatch(addClassroom(classroom))
         await dispatch(fetchSessions(link.current.url))
+    }
+
+    const  onSessionCheckin = async (session, attendee) => {
+        const checkin = Object.assign({}, session, attendee)
+        await dispatch(sessionCheckin(checkin))
     }
 
     const MonthlyDay = ({ renderDay }) => {
@@ -56,6 +61,7 @@ export const PilatesMonthlyCalendar = ({date}) => {
             </Box>
         );
     }
+
 
     const MonthlyNav = () => {
         let {currentMonth, onCurrentMonthChange} = useMonthlyCalendar();
@@ -100,7 +106,6 @@ export const PilatesMonthlyCalendar = ({date}) => {
         );
     };
 
-
     return (
         <MonthlyCalendar
             currentMonth={currentMonth}
@@ -113,6 +118,7 @@ export const PilatesMonthlyCalendar = ({date}) => {
                             <ClassroomEventItem
                                 key={index}
                                 classroom={item}
+                                onSessionCheckin={(session, attendee) => onSessionCheckin(session, attendee)}
                             />
                         ));
                         events.push(<AddClassroomItem key={Math.random()} clients={clients} onClassroomAdd={(classroom) => onClassroomAdd(classroom)}/>)

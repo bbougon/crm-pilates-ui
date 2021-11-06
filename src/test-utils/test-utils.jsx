@@ -1,14 +1,16 @@
 import React from 'react'
-import { render as rtlRender } from '@testing-library/react'
+import {act, render as rtlRender} from '@testing-library/react'
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import clientsReducer from "../features/clientsSlice"
 import sessionsReducer from "../features/sessionsSlice"
+import classroomsReducer from "../features/classroomSlice"
 // Import your own reducer
 
 const reducer = {
+    sessions: sessionsReducer,
     clients: clientsReducer,
-    sessions: sessionsReducer
+    classrooms: classroomsReducer
 }
 
 function render(
@@ -23,6 +25,14 @@ function render(
         return <Provider store={store}>{children}</Provider>
     }
     return rtlRender(ui, { wrapper: Wrapper, ...renderOptions })
+}
+
+export async function actThenSleep(ms) {
+    await act(() => sleep(20));
+}
+
+export function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export * from '@testing-library/react'

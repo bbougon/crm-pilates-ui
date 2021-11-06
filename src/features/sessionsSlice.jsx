@@ -2,12 +2,13 @@ import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {api} from "../api";
 import {map_action_thunk_error} from "./errors";
 import parse from "parse-link-header"
-import {parseISO} from "date-fns";
+import {isEqual, parseISO} from "date-fns";
 
 export const sessionStatuses = {
     LOADING: "loading",
     SUCCEEDED: "succeeded",
     FAILED: "failed",
+    CHECKIN_IN_PROGRESS: "chekinInProgress"
 }
 
 const initialState = {
@@ -28,6 +29,18 @@ export const fetchSessions = createAsyncThunk(
             return rejectWithValue(e)
         }
 
+    }
+)
+
+export const sessionCheckin = createAsyncThunk(
+    'sessions/checkin',
+    async (checkin, {rejectWithValue, fulfillWithValue}) => {
+        try {
+            const response = await api.sessionCheckin(checkin)
+            return fulfillWithValue(response.data)
+        } catch (e) {
+            return rejectWithValue(e)
+        }
     }
 )
 
@@ -57,6 +70,16 @@ const sessionsSlice = createSlice({
             .addCase(fetchSessions.rejected, (state, action) => {
                 state.status = sessionStatuses.FAILED
                 state.error = map_action_thunk_error(action)
+            })
+            .addCase(sessionCheckin.pending, (state, action) => {
+                state.status = sessionStatuses.CHECKIN_IN_PROGRESS
+            })
+            .addCase(sessionCheckin.fulfilled, (state, action) => {
+                state.status = sessionStatuses.SUCCEEDED
+                const sessionCheckedin = action.payload
+                let session = state.sessions.find(session => session.id === sessionCheckedin.id || (session.classroom_id === sessionCheckedin.classroom_id && isEqual(session.schedule.start, parseISO(sessionCheckedin.schedule.start))));
+                session.attendees = sessionCheckedin.attendees
+                session.id = sessionCheckedin.id
             })
     }
 })
