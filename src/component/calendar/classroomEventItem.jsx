@@ -47,9 +47,15 @@ const theme = createTheme({
     },
 });
 
-const Attendee = ({attendee}) => {
+const Attendee = ({attendee, onAttendeeSessionCheckin}) => {
     const [attendeeLabelStatus] = useState(attendee.attendance === "REGISTERED" ? 'R' : 'C')
     const [attendeeLabelColor] = useState(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
+
+    const handleChange = (event) => {
+        if (event.target.checked) {
+            onAttendeeSessionCheckin(attendee)
+        }
+    }
 
     return (
         <Grid container direction="row">
@@ -71,7 +77,7 @@ const Attendee = ({attendee}) => {
                     }}>
                         <ThemeProvider theme={theme}>
                             <Switch size="small" defaultChecked={attendee.attendance === "CHECKED_IN"}
-                                    color={attendeeLabelColor}/>
+                                    color={attendeeLabelColor} onChange={handleChange}/>
                         </ThemeProvider>
                     </Grid>
                     <Grid item xs={6} md={6} sx={{
@@ -90,9 +96,9 @@ const Attendee = ({attendee}) => {
 }
 
 
-const Attendees = ({attendees}) => {
+const Attendees = ({attendees, onAttendeeSessionCheckin}) => {
 
-    const content = attendees.map((attendee) => (<Attendee key={attendee.id} attendee={attendee}/>))
+    const content = attendees.map((attendee) => (<Attendee key={attendee.id} attendee={attendee} onAttendeeSessionCheckin={(attendee) => onAttendeeSessionCheckin(attendee)}/>))
     return (
         <Grid container>
             {content}
@@ -101,7 +107,7 @@ const Attendees = ({attendees}) => {
 }
 
 
-export const ClassroomEventItem = ({classroom: session}) => {
+export const ClassroomEventItem = ({classroom: session, onSessionCheckin}) => {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false);
@@ -113,6 +119,10 @@ export const ClassroomEventItem = ({classroom: session}) => {
 
     const closeSessionDisplay = () => {
         setOpen(false)
+    }
+
+    const onAttendeeSessionCheckin = (attendee) => {
+        onSessionCheckin(session, attendee)
     }
 
     return (
@@ -130,7 +140,7 @@ export const ClassroomEventItem = ({classroom: session}) => {
                                                         subheader={subheader}
                                                         component="div"/>
                                             <CardContent>
-                                                <Attendees attendees={session.attendees}/>
+                                                <Attendees attendees={session.attendees} onAttendeeSessionCheckin={(attendee) => onAttendeeSessionCheckin(attendee)}/>
                                             </CardContent>
                                         </Box>
                                     </ClickAwayListener>

@@ -18,7 +18,7 @@ export function ServerBuilder() {
                         request.body = {}
                     }
 
-                return res(compose(
+                return res.once(compose(
                     context.status(request.status),
                     context.json(request.body),
                     context.set(request.header)
@@ -27,7 +27,7 @@ export function ServerBuilder() {
         ))
         const postRequest = this.requests.filter(request => request.method === "post").map(request => rest.post(
             request.path, (req, res, ctx) => {
-                return res(
+                return res.once(
                     ctx.status(request.status),
                     ctx.json(request.body)
                 )
