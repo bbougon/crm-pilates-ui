@@ -134,7 +134,8 @@ export const ClassroomEventItem = ({classroom: session, onSessionCheckin}) => {
                         <ThemeProvider theme={theme}>
                             <Fade {...TransitionProps} timeout={350}>
                                 <Card sx={{minWidth: 450, maxWidth: 600, display: 'flex'}}>
-                                    <ClickAwayListener onClickAway={closeSessionDisplay}>
+                                    <ClickAwayListener onClickAway={closeSessionDisplay}
+                                                       disableReactTree={true} >
                                         <Box sx={{display: 'flex', flexDirection: 'column'}}>
                                             <CardHeader title={session.name}
                                                         subheader={subheader}
