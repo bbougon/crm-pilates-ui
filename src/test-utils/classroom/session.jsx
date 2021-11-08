@@ -52,9 +52,9 @@ export function SessionBuilder() {
         return this
     }
 
-    this.withSchedule = (startDate) => {
+    this.withSchedule = (startDate, amount = 1) => {
         this.schedule.start = startDate
-        this.schedule.stop = addHours(startDate, 1)
+        this.schedule.stop = addHours(startDate, amount)
         return this
     }
 

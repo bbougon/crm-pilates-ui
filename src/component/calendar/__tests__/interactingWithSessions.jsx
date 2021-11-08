@@ -19,7 +19,7 @@ describe("Interacting with session", () => {
         .request("/sessions", "get", new SessionsBuilder()
             .withSession(
                 new SessionBuilder().withClassroom(1).withName('Cours Duo')
-                    .withSchedule(classroomDate, 1).withPosition(2)
+                    .withSchedule(classroomDate, 1, 1).withPosition(2)
                     .withAttendee(attendee(3, "Bertrand", "Bougon", "REGISTERED"))
                     .build()
             )

@@ -6,8 +6,14 @@ import DateTimePicker from '@mui/lab/DateTimePicker';
 import * as React from "react";
 import {useState} from "react";
 import set from "date-fns/set";
+import {useDispatch, useSelector} from "react-redux";
+import {selectAllClients} from "../../features/clientsSlice";
+import {addClassroom} from "../../features/classroomSlice";
+import {fetchSessions} from "../../features/sessionsSlice";
 
-export const AddClassroomForm = ({date, clients, onSubmitClick}) => {
+export const AddClassroomForm = ({date}) => {
+
+    const dispatch = useDispatch();
 
     const available_durations = [
         {duration: 15, human: "0h15"},
@@ -31,6 +37,8 @@ export const AddClassroomForm = ({date, clients, onSubmitClick}) => {
     }))
     const [classroomEndDateTime, setClassroomEndDateTime] = useState(null)
     const [attendees, setAttendees] = useState([])
+    const clients = useSelector(selectAllClients)
+    const link = useSelector((state => state.sessions.link))
 
     const onClassroomNameChanged = (e) => setClassroomName(e.target.value)
     const onPositionChanged = (e) => setPosition(e.target.value)
@@ -45,8 +53,10 @@ export const AddClassroomForm = ({date, clients, onSubmitClick}) => {
             || !(available_durations.map(duration => duration.duration).includes(duration))
     }
 
-    const onSubmitClicked = () => {
-        onSubmitClick({classroomName, classroomStartDateTime, classroomEndDateTime, position, duration, attendees})
+    const onSubmitClicked = async () => {
+        const classroom = {classroomName, classroomStartDateTime, classroomEndDateTime, position, duration, attendees}
+        await dispatch(addClassroom(classroom))
+        await dispatch(fetchSessions(link.current.url))
     }
 
     return (
@@ -87,13 +97,12 @@ export const AddClassroomForm = ({date, clients, onSubmitClick}) => {
                     <FormControl>
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DateTimePicker
-                                label="Classroom start time"
-                                getOpenDialogAriaText={(value, utils) => `Choose start date, selected date is ${utils.format(utils.date(value), 'fullDate')}`}
-                                value={classroomStartDateTime}
+                                label="Choose start date"
                                 onChange={(newValue) => {
                                     setClassroomStartDateTime(newValue);
                                 }}
-                                renderInput={(params) => <TextField {...params} />}
+                                renderInput={(params) => <TextField {...params} label="Choose start date" helperText="Choose start date" />}
+                                value={classroomStartDateTime}
                                 minDateTime={dayStart}
                                 maxDateTime={dayEnd}
                             />
