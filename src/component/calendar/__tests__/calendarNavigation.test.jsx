@@ -19,12 +19,12 @@ describe("Navigate through calendar", () => {
             new SessionsBuilder()
                 .withSession(
                     new SessionBuilder().withId(13).withClassroom(1).withName('Stage 1')
-                        .withSchedule(new Date("2021-11-01T11:20:00")).withPosition(3)
+                        .withSchedule(new Date("2021-11-01T11:20:00"), 1).withPosition(3)
                         .build()
                 )
                 .withSession(
                     new SessionBuilder().withId(4).withClassroom(1).withName('Stage 2')
-                        .withSchedule(new Date("2021-11-01T13:20:00")).withPosition(1)
+                        .withSchedule(new Date("2021-11-01T13:20:00"), 1).withPosition(1)
                         .withAttendee(attendee(3, "Bertrand", "Bougon", "CHECKED_IN"))
                         .build()
                 )

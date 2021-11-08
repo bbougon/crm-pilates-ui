@@ -47,7 +47,7 @@ const theme = createTheme({
     },
 });
 
-const Attendee = ({attendee, onAttendeeSessionCheckin}) => {
+const SessionAttendee = ({attendee, onAttendeeSessionCheckin}) => {
     const [attendeeLabelStatus] = useState(attendee.attendance === "REGISTERED" ? 'R' : 'C')
     const [attendeeLabelColor] = useState(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
 
@@ -96,9 +96,9 @@ const Attendee = ({attendee, onAttendeeSessionCheckin}) => {
 }
 
 
-const Attendees = ({attendees, onAttendeeSessionCheckin}) => {
+const SessionAttendees = ({session, onAttendeeSessionCheckin}) => {
 
-    const content = attendees.map((attendee) => (<Attendee key={attendee.id} attendee={attendee} onAttendeeSessionCheckin={(attendee) => onAttendeeSessionCheckin(attendee)}/>))
+    const content = session.attendees.map((attendee) => (<SessionAttendee key={attendee.id} attendee={attendee} sessionId={session.id} onAttendeeSessionCheckin={(attendee) => onAttendeeSessionCheckin(attendee)}/>))
     return (
         <Grid container>
             {content}
@@ -141,7 +141,7 @@ export const ClassroomEventItem = ({classroom: session, onSessionCheckin}) => {
                                                         subheader={subheader}
                                                         component="div"/>
                                             <CardContent>
-                                                <Attendees attendees={session.attendees} onAttendeeSessionCheckin={(attendee) => onAttendeeSessionCheckin(attendee)}/>
+                                                <SessionAttendees session={session} onAttendeeSessionCheckin={(attendee) => onAttendeeSessionCheckin(attendee)}/>
                                             </CardContent>
                                         </Box>
                                     </ClickAwayListener>

@@ -3,12 +3,11 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {addMonths, format, getYear, isSameDay, startOfMonth, subMonths} from "date-fns";
 import {fetchSessions, selectMonthlySessions, sessionCheckin} from "../../features/sessionsSlice";
-import {addClassroom} from "../../features/classroomSlice";
 import {MonthlyBody, MonthlyCalendar, useMonthlyBody, useMonthlyCalendar} from "@zach.codes/react-calendar";
 import {Grid} from "@material-ui/core";
 import {AddClassroomItem} from "./addClassroomItem";
 import {ClassroomEventItem} from "./classroomEventItem";
-import {fetchClients, selectAllClients} from "../../features/clientsSlice";
+import {fetchClients} from "../../features/clientsSlice";
 import {Box, List} from "@mui/material";
 import {blueGrey} from "@mui/material/colors";
 
@@ -18,17 +17,11 @@ export const PilatesMonthlyCalendar = ({date}) => {
     let [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
     const sessions = useSelector(selectMonthlySessions)
     const link = useSelector((state => state.sessions.link))
-    const clients = useSelector(selectAllClients);
 
     useEffect(() => {
         dispatch(fetchSessions())
         dispatch(fetchClients())
     }, [dispatch])
-
-    const onClassroomAdd = async (classroom) => {
-        await dispatch(addClassroom(classroom))
-        await dispatch(fetchSessions(link.current.url))
-    }
 
     const  onSessionCheckin = async (session, attendee) => {
         const checkin = Object.assign({}, session, attendee)
@@ -121,7 +114,7 @@ export const PilatesMonthlyCalendar = ({date}) => {
                                 onSessionCheckin={(session, attendee) => onSessionCheckin(session, attendee)}
                             />
                         ));
-                        events.push(<AddClassroomItem key={Math.random()} clients={clients} onClassroomAdd={(classroom) => onClassroomAdd(classroom)}/>)
+                        events.push(<AddClassroomItem key={Math.random()} />)
                         return events
                     }
                     }
