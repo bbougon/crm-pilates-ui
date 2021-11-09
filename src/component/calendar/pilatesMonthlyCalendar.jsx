@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {addMonths, format, getYear, isSameDay, startOfMonth, subMonths} from "date-fns";
-import {fetchSessions, selectMonthlySessions, sessionCheckin} from "../../features/sessionsSlice";
+import {fetchSessions, selectMonthlySessions} from "../../features/sessionsSlice";
 import {MonthlyBody, MonthlyCalendar, useMonthlyBody, useMonthlyCalendar} from "@zach.codes/react-calendar";
 import {Grid} from "@material-ui/core";
 import {AddClassroomItem} from "./addClassroomItem";
@@ -22,11 +22,6 @@ export const PilatesMonthlyCalendar = ({date}) => {
         dispatch(fetchSessions())
         dispatch(fetchClients())
     }, [dispatch])
-
-    const  onSessionCheckin = async (session, attendee) => {
-        const checkin = Object.assign({}, session, attendee)
-        await dispatch(sessionCheckin(checkin))
-    }
 
     const MonthlyDay = ({ renderDay }) => {
         let { locale } = useMonthlyCalendar()
@@ -111,7 +106,6 @@ export const PilatesMonthlyCalendar = ({date}) => {
                             <ClassroomEventItem
                                 key={index}
                                 classroom={item}
-                                onSessionCheckin={(session, attendee) => onSessionCheckin(session, attendee)}
                             />
                         ));
                         events.push(<AddClassroomItem key={Math.random()} />)

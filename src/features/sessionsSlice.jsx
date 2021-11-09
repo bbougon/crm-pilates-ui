@@ -8,7 +8,8 @@ export const sessionStatuses = {
     LOADING: "loading",
     SUCCEEDED: "succeeded",
     FAILED: "failed",
-    CHECKIN_IN_PROGRESS: "chekinInProgress"
+    CHECKIN_IN_PROGRESS: "chekinInProgress",
+    CHECKIN_IN_SUCCEEDED: "chekinInSucceeded"
 }
 
 const initialState = {
@@ -54,8 +55,11 @@ const sessionsSlice = createSlice({
                 state.status = sessionStatuses.LOADING
             })
             .addCase(fetchSessions.fulfilled, (state, action) => {
-                 const map_session = (session) => {
-                    return Object.assign({}, session, {date: parseISO(session.schedule.start), schedule: {start: parseISO(session.schedule.start), stop: parseISO(session.schedule.stop)}});
+                const map_session = (session) => {
+                    return Object.assign({}, session, {
+                        date: parseISO(session.schedule.start),
+                        schedule: {start: parseISO(session.schedule.start), stop: parseISO(session.schedule.stop)}
+                    });
                 }
 
                 state.status = sessionStatuses.SUCCEEDED
@@ -63,7 +67,11 @@ const sessionsSlice = createSlice({
                 state.sessions = action.payload.map(session => map_session(session))
                 let links = () => {
                     const links = parse(action.meta.link)
-                    return {current: {url: links.current.url}, next: {url: links.next.url}, previous: {url: links.previous.url}}
+                    return {
+                        current: {url: links.current.url},
+                        next: {url: links.next.url},
+                        previous: {url: links.previous.url}
+                    }
                 };
                 state.link = links()
             })
@@ -75,7 +83,7 @@ const sessionsSlice = createSlice({
                 state.status = sessionStatuses.CHECKIN_IN_PROGRESS
             })
             .addCase(sessionCheckin.fulfilled, (state, action) => {
-                state.status = sessionStatuses.SUCCEEDED
+                state.status = sessionStatuses.CHECKIN_IN_SUCCEEDED
                 const sessionCheckedin = action.payload
                 let session = state.sessions.find(session => session.id === sessionCheckedin.id || (session.classroom_id === sessionCheckedin.classroom_id && isEqual(session.schedule.start, parseISO(sessionCheckedin.schedule.start))));
                 session.attendees = sessionCheckedin.attendees

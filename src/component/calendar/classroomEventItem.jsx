@@ -16,6 +16,8 @@ import {blue} from "@mui/material/colors";
 import {format} from "date-fns";
 import * as React from "react";
 import {useState} from "react";
+import {sessionCheckin} from "../../features/sessionsSlice";
+import {useDispatch} from "react-redux";
 
 const theme = createTheme({
     typography: {
@@ -47,13 +49,17 @@ const theme = createTheme({
     },
 });
 
-const SessionAttendee = ({attendee, onAttendeeSessionCheckin}) => {
+const SessionAttendee = ({attendee, session}) => {
+
     const [attendeeLabelStatus] = useState(attendee.attendance === "REGISTERED" ? 'R' : 'C')
     const [attendeeLabelColor] = useState(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
 
-    const handleChange = (event) => {
-        if (event.target.checked) {
-            onAttendeeSessionCheckin(attendee)
+    const dispatch = useDispatch();
+
+    const  onSessionCheckin = async (e) => {
+        if(e.target.checked) {
+            const checkin = Object.assign({}, session, attendee)
+            await dispatch(sessionCheckin(checkin))
         }
     }
 
@@ -77,7 +83,7 @@ const SessionAttendee = ({attendee, onAttendeeSessionCheckin}) => {
                     }}>
                         <ThemeProvider theme={theme}>
                             <Switch size="small" defaultChecked={attendee.attendance === "CHECKED_IN"}
-                                    color={attendeeLabelColor} onChange={handleChange}/>
+                                    color={attendeeLabelColor} onChange={onSessionCheckin}/>
                         </ThemeProvider>
                     </Grid>
                     <Grid item xs={6} md={6} sx={{
@@ -96,9 +102,9 @@ const SessionAttendee = ({attendee, onAttendeeSessionCheckin}) => {
 }
 
 
-const SessionAttendees = ({session, onAttendeeSessionCheckin}) => {
+const SessionAttendees = ({session}) => {
 
-    const content = session.attendees.map((attendee) => (<SessionAttendee key={attendee.id} attendee={attendee} sessionId={session.id} onAttendeeSessionCheckin={(attendee) => onAttendeeSessionCheckin(attendee)}/>))
+    const content = session.attendees.map((attendee) => (<SessionAttendee key={attendee.id} attendee={attendee} session={session} />))
     return (
         <Grid container>
             {content}
@@ -107,7 +113,7 @@ const SessionAttendees = ({session, onAttendeeSessionCheckin}) => {
 }
 
 
-export const ClassroomEventItem = ({classroom: session, onSessionCheckin}) => {
+export const ClassroomEventItem = ({classroom: session}) => {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false);
@@ -119,10 +125,6 @@ export const ClassroomEventItem = ({classroom: session, onSessionCheckin}) => {
 
     const closeSessionDisplay = () => {
         setOpen(false)
-    }
-
-    const onAttendeeSessionCheckin = (attendee) => {
-        onSessionCheckin(session, attendee)
     }
 
     return (
@@ -141,7 +143,7 @@ export const ClassroomEventItem = ({classroom: session, onSessionCheckin}) => {
                                                         subheader={subheader}
                                                         component="div"/>
                                             <CardContent>
-                                                <SessionAttendees session={session} onAttendeeSessionCheckin={(attendee) => onAttendeeSessionCheckin(attendee)}/>
+                                                <SessionAttendees session={session} />
                                             </CardContent>
                                         </Box>
                                     </ClickAwayListener>
