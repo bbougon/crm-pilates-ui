@@ -2,9 +2,10 @@ import {render} from "../../../test-utils/test-utils";
 import {screen} from "@testing-library/react";
 import React from "react";
 import {attendee, AttendeesBuilder, schedule, session} from "../../../test-utils/classroom/session";
-import {addHours, format} from "date-fns";
+import {addHours} from "date-fns";
 import userEvent from "@testing-library/user-event";
 import {ClassroomEventItem} from "../classroomEventItem";
+import {formatFullDate} from "../../../utils/date";
 
 describe('Classroom Event', function () {
 
@@ -18,7 +19,7 @@ describe('Classroom Event', function () {
 
         expect(screen.getByRole("tooltip")).toBeInTheDocument()
         expect(screen.getByText("Cours tapis", {selector: 'span'})).toBeInTheDocument()
-        expect(screen.getByText(format(classroomSession.schedule.start, "yyyy-MM-dd H:mm").concat(" / ").concat(format(classroomSession.schedule.stop, "yyyy-MM-dd H:mm")), {selector: 'span'})).toBeInTheDocument()
+        expect(screen.getByText(formatFullDate(classroomSession.schedule.start, "yyyy-MM-dd H:mm").concat(" / ").concat(formatFullDate(classroomSession.schedule.stop, "yyyy-MM-dd H:mm")), {selector: 'span'})).toBeInTheDocument()
         expect(screen.getByText("Laurent Gas", {selector: 'p'})).toBeInTheDocument()
         expect(screen.getByText("Bertrand Bougon", {selector: 'p'})).toBeInTheDocument()
         expect(screen.getAllByText("R", {selector: 'span'})).toBeTruthy()

@@ -2,7 +2,7 @@ import {FulFilledAction} from "../../test-utils/features/actionFixtures";
 import reducer, {fetchSessions} from "../sessionsSlice";
 import {LoadingState} from "../../test-utils/features/sessions/sessionsStateFixtures";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../test-utils/classroom/session";
-import {addHours, subHours} from "date-fns";
+import {addHours, format, subHours} from "date-fns";
 
 describe("SessionsSlice", () =>{
 
@@ -43,7 +43,7 @@ describe("SessionsSlice", () =>{
                     classroom_id: 1,
                     name: "Pilates avancé",
                     date: startDate,
-                    schedule: {start: startDate, stop: addHours(startDate, 1)},
+                    schedule: {start: format(startDate, "yyyy-MM-dd'T'HH:mm:ss.SSSX"), stop: format(addHours(startDate, 1), "yyyy-MM-dd'T'HH:mm:ss.SSSX")},
                     position: 3,
                     attendees: [
                         {id: 1, firstname: "Laurent", lastname: "Gas", attendance: "CHECKED_IN"},

@@ -85,8 +85,8 @@ export const attendee = (id = 1, firstname = "Laurent", lastname = "Gas", attend
 
 export const schedule = (start= new Date(), stop = addHours(new Date(), 1)) => {
     return {
-        start: start,
-        stop: stop
+        start: formatISO(start),
+        stop: formatISO(stop)
     }
 }
 
