@@ -16,7 +16,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import styled from "styled-components";
 import {useDispatch, useSelector} from "react-redux";
 import {clientStatuses, createClient} from "../../features/clientsSlice";
-import {DisplayError} from "../errors/displayError";
+import {DisplayError} from "../errors/DisplayError";
 
 
 const Wrapper = styled.div`

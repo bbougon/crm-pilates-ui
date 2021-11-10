@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {clientStatuses, fetchClients, selectAllClients} from "../../features/clientsSlice";
 import {Avatar, CardContent, Stack} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
-import {DisplayError} from "../errors/displayError";
+import {DisplayError} from "../errors/DisplayError";
 
 
 const Client = ({client}) => {

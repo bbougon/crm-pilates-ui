@@ -16,8 +16,17 @@ const theme = createTheme({
     },
 });
 
+type Props = {
+    error: [
+        {
+            message: string
+            type: string
+        }
+    ]
+}
 
-export const DisplayError = ({error}) => {
+
+export const DisplayError = ({error}: Props) => {
 
     let errorMessage
     errorMessage = error.map((error) => {
@@ -36,6 +45,7 @@ export const DisplayError = ({error}) => {
             </Stack>
         )
     })
+
     return (
         <Grid item xs={12}>
             <Card>
