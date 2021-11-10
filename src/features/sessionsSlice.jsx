@@ -58,7 +58,6 @@ const sessionsSlice = createSlice({
                 const map_session = (session) => {
                     return Object.assign({}, session, {
                         date: parseISO(session.schedule.start),
-                        schedule: {start: parseISO(session.schedule.start), stop: parseISO(session.schedule.stop)}
                     });
                 }
 

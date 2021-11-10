@@ -119,7 +119,7 @@ describe('Creating a classroom', () => {
         const duration = screen.getByRole("presentation");
         userEvent.click(within(duration).getByText(/2h00/i));
 
-        userEvent.type(await within(classroomForm).getByRole("textbox", {name: /attendees/i}), "Bertrand")
+        userEvent.type(within(classroomForm).getByRole("textbox", {name: /attendees/i}), "Bertrand")
         const clients = screen.getByRole("presentation");
         userEvent.click(within(clients).getByText(/bertrand/i))
         userEvent.type(screen.getByRole("textbox", {name: /attendees/i}), "Pierre")

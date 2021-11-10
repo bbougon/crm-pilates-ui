@@ -2,10 +2,10 @@ import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {Grid} from "@material-ui/core";
 import {Box, Card, ClickAwayListener, Fade, Popper, Typography} from "@mui/material";
 import {blue} from "@mui/material/colors";
-import {format} from "date-fns";
 import * as React from "react";
 import {useState} from "react";
 import {SessionDetails} from "../classroom/sessionDetails";
+import {formatHours} from "../../utils/date";
 
 const theme = createTheme({
     typography: {
@@ -59,11 +59,11 @@ export const ClassroomEventItem = ({classroom: session}) => {
                     return (
                         <ThemeProvider theme={theme}>
                             <Fade {...TransitionProps} timeout={350}>
-                                <Card sx={{minWidth: 450, maxWidth: 600, display: 'flex'}}>
+                                <Card sx={{minWidth: 500, maxWidth: 600, display: 'flex'}}>
                                     <ClickAwayListener onClickAway={closeSessionDisplay}
                                                        disableReactTree={true}>
 
-                                        <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                                        <Box sx={{width: 1, display: 'flex', flexDirection: 'column'}}>
                                             <SessionDetails session={session}/>
                                         </Box>
                                     </ClickAwayListener>
@@ -107,7 +107,7 @@ export const ClassroomEventItem = ({classroom: session}) => {
                             justifyContent: 'flex-end'
                         }}>
                             <Typography>
-                                {format(session.schedule.start, 'k:mm')}
+                                {formatHours(session.schedule.start)}
                             </Typography>
                         </Box>
                     </ThemeProvider>

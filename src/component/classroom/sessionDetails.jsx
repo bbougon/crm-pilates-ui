@@ -5,7 +5,7 @@ import {sessionCheckin} from "../../features/sessionsSlice";
 import {Grid} from "@material-ui/core";
 import {Box, Card, CardContent, CardHeader, Chip, Switch, Typography} from "@mui/material";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
-import {format} from "date-fns";
+import {formatFullDate} from "../../utils/date";
 
 const theme = createTheme({
     typography: {
@@ -103,9 +103,9 @@ const SessionAttendees = ({session}) => {
 export const SessionDetails = ({session}) => {
 
     return (
-        <Card>
+        <Card sx={{width: 1}}>
             <CardHeader title={session.name}
-                        subheader={format(session.schedule.start, "yyyy-MM-dd H:mm").concat(" / ").concat(format(session.schedule.stop, "yyyy-MM-dd H:mm"))}
+                        subheader={formatFullDate(session.schedule.start).concat(" / ").concat(formatFullDate(session.schedule.stop, "yyyy-MM-dd H:mm"))}
                         component="div"/>
             <CardContent>
                 <SessionAttendees session={session}/>
