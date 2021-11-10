@@ -1,5 +1,3 @@
-import {checkin} from "../test-utils/classroom/checkin";
-
 export async function api(endpoint, { body, ...customConfig } = {}) {
     const headers = { 'Content-Type': 'application/json' }
 
