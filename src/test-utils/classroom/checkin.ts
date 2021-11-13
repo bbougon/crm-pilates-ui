@@ -1,4 +1,4 @@
-import {ApiSession} from "../../features/sessionsSlice";
+import {ApiSession} from "../../api";
 
 export const checkin = (session_id: string, classroom_id: string, session: ApiSession) => {
     return {

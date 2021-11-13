@@ -4,7 +4,7 @@ import {Clients} from "./component/clients/ClientPage";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {NavigationBar} from "./navigation/navigation-bar";
 import Sidebar from "./navigation/side-bar";
-import Calendar from "./component/calendar/calendar";
+import Calendar from "./component/calendar/Calendar";
 
 function App() {
   return (

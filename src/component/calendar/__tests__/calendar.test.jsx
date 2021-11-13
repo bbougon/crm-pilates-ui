@@ -1,7 +1,7 @@
 import {render} from "../../../test-utils/test-utils";
 import {screen} from "@testing-library/react";
 import React from "react";
-import Calendar from "../calendar";
+import Calendar from "../Calendar";
 import {formatISO, subHours} from "date-fns";
 import {ServerBuilder} from "../../../test-utils/server/server";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";

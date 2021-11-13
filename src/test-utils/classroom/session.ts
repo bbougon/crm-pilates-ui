@@ -1,5 +1,6 @@
 import {addHours, formatISO, parseISO} from "date-fns";
-import {ApiAttendee, ApiSession, Attendee, Session} from "../../features/sessionsSlice";
+import {Attendee, Session} from "../../features/sessionsSlice";
+import {ApiAttendee, ApiSession} from "../../api";
 
 export class AttendeesBuilder {
 

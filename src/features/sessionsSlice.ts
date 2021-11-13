@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {api} from "../api";
+import {api, ApiSession} from "../api";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 import parse from "parse-link-header"
 import {isEqual, parseISO} from "date-fns";
@@ -28,32 +28,13 @@ const initialState: SessionState = {
     link: undefined
 }
 
-export interface ApiAttendee {
-    id: string;
-    firstname: string;
-    lastname: string;
-    attendance: string;
-}
-
-export interface ApiSession {
-    id?: string
-    name: string
-    classroom_id: string
-    position: number
-    schedule: {
-        start: string
-        stop: string
-    }
-    attendees?: [ApiAttendee]
-}
-
 export interface Session {
     id?: string | undefined
     classroomId: string
     name: string
     schedule: {
         start: string
-        stop?: string | undefined
+        stop: string
     }
     position: number
     attendees?: Attendee[]

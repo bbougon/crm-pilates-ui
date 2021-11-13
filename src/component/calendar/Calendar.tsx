@@ -5,7 +5,7 @@ import {Grid} from "@material-ui/core";
 import {PilatesMonthlyCalendar} from "./PilatesMonthlyCalendar";
 
 
-export class Calendar extends React.Component {
+export class Calendar extends React.Component<{date: Date}> {
 
     render() {
         return (

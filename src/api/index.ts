@@ -1,5 +1,4 @@
 import {ClientCreation} from "../features/clientsSlice";
-import {ApiClassroom} from "../features/classroomSlice";
 import {Checkin} from "../features/sessionsSlice";
 
 type RequestConfig = {
@@ -69,4 +68,36 @@ api.sessionCheckin = (checkin: Checkin) => {
 
 api.addClassroom = (body: ApiClassroom) => {
     return api("/classrooms", {customConfig: {}, body})
+}
+
+export interface ApiClassroom {
+    id?: string
+    name: string,
+    position: number,
+    start_date: string,
+    stop_date: string | null,
+    duration: {
+        duration: number,
+        unit: "MINUTE"
+    },
+    attendees: { id: string }[]
+}
+
+export interface ApiAttendee {
+    id: string;
+    firstname: string;
+    lastname: string;
+    attendance: string;
+}
+
+export interface ApiSession {
+    id?: string
+    name: string
+    classroom_id: string
+    position: number
+    schedule: {
+        start: string
+        stop: string
+    }
+    attendees?: [ApiAttendee]
 }

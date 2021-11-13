@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {api} from "../api";
+import {api, ApiClassroom} from "../api";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 
 export enum ClassroomStatus {
@@ -21,19 +21,6 @@ export interface Classroom {
     endDate: string | null
     duration: number
     attendees: Attendee[]
-}
-
-export interface ApiClassroom {
-    id?: string
-    name: string,
-    position: number,
-    start_date: string,
-    stop_date: string | null,
-    duration: {
-        duration: number,
-        unit: "MINUTE"
-    },
-    attendees: {id: string}[]
 }
 
 interface ClassroomState {

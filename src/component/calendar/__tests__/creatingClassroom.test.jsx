@@ -1,7 +1,7 @@
 import {ServerBuilder} from "../../../test-utils/server/server";
 import {addWeeks, format, formatISO} from "date-fns";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
-import Calendar from "../calendar";
+import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
 import {fireEvent, screen, within} from "@testing-library/react";
 import React from "react";
