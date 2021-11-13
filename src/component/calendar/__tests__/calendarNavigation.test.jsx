@@ -1,5 +1,5 @@
 import {ServerBuilder} from "../../../test-utils/server/server";
-import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
+import {ApiSessionsBuilder, attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
 import {screen, waitFor} from "@testing-library/react";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../calendar";
@@ -18,13 +18,13 @@ describe("Navigate through calendar", () => {
         .request(`/sessions`, "get",
             new SessionsBuilder()
                 .withSession(
-                    new SessionBuilder().withId(13).withClassroom(1).withName('Stage 1')
-                        .withSchedule(new Date("2021-11-01T11:20:00"), 1).withPosition(3)
+                    new ApiSessionsBuilder().withId("13").withClassroom(1).withName('Stage 1')
+                        .withSchedule("2021-11-01T11:20:00Z", 1).withPosition(3)
                         .build()
                 )
                 .withSession(
-                    new SessionBuilder().withId(4).withClassroom(1).withName('Stage 2')
-                        .withSchedule(new Date("2021-11-01T13:20:00"), 1).withPosition(1)
+                    new ApiSessionsBuilder().withId("4").withClassroom(1).withName('Stage 2')
+                        .withSchedule("2021-11-01T13:20:00Z", 1).withPosition(1)
                         .withAttendee(attendee(3, "Bertrand", "Bougon", "CHECKED_IN"))
                         .build()
                 )

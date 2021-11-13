@@ -1,15 +1,17 @@
 import {FulFilledAction} from "../../test-utils/features/actionFixtures";
 import reducer, {fetchSessions} from "../sessionsSlice";
 import {LoadingState} from "../../test-utils/features/sessions/sessionsStateFixtures";
-import {attendee, SessionBuilder, SessionsBuilder} from "../../test-utils/classroom/session";
-import {addHours, format, subHours} from "date-fns";
+import {ApiSessionsBuilder, attendee, SessionBuilder, SessionsBuilder} from "../../test-utils/classroom/session";
+import {addHours, format, formatISO, subHours} from "date-fns";
 
 describe("SessionsSlice", () =>{
 
     describe("Fetching sessions", () => {
         it("should get links header", () => {
             const previousState = new LoadingState().build()
-            const action = new FulFilledAction(fetchSessions).withPayload([]).withMeta({link :'</sessions?from=previous>; rel="previous", </sessions?from=current>; rel="current", </sessions?from=next>; rel="next"'}).build()
+            const action = new FulFilledAction(fetchSessions)
+                .withPayload({sessions: [], link :'</sessions?from=previous>; rel="previous", </sessions?from=current>; rel="current", </sessions?from=next>; rel="next"'})
+                .build()
 
             expect(reducer(previousState, action)).toEqual({
                 sessions: [],
@@ -27,23 +29,24 @@ describe("SessionsSlice", () =>{
             const currentDate = new Date()
             const sessions = new SessionsBuilder()
                 .withSession(
-                    new SessionBuilder().withClassroom(1).withName('Pilates avancé')
-                        .withScheduleAsString(subHours(currentDate, 5)).withPosition(3)
+                    new ApiSessionsBuilder().withClassroom(1).withName('Pilates avancé')
+                        .withScheduleAsString(formatISO(subHours(currentDate, 5))).withPosition(3)
                         .withAttendee(attendee(1, "Laurent", "Gas", "CHECKED_IN"))
                         .withAttendee(attendee(2, "Pierre", "Bernard", "REGISTERED"))
                         .build()
                 )
                 .build()
             const previousState = new LoadingState().build()
-            const action = new FulFilledAction(fetchSessions).withPayload(sessions).withMeta({link :'</sessions?from=previous>; rel="previous", </sessions?from=current>; rel="current", </sessions?from=next>; rel="next"'}).build()
+            const action = new FulFilledAction(fetchSessions)
+                .withPayload({sessions: sessions, link :'</sessions?from=previous>; rel="previous", </sessions?from=current>; rel="current", </sessions?from=next>; rel="next"'})
+                .build()
 
             let startDate = subHours(currentDate, 5);
             expect(reducer(previousState, action)).toEqual({
                 sessions: [{
-                    classroom_id: 1,
+                    classroomId: 1,
                     name: "Pilates avancé",
-                    date: startDate,
-                    schedule: {start: format(startDate, "yyyy-MM-dd'T'HH:mm:ss.SSSX"), stop: format(addHours(startDate, 1), "yyyy-MM-dd'T'HH:mm:ss.SSSX")},
+                    schedule: {start: format(startDate, "yyyy-MM-dd'T'HH:mm:ssXXX"), stop: format(addHours(startDate, 1), "yyyy-MM-dd'T'HH:mm:ssXXX")},
                     position: 3,
                     attendees: [
                         {id: 1, firstname: "Laurent", lastname: "Gas", attendance: "CHECKED_IN"},

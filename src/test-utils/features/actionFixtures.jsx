@@ -21,7 +21,7 @@ export function RejectedAction(type) {
     }
 
     this.withErrorPayload = () => {
-        this.action.payload = "error"
+        this.action.payload = {detail: [{msg: "error", type:"type"}]}
         return this
     }
 

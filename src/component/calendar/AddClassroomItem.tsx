@@ -15,7 +15,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {Popper} from "@material-ui/core";
 import {useMonthlyBody} from "@zach.codes/react-calendar";
 import {createTheme} from "@mui/material/styles";
-import {AddClassroomForm} from "../classroom/addClassroomForm";
+import {AddClassroomForm} from "../classroom/AddClassroomForm";
 import {format} from "date-fns";
 
 const theme = createTheme({
@@ -45,7 +45,7 @@ export const AddClassroomItem = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false);
 
-    const openAddClassRoomForm = () => (event) => {
+    const openAddClassRoomForm = () => (event: any) => {
         setAnchorEl(event.currentTarget);
         setOpen((prev) => !prev);
     }

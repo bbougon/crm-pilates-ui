@@ -1,5 +1,5 @@
-import {Autocomplete, Button, Grid, InputLabel, MenuItem, Select} from "@mui/material";
-import {FormControl, TextField} from "@material-ui/core";
+import {Autocomplete, Button, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import {FormControl} from "@material-ui/core";
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
@@ -7,11 +7,17 @@ import * as React from "react";
 import {useState} from "react";
 import set from "date-fns/set";
 import {useDispatch, useSelector} from "react-redux";
-import {selectAllClients} from "../../features/clientsSlice";
-import {addClassroom} from "../../features/classroomSlice";
-import {fetchSessions} from "../../features/sessionsSlice";
+import {Client, selectAllClients} from "../../features/clientsSlice";
+import {addClassroom, Classroom} from "../../features/classroomSlice";
+import {fetchSessions, Link} from "../../features/sessionsSlice";
+import {RootState} from "../../app/store";
+import {formatISO} from "date-fns";
 
-export const AddClassroomForm = ({date}) => {
+interface AddClassroomFormProps {
+    date: Date
+}
+
+export const AddClassroomForm = ({date}: AddClassroomFormProps) => {
 
     const dispatch = useDispatch();
 
@@ -31,18 +37,18 @@ export const AddClassroomForm = ({date}) => {
     const [classroomName, setClassroomName] = useState('')
     const [position, setPosition] = useState(1)
     const [duration, setDuration] = useState(60)
-    const [classroomStartDateTime, setClassroomStartDateTime] = useState(set(date, {
+    const [classroomStartDateTime, setClassroomStartDateTime] = useState<Date | null>(set(date, {
         hours: currentDate.getHours(),
         minutes: currentDate.getMinutes()
     }))
-    const [classroomEndDateTime, setClassroomEndDateTime] = useState(null)
-    const [attendees, setAttendees] = useState([])
-    const clients = useSelector(selectAllClients)
-    const link = useSelector((state => state.sessions.link))
+    const [classroomEndDateTime, setClassroomEndDateTime] = useState<Date | null>(null)
+    const [attendees, setAttendees] = useState<Client[]>([])
+    const clients: Client[] = useSelector(selectAllClients)
+    const link = useSelector<RootState, Link | undefined>((state => state.sessions.link))
 
-    const onClassroomNameChanged = (e) => setClassroomName(e.target.value)
-    const onPositionChanged = (e) => setPosition(e.target.value)
-    const onDurationChanged = (e) => setDuration(e.target.value)
+    const onClassroomNameChanged = (e: any) => setClassroomName(e.target.value)
+    const onPositionChanged = (e: any) => setPosition(e.target.value)
+    const onDurationChanged = (e: any) => setDuration(e.target.value)
 
     const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
     const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)
@@ -54,9 +60,16 @@ export const AddClassroomForm = ({date}) => {
     }
 
     const onSubmitClicked = async () => {
-        const classroom = {classroomName, classroomStartDateTime, classroomEndDateTime, position, duration, attendees}
+        const classroom: Classroom = {
+            classroomName,
+            startDate: formatISO(classroomStartDateTime || new Date()),
+            endDate: classroomEndDateTime != null ? formatISO(classroomEndDateTime) : null,
+            position,
+            duration,
+            attendees: attendees.map(attendee => {return {id: attendee.id}})
+        }
         await dispatch(addClassroom(classroom))
-        await dispatch(fetchSessions(link.current.url))
+        await dispatch(fetchSessions(link?.current.url))
     }
 
     return (
@@ -68,6 +81,7 @@ export const AddClassroomForm = ({date}) => {
                                    label="Classroom's name"
                                    helperText="Provide a classroom's name"
                                    required
+                                   variant="standard"
                                    onChange={onClassroomNameChanged}
                                    aria-describedby="classroom-name-help"
                                    value={classroomName}
@@ -101,7 +115,8 @@ export const AddClassroomForm = ({date}) => {
                                 onChange={(newValue) => {
                                     setClassroomStartDateTime(newValue);
                                 }}
-                                renderInput={(params) => <TextField {...params} label="Choose start date" helperText="Choose start date" />}
+                                renderInput={(params) => <TextField {...params} label="Choose start date"
+                                                                    helperText="Choose start date" variant="standard"/>}
                                 value={classroomStartDateTime}
                                 minDateTime={dayStart}
                                 maxDateTime={dayEnd}
@@ -117,10 +132,9 @@ export const AddClassroomForm = ({date}) => {
                                 onChange={(newValue) => {
                                     setClassroomEndDateTime(newValue);
                                 }}
-                                renderInput={(params) => <TextField  {...params}
-                                                                     helperText="Choose a date for recurrence"/>}
                                 minDateTime={dayStart}
                                 value={classroomEndDateTime}
+                                renderInput={(props) => <TextField  {...props} variant="standard"/>}
                             />
                         </LocalizationProvider>
                     </FormControl>

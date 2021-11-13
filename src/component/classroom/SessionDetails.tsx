@@ -1,11 +1,10 @@
 import * as React from "react";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {sessionCheckin} from "../../features/sessionsSlice";
-import {Grid} from "@material-ui/core";
-import {Box, Card, CardContent, CardHeader, Chip, Switch, Typography} from "@mui/material";
+import {Attendee, Session, sessionCheckin} from "../../features/sessionsSlice";
+import {Box, Grid, Card, CardContent, CardHeader, Chip, Typography, Switch} from "@mui/material";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
-import {formatFullDate} from "../../utils/date";
+import {formatFullDate, formatHours} from "../../utils/date";
 
 const theme = createTheme({
     typography: {
@@ -37,17 +36,28 @@ const theme = createTheme({
     },
 });
 
-const SessionAttendee = ({attendee, session}) => {
+interface SessionAttendeeProps {
+    attendee: Attendee
+    session: Session
+}
 
+const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
+
+    const [attendee] = useState(sessionAttendeeProps.attendee);
+    const [session] = useState(sessionAttendeeProps.session);
     const [attendeeLabelStatus] = useState(attendee.attendance === "REGISTERED" ? 'R' : 'C')
-    const [attendeeLabelColor] = useState(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
+    const [attendeeLabelColor] = useState<'primary' | 'success'>(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
 
     const dispatch = useDispatch();
 
-    const onSessionCheckin = async (e) => {
+    const onSessionCheckin = async (e: any) => {
         if (e.target.checked) {
-            const checkin = Object.assign({}, session, attendee)
-            await dispatch(sessionCheckin(checkin))
+            const checkin = {
+                classroomId: session.classroomId,
+                start: session.schedule.start,
+                attendeeId: attendee.id
+            }
+            dispatch(sessionCheckin(checkin))
         }
     }
 
@@ -89,9 +99,9 @@ const SessionAttendee = ({attendee, session}) => {
     )
 }
 
-const SessionAttendees = ({session}) => {
+const SessionAttendees = (session: Session) => {
 
-    const content = session.attendees.map((attendee) => (
+    const content = session?.attendees?.map((attendee) => (
         <SessionAttendee key={attendee.id} attendee={attendee} session={session}/>))
     return (
         <Grid container>
@@ -100,15 +110,22 @@ const SessionAttendees = ({session}) => {
     )
 }
 
-export const SessionDetails = ({session}) => {
+export const SessionDetails = (session: Session) => {
 
+    let sessionStart = session.schedule.start;
+    let sessionEnd = session.schedule.stop;
+    let dateSubheader = formatFullDate(sessionStart)
+        .concat(` ${formatHours(sessionStart)}`)
+        .concat(" / ")
+        .concat(formatFullDate(sessionEnd))
+        .concat(` ${formatHours(sessionEnd)}`);
     return (
         <Card sx={{width: 1}}>
             <CardHeader title={session.name}
-                        subheader={formatFullDate(session.schedule.start).concat(" / ").concat(formatFullDate(session.schedule.stop, "yyyy-MM-dd H:mm"))}
+                        subheader={dateSubheader}
                         component="div"/>
             <CardContent>
-                <SessionAttendees session={session}/>
+                <SessionAttendees {...session}/>
             </CardContent>
         </Card>
     )

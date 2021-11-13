@@ -2,6 +2,7 @@ import {CardContent, Stack, Typography} from "@mui/material";
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {Card, Grid} from "@material-ui/core";
 import * as React from "react";
+import {ErrorMessage} from "../../features/errors";
 
 const theme = createTheme({
     typography: {
@@ -16,20 +17,15 @@ const theme = createTheme({
     },
 });
 
-type Props = {
-    error: [
-        {
-            message: string
-            type: string
-        }
-    ]
+interface DisplayErrorProps {
+    error: ErrorMessage[]
 }
 
 
-export const DisplayError = ({error}: Props) => {
+export const DisplayError = ({error}: DisplayErrorProps) => {
 
     let errorMessage
-    errorMessage = error.map((error) => {
+    errorMessage = error?.map((error) => {
         return (
             <Stack key={Math.random()}>
                 <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>

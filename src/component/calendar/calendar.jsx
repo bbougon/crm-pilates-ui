@@ -2,7 +2,7 @@ import '@zach.codes/react-calendar/dist/calendar-tailwind.css';
 import * as React from "react";
 import {MainContainer} from "../../const/containers";
 import {Grid} from "@material-ui/core";
-import {PilatesMonthlyCalendar} from "./pilatesMonthlyCalendar";
+import {PilatesMonthlyCalendar} from "./PilatesMonthlyCalendar";
 
 
 export class Calendar extends React.Component {

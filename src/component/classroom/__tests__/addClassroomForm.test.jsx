@@ -1,8 +1,7 @@
 import {render} from "../../../test-utils/test-utils";
 import {fireEvent, screen, within} from "@testing-library/react";
-import {AddClassroomForm} from "../addClassroomForm";
+import {AddClassroomForm} from "../AddClassroomForm";
 import userEvent from "@testing-library/user-event";
-import {client, ClientsBuilder} from "../../../test-utils/clients/clients";
 
 describe("Add classroom form", () => {
 
@@ -43,42 +42,5 @@ describe("Add classroom form", () => {
 
         expect(screen.getByRole("button", {name: /duration 1h30/i})).toHaveTextContent("1h30")
     })
-
-
-    it.skip('should submit with end date according to classroom duration', function () {
-        let date = new Date();
-        let clients = new ClientsBuilder().withClient(client()).withClient(client("Bertrand", "Bougon", "2")).build();
-
-        render(<AddClassroomForm date={date} />)
-
-        userEvent.type(screen.getByText("Classroom's name"), "Cours Duo")
-        fireEvent.mouseDown(screen.getByRole("button", {name: /duration 1h00/i}))
-        const duration = within(screen.getByRole('listbox'));
-        userEvent.click(duration.getByText(/1h30/i));
-        userEvent.click(screen.getByRole("button", {name: /submit/i}))
-    });
-
-
-    it.skip('should submit with attendees', function () {
-        let date = new Date();
-        let clients = new ClientsBuilder().withClient(client()).withClient(client("Bertrand", "Bougon", "2")).build();
-
-        render(<AddClassroomForm date={date} />)
-
-        userEvent.type(screen.getByText("Classroom's name"), "Cours Duo")
-        fireEvent.mouseDown(screen.getByRole("button", {name: /position 1/i}))
-        const position = within(screen.getByRole('listbox'));
-        userEvent.click(position.getByText(/2/i));
-        fireEvent.mouseDown(screen.getByRole("button", {name: /duration 1h00/i}))
-        const duration = within(screen.getByRole('listbox'));
-        userEvent.click(duration.getByText(/2h00/i));
-        userEvent.type(screen.getByRole("textbox", {name: /attendees/i}), "Bertrand")
-        userEvent.click(screen.getByText(/bertrand/i))
-        userEvent.click(screen.getByRole("button", {name: /submit/i}))
-
-        let attendeesSelect = screen.getByRole("combobox");
-        expect(within(attendeesSelect).getByText(/bougon bertrand/i)).toBeInTheDocument()
-    });
-
 
 })

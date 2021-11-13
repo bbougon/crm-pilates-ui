@@ -1,13 +1,18 @@
 import {configureStore} from "@reduxjs/toolkit";
 import clientsReducer from "../features/clientsSlice";
 import sessionsReducer from "../features/sessionsSlice";
+import classroomReducer from "../features/classroomSlice";
 
 /* eslint-disable no-underscore-dangle */
-export default configureStore({
+export const store =  configureStore({
     reducer: {
         clients: clientsReducer,
-        sessions: sessionsReducer
+        sessions: sessionsReducer,
+        classroom: classroomReducer
     },
-}, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+})
+
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
 
 /* eslint-enable */

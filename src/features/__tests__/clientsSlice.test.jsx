@@ -43,7 +43,7 @@ describe('ClientsSlice', () => {
                 expect(reducer(previousState, action)).toEqual({
                     clients: [],
                     status: "failed",
-                    error: [{message: "error"}]
+                    error: [{message: "error", type: "type"}]
                 })
             })
 

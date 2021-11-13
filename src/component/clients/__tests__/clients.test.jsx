@@ -1,5 +1,5 @@
 import React from "react";
-import {Clients} from "../clients";
+import {Clients} from "../ClientPage";
 import {prettyDOM, screen, waitFor} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import {render} from "../../../test-utils/test-utils";
@@ -7,7 +7,7 @@ import {client, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {APIDetail, APIErrorBody, ServerBuilder} from "../../../test-utils/server/server";
 
 
-describe('Clients page', function () {
+describe('ClientPage page', function () {
     const server = new ServerBuilder().request("/clients", "get", []).build()
 
     beforeAll(() => server.listen())
@@ -93,8 +93,8 @@ describe('Clients page', function () {
             userEvent.type(screen.getByText("Client's firstname"), "John")
             userEvent.click(screen.getByRole("button", {name: /submit/i}))
 
-            expect(await screen.queryByDisplayValue("Doe")).toBeInTheDocument()
-            expect(await screen.queryByDisplayValue("John")).toBeInTheDocument()
+            expect(await screen.findByText("Doe", {selector: 'h6'})).toBeInTheDocument()
+            expect(await screen.findByText("John", )).toBeInTheDocument()
             await waitFor(() => expect(screen.getByLabelText("Client's name *", {selector: 'input'})).toHaveValue(""))
             await waitFor(() => expect(screen.getByLabelText("Client's firstname *", {selector: 'input'})).toHaveValue(""))
         })

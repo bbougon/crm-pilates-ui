@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Clients page should be displayed 1`] = `
+exports[`ClientPage page should be displayed 1`] = `
 "[36m<div>[39m
   [36m<div[39m
-    [33mclass[39m=[32m\\"sc-bdfBQB gOWVrL\\"[39m
+    [33mclass[39m=[32m\\"sc-gsTEea eZhNqH\\"[39m
   [36m>[39m
     [36m<div[39m
       [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m
@@ -74,7 +74,7 @@ exports[`Clients page should be displayed 1`] = `
                     [33mclass[39m=[32m\\"MuiAccordionDetails-root\\"[39m
                   [36m>[39m
                     [36m<div[39m
-                      [33mclass[39m=[32m\\"sc-gsTEea iKEupo\\"[39m
+                      [33mclass[39m=[32m\\"sc-bdfBQB glpenM\\"[39m
                     [36m>[39m
                       [36m<div[39m
                         [33mclass[39m=[32m\\"MuiGrid-root MuiGrid-container\\"[39m

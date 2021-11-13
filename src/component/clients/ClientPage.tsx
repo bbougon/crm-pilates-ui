@@ -1,8 +1,8 @@
 import * as React from "react";
-import {MainContainer} from "../../const/containers";
 import {Grid} from "@material-ui/core";
-import {AddClientForm} from "./addClientForm";
-import {ClientsList} from "./clientsList";
+import {ClientsList} from "./ClientsList";
+import {AddClientForm} from "./ClientForm";
+import {MainContainer} from "../../const/containers";
 
 
 export class Clients extends React.Component {

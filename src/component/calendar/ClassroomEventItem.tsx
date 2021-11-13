@@ -4,8 +4,9 @@ import {Box, Card, ClickAwayListener, Fade, Popper, Typography} from "@mui/mater
 import {blue} from "@mui/material/colors";
 import * as React from "react";
 import {useState} from "react";
-import {SessionDetails} from "../classroom/sessionDetails";
 import {formatHours} from "../../utils/date";
+import {Session} from "../../features/sessionsSlice";
+import {SessionDetails} from "../classroom/SessionDetails";
 
 const theme = createTheme({
     typography: {
@@ -38,12 +39,12 @@ const theme = createTheme({
 });
 
 
-export const ClassroomEventItem = ({classroom: session}) => {
+export const ClassroomEventItem = (session: Session) => {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false);
 
-    const displaySession = () => (event) => {
+    const displaySession = () => (event: any) => {
         setAnchorEl(event.currentTarget);
         setOpen((prev) => !prev);
     }
@@ -64,7 +65,7 @@ export const ClassroomEventItem = ({classroom: session}) => {
                                                        disableReactTree={true}>
 
                                         <Box sx={{width: 1, display: 'flex', flexDirection: 'column'}}>
-                                            <SessionDetails session={session}/>
+                                            <SessionDetails {...session}/>
                                         </Box>
                                     </ClickAwayListener>
                                 </Card>
@@ -94,7 +95,7 @@ export const ClassroomEventItem = ({classroom: session}) => {
                             justifyContent: 'center'
                         }}>
                             <Typography color={blue[400]}>
-                                {session.attendees.length} / {session.position}
+                                {session?.attendees?.length} / {session.position}
                             </Typography>
                         </Box>
                     </ThemeProvider>

@@ -1,12 +1,18 @@
 import {ServerBuilder} from "../../../test-utils/server/server";
-import {attendee, schedule, session, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
+import {
+    apiSession,
+    ApiSessionsBuilder,
+    attendee,
+    schedule,
+    SessionsBuilder
+} from "../../../test-utils/classroom/session";
 import {checkin} from "../../../test-utils/classroom/checkin";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../calendar";
 import userEvent from "@testing-library/user-event";
-import {screen, waitFor} from "@testing-library/react";
+import {screen} from "@testing-library/react";
 import React from "react";
-import {addHours} from "date-fns";
+import {addHours, formatISO} from "date-fns";
 
 describe("Interacting with session", () => {
 
@@ -18,14 +24,14 @@ describe("Interacting with session", () => {
     const server = new ServerBuilder()
         .request("/sessions", "get", new SessionsBuilder()
             .withSession(
-                new SessionBuilder().withClassroom(1).withName('Cours Duo')
-                    .withSchedule(classroomDate, 1, 1).withPosition(2)
+            new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
+                    .withSchedule(formatISO(classroomDate), 1).withPosition(2)
                     .withAttendee(attendee(3, "Bertrand", "Bougon", "REGISTERED"))
                     .build()
             )
             .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
         .request("/clients", "get", [])
-        .request("/sessions/checkin", "post", checkin(15, 1, session(undefined, 1, "Cours Duo", schedule(classroomDate, addHours(classroomDate, 1)), 2, attendee(3, "Bertrand", "Bougon", "CHECKEDIN"))), 201)
+        .request("/sessions/checkin", "post", checkin("15", 1, apiSession("15", 1, "Cours Duo", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", "CHECKED_IN")])), 201)
         .build()
 
     beforeAll(() => server.listen())
@@ -34,7 +40,7 @@ describe("Interacting with session", () => {
 
     afterAll(() => server.close())
 
-    it.skip("should checkin attendee", async () => {
+    it("should checkin attendee", async () => {
         await render(<Calendar date={classroomDate} />)
 
         await actThenSleep(20)
@@ -43,6 +49,6 @@ describe("Interacting with session", () => {
         await actThenSleep(20)
         userEvent.click(await screen.findByText("Cours Duo"))
 
-        await waitFor(() => expect(screen.getByText("C", {selector: "span"})).toBeInTheDocument())
+        expect(screen.getByText("C", {selector: "span"})).toBeInTheDocument()
     })
 })

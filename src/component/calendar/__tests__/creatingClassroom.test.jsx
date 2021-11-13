@@ -1,9 +1,9 @@
 import {ServerBuilder} from "../../../test-utils/server/server";
-import {addWeeks, format, subHours} from "date-fns";
+import {addWeeks, format, formatISO} from "date-fns";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../calendar";
 import userEvent from "@testing-library/user-event";
-import {fireEvent, screen, waitFor, within} from "@testing-library/react";
+import {fireEvent, screen, within} from "@testing-library/react";
 import React from "react";
 import {client, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
@@ -31,7 +31,7 @@ describe('Creating a classroom', () => {
         .request("/sessions", "get", new SessionsBuilder()
             .withSession(
                 new SessionBuilder().withClassroom(1).withName('Cours Duo')
-                    .withSchedule(classroomDate, 2).withPosition(3)
+                    .withSchedule(formatISO(classroomDate), 2).withPosition(3)
                     .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
                     .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
                     .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
@@ -39,7 +39,7 @@ describe('Creating a classroom', () => {
             )
             .withSession(
                 new SessionBuilder().withClassroom(1).withName('Cours Duo')
-                    .withSchedule(addWeeks(classroomDate, 1), 2).withPosition(3)
+                    .withSchedule(formatISO(addWeeks(classroomDate, 1)), 2).withPosition(3)
                     .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
                     .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
                     .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
@@ -47,7 +47,7 @@ describe('Creating a classroom', () => {
             )
             .withSession(
                 new SessionBuilder().withClassroom(1).withName('Cours Duo')
-                    .withSchedule(addWeeks(classroomDate, 2), 2).withPosition(3)
+                    .withSchedule(formatISO(addWeeks(classroomDate, 2)), 2).withPosition(3)
                     .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
                     .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
                     .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
@@ -55,7 +55,7 @@ describe('Creating a classroom', () => {
             )
             .withSession(
                 new SessionBuilder().withClassroom(1).withName('Cours Duo')
-                    .withSchedule(addWeeks(classroomDate, 3), 2).withPosition(3)
+                    .withSchedule(formatISO(addWeeks(classroomDate, 3)), 2).withPosition(3)
                     .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
                     .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
                     .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
@@ -63,7 +63,7 @@ describe('Creating a classroom', () => {
             )
             .withSession(
                 new SessionBuilder().withClassroom(1).withName('Cours Duo')
-                    .withSchedule(addWeeks(classroomDate, 4), 2).withPosition(3)
+                    .withSchedule(formatISO(addWeeks(classroomDate, 4), 2)).withPosition(3)
                     .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
                     .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
                     .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
@@ -118,6 +118,7 @@ describe('Creating a classroom', () => {
         fireEvent.mouseDown(within(classroomForm).getAllByRole("button", {name: /1h00/i})[0])
         const duration = screen.getByRole("presentation");
         userEvent.click(within(duration).getByText(/2h00/i));
+        expect(within(classroomForm).getByRole("button", {name: /2h00/i})).toBeInTheDocument()
 
         userEvent.type(within(classroomForm).getByRole("textbox", {name: /attendees/i}), "Bertrand")
         const clients = screen.getByRole("presentation");

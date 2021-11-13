@@ -15,8 +15,10 @@ import {useState} from "react";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import styled from "styled-components";
 import {useDispatch, useSelector} from "react-redux";
-import {clientStatuses, createClient} from "../../features/clientsSlice";
+import {ClientStatus, createClient} from "../../features/clientsSlice";
 import {DisplayError} from "../errors/DisplayError";
+import {ErrorMessage} from "../../features/errors";
+import {RootState} from "../../app/store";
 
 
 const Wrapper = styled.div`
@@ -26,14 +28,14 @@ const Wrapper = styled.div`
     width: 100%;
 `;
 
-
-function ClientAccordionSummary() {
+const ClientAccordionSummary = () => {
+    const props = {
+        expandIcon: <ExpandMoreIcon/>,
+        sx: {textAlign: "center"},
+        id: "panel1c-header"
+    }
     return (
-        <AccordionSummary
-            expandIcon={<ExpandMoreIcon/>}
-            aria-controls="panel1c-content"
-            id="panel1c-header"
-            sx={{textAlign: "center"}}>
+        <AccordionSummary {...props} aria-controls={"panel1c-content"}>
             <Typography variant="h6" color="textSecondary">Add a new client</Typography>
         </AccordionSummary>
     )
@@ -43,27 +45,27 @@ export const AddClientForm = () => {
 
     const dispatch = useDispatch()
 
-    const error = useSelector((state => state.clients.error))
-    const status = useSelector((state => state.clients.status))
+    const errorMessages: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>((state => state.clients.error))
+    const status: ClientStatus = useSelector<RootState, ClientStatus>((state => state.clients.status))
     let errorContent = undefined
 
     const [firstname, setFirstname] = useState('')
     const [lastname, setLastname] = useState('')
 
-    const onFirstnameChanged = (e) => setFirstname(e.target.value)
-    const onLastnameChanged = (e) => setLastname(e.target.value)
+    const onFirstnameChanged = (e: any) => setFirstname(e.target.value)
+    const onLastnameChanged = (e: any) => setLastname(e.target.value)
 
     const onSubmitClicked = async () => {
-        await dispatch(createClient({firstname, lastname}))
+        dispatch(createClient({firstname, lastname}))
         setLastname('')
         setFirstname('')
     }
 
-    if (status === clientStatuses.CREATION_FAILED) {
+    if (status === ClientStatus.CREATION_FAILED) {
         errorContent = (
             <Grid container>
                 <Grid item xs={12} md={12}>
-                    <DisplayError error={error}/>
+                    <DisplayError {...{error: errorMessages}}/>
                 </Grid>
             </Grid>
         )

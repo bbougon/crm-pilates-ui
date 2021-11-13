@@ -1,5 +1,5 @@
 import {render} from "../../../test-utils/test-utils";
-import {AddClientForm} from "../addClientForm";
+import {AddClientForm} from "../ClientForm";
 import {screen} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import React from "react";

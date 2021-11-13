@@ -1,49 +1,59 @@
 import {useDispatch, useSelector} from "react-redux";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {addMonths, format, getYear, isSameDay, startOfMonth, subMonths} from "date-fns";
-import {fetchSessions, selectMonthlySessions} from "../../features/sessionsSlice";
+import {addMonths, format, getYear, isSameDay, parseISO, startOfMonth, subMonths} from "date-fns";
+import {fetchSessions, Link, selectMonthlySessions, Session} from "../../features/sessionsSlice";
 import {MonthlyBody, MonthlyCalendar, useMonthlyBody, useMonthlyCalendar} from "@zach.codes/react-calendar";
-import {Grid} from "@material-ui/core";
-import {AddClassroomItem} from "./addClassroomItem";
-import {ClassroomEventItem} from "./classroomEventItem";
+import {Box} from "@material-ui/core";
 import {fetchClients} from "../../features/clientsSlice";
-import {Box, List} from "@mui/material";
+import {Grid, List} from "@mui/material";
 import {blueGrey} from "@mui/material/colors";
+import {RootState} from "../../app/store";
+import {ClassroomEventItem} from "./ClassroomEventItem";
+import {AddClassroomItem} from "./AddClassroomItem";
 
-export const PilatesMonthlyCalendar = ({date}) => {
+
+interface MonthlyDayProps {
+    render(events: any): any
+}
+
+export interface PilatesMonthlyCalendarProps {
+    date: Date
+}
+
+export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
 
     const dispatch = useDispatch();
     let [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
     const sessions = useSelector(selectMonthlySessions)
-    const link = useSelector((state => state.sessions.link))
+    const link = useSelector<RootState, Link | undefined>((state => state.sessions.link))
 
     useEffect(() => {
         dispatch(fetchSessions())
         dispatch(fetchClients())
     }, [dispatch])
 
-    const MonthlyDay = ({ renderDay }) => {
-        let { locale } = useMonthlyCalendar()
-        let { day, events } = useMonthlyBody()
-        let dayNumber = format(day, 'd', { locale });
+    const MonthlyDay = (props: MonthlyDayProps) => {
+        let {locale} = useMonthlyCalendar()
+        let {day, events} = useMonthlyBody()
+        let dayNumber = format(day, 'd', {locale});
 
         const backgroundColor = isSameDay(day, new Date()) ? blueGrey[50] : "white"
 
         return (
-            <Box direction="row"
+            <Box
                 aria-label={`Events for day ${dayNumber}`}
                 className="rc-h-48 rc-p-2 rc-border-b-2 rc-border-r-2" sx={{bgcolor: backgroundColor}}
             >
                 <Grid className="rc-flex rc-justify-between">
                     <Grid item className="rc-font-bold">{dayNumber}</Grid>
                     <Grid item className="lg:rc-hidden rc-block">
-                        {format(day, 'EEEE', { locale })}
+                        {format(day, 'EEEE', {locale})}
                     </Grid>
                 </Grid>
                 <Grid>
                     <List className="rc-divide-gray-200 rc-divide-y rc-overflow-hidden rc-max-h-36 rc-overflow-y-auto">
-                        {renderDay(events)}
+                        {props.render(events)}
                     </List>
                 </Grid>
             </Box>
@@ -54,7 +64,7 @@ export const PilatesMonthlyCalendar = ({date}) => {
     const MonthlyNav = () => {
         let {currentMonth, onCurrentMonthChange} = useMonthlyCalendar();
 
-        const onPeriodClick = async (date, link) => {
+        const onPeriodClick = async (date: Date, link: string | undefined) => {
             await dispatch(fetchSessions(link))
             onCurrentMonthChange(date)
         }
@@ -66,7 +76,7 @@ export const PilatesMonthlyCalendar = ({date}) => {
                     justifyContent: 'flex-end'
                 }}>
                     <button
-                        onClick={() => onPeriodClick(subMonths(currentMonth, 1), link.previous.url)}
+                        onClick={() => onPeriodClick(subMonths(currentMonth, 1), link?.previous.url)}
                         className="cursor-pointer">
                         Previous
                     </button>
@@ -85,7 +95,7 @@ export const PilatesMonthlyCalendar = ({date}) => {
                     justifyContent: 'flex-end'
                 }}>
                     <button
-                        onClick={() => onPeriodClick(addMonths(currentMonth, 1), link.next.url)}
+                        onClick={() => onPeriodClick(addMonths(currentMonth, 1), link?.next.url)}
                         className="cursor-pointer">
                         Next
                     </button>
@@ -94,24 +104,30 @@ export const PilatesMonthlyCalendar = ({date}) => {
         );
     };
 
+
+    function mapToCalendarEvent(session: Session) {
+        return {
+            ...session,
+            date: parseISO(`${session.schedule.start}`)
+        }
+    }
+
     return (
         <MonthlyCalendar
             currentMonth={currentMonth}
             onCurrentMonthChange={date => setCurrentMonth(date)}>
             <MonthlyNav/>
-            <MonthlyBody events={sessions} omitDays={[0]}>
+            <MonthlyBody events={sessions.map(session => mapToCalendarEvent(session))} omitDays={[0]}>
                 <MonthlyDay
-                    renderDay={data => {
-                        let events = data.map((item, index) => (
-                            <ClassroomEventItem
-                                key={index}
-                                classroom={item}
-                            />
-                        ));
-                        events.push(<AddClassroomItem key={Math.random()} />)
-                        return events
-                    }
-                    }
+                    {...{
+                        render: (data) => {
+                            let events = data.map((item: Session, index: number) => (
+                                <ClassroomEventItem key={index} {...item} />
+                            ));
+                            events.push(<AddClassroomItem key={Math.random()}/>)
+                            return events
+                        }
+                    }}
                 />
             </MonthlyBody>
         </MonthlyCalendar>

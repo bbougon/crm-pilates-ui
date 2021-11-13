@@ -2,13 +2,15 @@ import * as React from "react";
 import {useEffect} from "react";
 import {Card, Grid, Typography} from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
-import {clientStatuses, fetchClients, selectAllClients} from "../../features/clientsSlice";
+import {Client, ClientStatus, fetchClients, selectAllClients} from "../../features/clientsSlice";
 import {Avatar, CardContent, Stack} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import {DisplayError} from "../errors/DisplayError";
+import {ErrorMessage} from "../../features/errors";
+import {RootState} from "../../app/store";
 
 
-const Client = ({client}) => {
+const ClientItem = (client: Client) => {
     return (
         <Grid item xs={12}>
             <Card>
@@ -33,18 +35,18 @@ const Client = ({client}) => {
 export const ClientsList = () => {
 
     const dispatch = useDispatch();
-    const clients = useSelector(selectAllClients);
-    const error = useSelector((state => state.clients.error))
-    const status = useSelector((state => state.clients.status))
+    const clients: Client[] = useSelector(selectAllClients);
+    const error: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>((state => state.clients.error))
+    const status: ClientStatus = useSelector<RootState, ClientStatus>((state => state.clients.status))
     let content
 
     useEffect(() => {
         dispatch(fetchClients())
     }, [dispatch])
 
-    content = clients.map((client) => (<Client key={client.id} client={client}/>))
-    if (status === clientStatuses.FAILED) {
-        content = <DisplayError error={error}/>
+    content = clients.map((client) => (<ClientItem key={client.id} {...client}/>))
+    if (status === ClientStatus.FAILED) {
+        content = <DisplayError {...{error: error}}/>
     }
 
     return (
