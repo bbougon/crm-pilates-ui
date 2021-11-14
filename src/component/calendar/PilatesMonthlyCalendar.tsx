@@ -33,6 +33,10 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
         dispatch(fetchClients())
     }, [dispatch])
 
+    const handleClassroomAdded = async () => {
+        dispatch(fetchSessions(link?.current.url))
+    }
+
     const MonthlyDay = (props: MonthlyDayProps) => {
         let {locale} = useMonthlyCalendar()
         let {day, events} = useMonthlyBody()
@@ -124,7 +128,7 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
                             let events = data.map((item: Session, index: number) => (
                                 <ClassroomEventItem key={index} {...item} />
                             ));
-                            events.push(<AddClassroomItem key={Math.random()}/>)
+                            events.push(<AddClassroomItem key={Math.random()} onClassroomAdded={handleClassroomAdded}/>)
                             return events
                         }
                     }}

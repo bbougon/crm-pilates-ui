@@ -1,22 +1,11 @@
 import * as React from "react";
 import {useState} from "react";
-import {
-    Box,
-    Card,
-    CardContent,
-    CardHeader,
-    ClickAwayListener,
-    Fade,
-    Grid,
-    IconButton,
-    ThemeProvider
-} from "@mui/material";
+import {Box, Card, ClickAwayListener, Fade, Grid, IconButton, ThemeProvider} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import {Popper} from "@material-ui/core";
 import {useMonthlyBody} from "@zach.codes/react-calendar";
 import {createTheme} from "@mui/material/styles";
 import {AddClassroomForm} from "../classroom/AddClassroomForm";
-import {format} from "date-fns";
 
 const theme = createTheme({
     typography: {
@@ -38,8 +27,11 @@ const theme = createTheme({
     },
 });
 
+type AddClassroomItemProps = {
+    onClassroomAdded: () => void
+}
 
-export const AddClassroomItem = () => {
+export const AddClassroomItem = ({onClassroomAdded}: AddClassroomItemProps) => {
     let {day} = useMonthlyBody();
 
     const [anchorEl, setAnchorEl] = useState(null);
@@ -54,27 +46,27 @@ export const AddClassroomItem = () => {
         setOpen(false)
     }
 
+    const handleClassroomAdded = () => {
+        onClassroomAdded()
+    }
+
     return (
         <Grid container>
             <Popper open={open} anchorEl={anchorEl} placement="right-start" transition>
                 {({TransitionProps}) => {
-                    const cardHeader = "Add a classroom on ".concat(format(day, "yyyy-MM-dd"))
                     return (
                         <ThemeProvider theme={theme}>
                             <Fade {...TransitionProps} timeout={350}>
-                                <Card sx={{minWidth: 450, maxWidth: 600, display: 'flex'}}>
+                                <Box sx={{minWidth: 450, maxWidth: 600, display: 'flex'}}>
                                     <ClickAwayListener
                                         mouseEvent="onMouseDown"
                                         touchEvent="onTouchStart"
                                         onClickAway={closeClassroomForm}>
-                                        <Box sx={{display: 'flex', flexDirection: 'column'}}>
-                                            <CardHeader title={cardHeader} component="div"/>
-                                            <CardContent>
-                                                <AddClassroomForm date={day} />
-                                            </CardContent>
-                                        </Box>
+                                        <Card>
+                                            <AddClassroomForm date={day} onClassroomAdded={handleClassroomAdded}/>
+                                        </Card>
                                     </ClickAwayListener>
-                                </Card>
+                                </Box>
                             </Fade>
                         </ThemeProvider>
                     )
