@@ -16,13 +16,14 @@ export enum SessionStatus {
     CHECKOUT_IN_PROGRESS = "checkOutFailed",
     CHECKOUT_FAILED = "checkOutFailed",
     CHECKOUT_SUCCEEDED = "checkOutSucceeded",
+    REVOKE_SUCCEEDED = "revokeSucceeded"
 }
 
 export interface SessionState {
     sessions: Session[],
     status: SessionStatus.IDLE | SessionStatus.CHECKIN_IN_PROGRESS | SessionStatus.CHECKIN_IN_FAILED | SessionStatus.CHECKIN_IN_SUCCEEDED
         | SessionStatus.SUCCEEDED | SessionStatus.LOADING | SessionStatus.FAILED | SessionStatus.CHECKOUT_SUCCEEDED | SessionStatus.CHECKOUT_FAILED
-        | SessionStatus.CHECKOUT_IN_PROGRESS,
+        | SessionStatus.CHECKOUT_IN_PROGRESS | SessionStatus.REVOKE_SUCCEEDED,
     error: ErrorMessage[],
     link: Link | undefined
 }
@@ -70,6 +71,12 @@ export interface Checkin {
     attendeeId: string
 }
 
+export interface Revoke {
+    classroomId: string
+    start: string
+    attendeeId: string
+}
+
 
 export interface Checkout {
     sessionId: string
@@ -106,6 +113,18 @@ export const sessionCheckout = createAsyncThunk<ApiSession, Checkout, { rejectVa
     async (checkout, thunkAPI) => {
         try {
             const response = await api.sessionCheckout(checkout)
+            return response.data as ApiSession
+        } catch (e) {
+            return thunkAPI.rejectWithValue(e as ApiError)
+        }
+    }
+)
+
+export const sessionRevoke = createAsyncThunk<ApiSession, Revoke, { rejectValue: ApiError }>(
+    'sessions/revoke',
+    async (revoke, thunkAPI) => {
+        try {
+            const response = await api.sessionRevoke(revoke)
             return response.data as ApiSession
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)
@@ -193,7 +212,16 @@ const sessionsSlice = createSlice({
                 let session = state.sessions.find(session => session.id === sessionCheckedOut.id);
                 if (session) {
                     session.attendees = sessionCheckedOut.attendees?.map(attendee => mapAttendee(attendee))
-                    session.id = sessionCheckedOut.id
+                }
+            })
+            .addCase(sessionRevoke.fulfilled, (state, action) => {
+                state.status = SessionStatus.REVOKE_SUCCEEDED
+                const sessionRevoked = action.payload
+                let session = state.sessions.find(session => session.id === sessionRevoked.id
+                    || (session.classroomId === sessionRevoked.classroom_id && isEqual(parseISO(`${session.schedule.start}`), parseISO(`${sessionRevoked.schedule.start}`))));
+                if(session) {
+                    session.attendees = sessionRevoked.attendees?.map(attendee => mapAttendee(attendee))
+                    session.id = sessionRevoked.id
                 }
             })
     }

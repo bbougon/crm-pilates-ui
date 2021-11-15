@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {Attendance, Attendee, Session, sessionCheckin, sessionCheckout} from "../../features/sessionsSlice";
+import {Attendance, Attendee, Session, sessionCheckin, sessionCheckout, sessionRevoke} from "../../features/sessionsSlice";
 import {
     Box,
     Card,
@@ -45,6 +45,12 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
+    const options = [
+        'Revoke',
+    ]
+
+    const dispatch = useDispatch();
+
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -53,11 +59,15 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
         setAnchorEl(null);
     };
 
-    const options = [
-        'Revoke',
-    ]
-
-    const dispatch = useDispatch();
+    const handleAction = (event: React.MouseEvent<HTMLElement>) => {
+        const revoke = {
+            classroomId: session.classroomId,
+            start: session.schedule.start,
+            attendeeId: attendee.id
+        }
+        dispatch(sessionRevoke(revoke))
+        setAnchorEl(null);
+    };
 
     const onSessionCheckin = async (e: any) => {
         if (e.target.checked) {
@@ -140,7 +150,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                             }}
                         >
                             {options.map((option) => (
-                                <MenuItem key={option} onClick={handleClose} disabled={attendee.attendance === "CHECKED_IN"}>
+                                <MenuItem key={option} onClick={(event) => handleAction(event)} disabled={attendee.attendance === "CHECKED_IN"}>
                                     {option}
                                 </MenuItem>
                             ))}

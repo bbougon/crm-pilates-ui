@@ -10,7 +10,7 @@ import {checkin, checkout} from "../../../test-utils/classroom/checkin";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
-import {screen} from "@testing-library/react";
+import {screen, waitForElementToBeRemoved, within} from "@testing-library/react";
 import React from "react";
 import {addHours, formatISO} from "date-fns";
 
@@ -151,5 +151,41 @@ describe("Interacting with session", () => {
             })
 
         })
+    })
+
+    describe("Revoking an attendee from session", function () {
+
+        const server = new ServerBuilder()
+            .request("/sessions", "get", new SessionsBuilder()
+                .withSession(
+                    new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
+                        .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                        .withAttendee(attendee(3, "Bertrand", "Bougon", "REGISTERED"))
+                        .build()
+                )
+                .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+            .request("/clients", "get", [])
+            .request("/sessions/revoke/3", "post",
+                checkin("15", 1, apiSession("15", 1, "Cours Duo", schedule(classroomDate, addHours(classroomDate, 1)), 2, [])),
+                201)
+            .build()
+
+        beforeAll(() => server.listen())
+
+        afterEach(() => server.resetHandlers())
+
+        afterAll(() => server.close())
+
+        it('should revoke the attendee', async () => {
+            await render(<Calendar date={classroomDate} />)
+
+            userEvent.click(await screen.findByText("Cours Duo"))
+            userEvent.click(screen.getByRole("button", {name: /more/i}))
+            const options = screen.getByRole("presentation");
+            userEvent.click(within(options).getByRole("menuitem", {name: /revoke/i}))
+            userEvent.click(await screen.findByText("Cours Duo"))
+
+            expect(screen.queryByText('Bertrand Bougon')).not.toBeInTheDocument()
+        });
     })
 })
