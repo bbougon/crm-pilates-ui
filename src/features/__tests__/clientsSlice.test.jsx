@@ -6,7 +6,7 @@ import {client, ClientsBuilder} from "../../test-utils/clients/clients";
 describe('ClientsSlice', () => {
 
     describe("Fetching clients", () => {
-        it('it should override previous state with fetched clients', async () => {
+        it('should override previous state with fetched clients', async () => {
             const previousState = new LoadingState().withClient(client()).build()
             let all_clients = new ClientsBuilder()
                 .withClient(client())
@@ -54,7 +54,7 @@ describe('ClientsSlice', () => {
                 expect(reducer(previousState, action)).toEqual({
                     clients: [],
                     status: "failed",
-                    error: [{message: "An error occurred"}]
+                    error: [{message: "We could not fetch the request"}]
                 })
             })
         })

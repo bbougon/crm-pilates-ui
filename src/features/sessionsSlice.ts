@@ -9,14 +9,20 @@ export enum SessionStatus {
     LOADING = "loading",
     SUCCEEDED = "succeeded",
     FAILED = "failed",
-    CHECKIN_IN_PROGRESS = "chekinInProgress",
-    CHECKIN_IN_SUCCEEDED = "chekinInSucceeded",
+    CHECKIN_IN_PROGRESS = "checkinInProgress",
+    CHECKIN_IN_SUCCEEDED = "checkinInSucceeded",
     IDLE = "idle",
+    CHECKIN_IN_FAILED = "checkInFailed",
+    CHECKOUT_IN_PROGRESS = "checkOutFailed",
+    CHECKOUT_FAILED = "checkOutFailed",
+    CHECKOUT_SUCCEEDED = "checkOutSucceeded",
 }
 
 export interface SessionState {
     sessions: Session[],
-    status: SessionStatus.IDLE | SessionStatus.CHECKIN_IN_PROGRESS | SessionStatus.CHECKIN_IN_SUCCEEDED | SessionStatus.SUCCEEDED | SessionStatus.LOADING | SessionStatus.FAILED,
+    status: SessionStatus.IDLE | SessionStatus.CHECKIN_IN_PROGRESS | SessionStatus.CHECKIN_IN_FAILED | SessionStatus.CHECKIN_IN_SUCCEEDED
+        | SessionStatus.SUCCEEDED | SessionStatus.LOADING | SessionStatus.FAILED | SessionStatus.CHECKOUT_SUCCEEDED | SessionStatus.CHECKOUT_FAILED
+        | SessionStatus.CHECKOUT_IN_PROGRESS,
     error: ErrorMessage[],
     link: Link | undefined
 }
@@ -42,7 +48,7 @@ export interface Session {
 
 export enum Attendance {
     REGISTERED = "REGISTERED",
-    CHECKED_IN = "CHECKED_IN"
+    CHECKED_IN = "CHECKED_IN",
 }
 
 export interface Attendee {
@@ -64,6 +70,11 @@ export interface Checkin {
     attendeeId: string
 }
 
+
+export interface Checkout {
+    sessionId: string
+    attendeeId: string
+}
 
 export const fetchSessions = createAsyncThunk<{ sessions: ApiSession[], link: string | null }, string | undefined, { rejectValue: ApiError }>(
     'sessions/fetch',
@@ -90,6 +101,18 @@ export const sessionCheckin = createAsyncThunk<ApiSession, Checkin, { rejectValu
     }
 )
 
+export const sessionCheckout = createAsyncThunk<ApiSession, Checkout, { rejectValue: ApiError }>(
+    'sessions/checkout',
+    async (checkout, thunkAPI) => {
+        try {
+            const response = await api.sessionCheckout(checkout)
+            return response.data as ApiSession
+        } catch (e) {
+            return thunkAPI.rejectWithValue(e as ApiError)
+        }
+    }
+)
+
 const sessionsSlice = createSlice({
     name: 'sessions',
     initialState,
@@ -103,7 +126,7 @@ const sessionsSlice = createSlice({
                 attendance: attendee.attendance as Attendance
             }
         }
-        const mapSession = (apiSession: ApiSession):Session => {
+        const mapSession = (apiSession: ApiSession): Session => {
 
             return {
                 id: apiSession.id,
@@ -143,6 +166,10 @@ const sessionsSlice = createSlice({
             .addCase(sessionCheckin.pending, (state, action) => {
                 state.status = SessionStatus.CHECKIN_IN_PROGRESS
             })
+            .addCase(sessionCheckin.rejected, (state, action) => {
+                state.status = SessionStatus.CHECKIN_IN_FAILED
+                state.error = map_action_thunk_error(action.payload as ApiError)
+            })
             .addCase(sessionCheckin.fulfilled, (state, action) => {
                 state.status = SessionStatus.CHECKIN_IN_SUCCEEDED
                 const sessionCheckedin = action.payload
@@ -151,6 +178,22 @@ const sessionsSlice = createSlice({
                 if (session) {
                     session.attendees = sessionCheckedin.attendees?.map(attendee => mapAttendee(attendee))
                     session.id = sessionCheckedin.id
+                }
+            })
+            .addCase(sessionCheckout.pending, (state, action) => {
+                state.status = SessionStatus.CHECKOUT_IN_PROGRESS
+            })
+            .addCase(sessionCheckout.rejected, (state, action) => {
+                state.status = SessionStatus.CHECKOUT_FAILED
+                state.error = map_action_thunk_error(action.payload as ApiError)
+            })
+            .addCase(sessionCheckout.fulfilled, (state, action) => {
+                state.status = SessionStatus.CHECKOUT_SUCCEEDED
+                const sessionCheckedOut = action.payload
+                let session = state.sessions.find(session => session.id === sessionCheckedOut.id);
+                if (session) {
+                    session.attendees = sessionCheckedOut.attendees?.map(attendee => mapAttendee(attendee))
+                    session.id = sessionCheckedOut.id
                 }
             })
     }

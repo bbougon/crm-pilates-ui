@@ -1,8 +1,8 @@
 import * as React from "react";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {Attendee, Session, sessionCheckin} from "../../features/sessionsSlice";
-import {Box, Grid, Card, CardContent, CardHeader, Chip, Typography, Switch} from "@mui/material";
+import {Attendance, Attendee, Session, sessionCheckin, sessionCheckout} from "../../features/sessionsSlice";
+import {Box, Card, CardContent, CardHeader, Chip, Grid, Switch, Typography} from "@mui/material";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {formatFullDate, formatHours} from "../../utils/date";
 
@@ -45,8 +45,8 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
 
     const [attendee] = useState(sessionAttendeeProps.attendee);
     const [session] = useState(sessionAttendeeProps.session);
-    const [attendeeLabelStatus] = useState(attendee.attendance === "REGISTERED" ? 'R' : 'C')
-    const [attendeeLabelColor] = useState<'primary' | 'success'>(attendee.attendance === "REGISTERED" ? 'primary' : 'success')
+    const [attendeeLabelStatus] = useState(attendee.attendance === Attendance.REGISTERED ? 'R' : 'C')
+    const [attendeeLabelColor] = useState<'primary' | 'success'>(attendee.attendance === Attendance.REGISTERED ? 'primary' : 'success')
 
     const dispatch = useDispatch();
 
@@ -58,6 +58,12 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                 attendeeId: attendee.id
             }
             dispatch(sessionCheckin(checkin))
+        } else {
+            const checkout = {
+                sessionId: session.id || "",
+                attendeeId: attendee.id,
+            }
+            dispatch(sessionCheckout(checkout))
         }
     }
 

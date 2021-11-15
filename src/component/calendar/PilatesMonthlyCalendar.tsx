@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {addMonths, format, getYear, isSameDay, parseISO, startOfMonth, subMonths} from "date-fns";
-import {fetchSessions, Link, selectMonthlySessions, Session} from "../../features/sessionsSlice";
+import {fetchSessions, Link, selectMonthlySessions, Session, SessionStatus} from "../../features/sessionsSlice";
 import {MonthlyBody, MonthlyCalendar, useMonthlyBody, useMonthlyCalendar} from "@zach.codes/react-calendar";
 import {Box} from "@material-ui/core";
 import {fetchClients} from "../../features/clientsSlice";
@@ -11,6 +11,8 @@ import {blueGrey} from "@mui/material/colors";
 import {RootState} from "../../app/store";
 import {ClassroomEventItem} from "./ClassroomEventItem";
 import {AddClassroomItem} from "./AddClassroomItem";
+import {ErrorMessage} from "../../features/errors";
+import {DisplayError} from "../errors/DisplayError";
 
 
 interface MonthlyDayProps {
@@ -27,6 +29,8 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
     let [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
     const sessions = useSelector(selectMonthlySessions)
     const link = useSelector<RootState, Link | undefined>((state => state.sessions.link))
+    const error: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>((state => state.sessions.error))
+    const status: SessionStatus = useSelector<RootState, SessionStatus>((state => state.sessions.status))
 
     useEffect(() => {
         dispatch(fetchSessions())
@@ -116,10 +120,16 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
         }
     }
 
+    let content = undefined
+    if (status === SessionStatus.FAILED || status === SessionStatus.CHECKIN_IN_FAILED || status === SessionStatus.CHECKOUT_FAILED) {
+        content = <DisplayError {...{error: error}}/>
+    }
+
     return (
         <MonthlyCalendar
             currentMonth={currentMonth}
             onCurrentMonthChange={date => setCurrentMonth(date)}>
+            {content}
             <MonthlyNav/>
             <MonthlyBody events={sessions.map(session => mapToCalendarEvent(session))} omitDays={[0]}>
                 <MonthlyDay

@@ -15,12 +15,12 @@ export type ErrorMessage =
 
 
 let map_action_thunk_error = (payload: ApiError): ErrorMessage[] => {
-    if (payload) {
-        return payload.detail?.map(detail => {
+    if (payload?.detail) {
+        return payload.detail.map(detail => {
             return {message: detail.msg, type: detail.type}
         })
     }
-    return [{message: "An error occurred"}]
+    return [{message: "We could not fetch the request"}]
 }
 
 export default map_action_thunk_error

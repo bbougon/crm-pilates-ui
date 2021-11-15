@@ -16,7 +16,7 @@ describe('ClientPage page', function () {
 
     afterAll(() => server.close())
 
-    it('should be displayed', () => {
+    it('should be displayed', async () => {
         const {container} = render(<Clients/>)
 
         expect(prettyDOM(container)).toMatchSnapshot()

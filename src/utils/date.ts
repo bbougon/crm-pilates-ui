@@ -15,7 +15,3 @@ export const formatHours = (dateAsString: string): string => {
         minute: 'numeric'
     })
 }
-
-export const toDate = (dateAsString: string): Date => {
-    return parseISO(dateAsString)
-}

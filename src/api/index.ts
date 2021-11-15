@@ -1,5 +1,5 @@
 import {ClientCreation} from "../features/clientsSlice";
-import {Checkin} from "../features/sessionsSlice";
+import {Checkin, Checkout} from "../features/sessionsSlice";
 
 type RequestConfig = {
     body?: {}
@@ -64,6 +64,14 @@ api.sessionCheckin = (checkin: Checkin) => {
         attendee: checkin.attendeeId
     };
     return api("/sessions/checkin", {customConfig, body})
+}
+
+api.sessionCheckout = (checkout: Checkout) => {
+    const customConfig = {}
+    const body = {
+        attendee: checkout.attendeeId
+    };
+    return api(`/sessions/${checkout.sessionId}/checkout`, {customConfig, body})
 }
 
 api.addClassroom = (body: ApiClassroom) => {

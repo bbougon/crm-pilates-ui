@@ -1,4 +1,4 @@
-import {ServerBuilder} from "../../../test-utils/server/server";
+import {APIErrorBody, ServerBuilder} from "../../../test-utils/server/server";
 import {
     apiSession,
     ApiSessionsBuilder,
@@ -6,7 +6,7 @@ import {
     schedule,
     SessionsBuilder
 } from "../../../test-utils/classroom/session";
-import {checkin} from "../../../test-utils/classroom/checkin";
+import {checkin, checkout} from "../../../test-utils/classroom/checkin";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
@@ -43,12 +43,113 @@ describe("Interacting with session", () => {
     it("should checkin attendee", async () => {
         await render(<Calendar date={classroomDate} />)
 
-        await actThenSleep(20)
         userEvent.click(await screen.findByText("Cours Duo"))
         userEvent.click(await screen.findByRole("checkbox"))
-        await actThenSleep(20)
+        await actThenSleep(2)
         userEvent.click(await screen.findByText("Cours Duo"))
 
         expect(screen.getByText("C", {selector: "span"})).toBeInTheDocument()
+    })
+
+    describe("Facing an error", function () {
+
+        const server = new ServerBuilder()
+        .request("/sessions", "get", new SessionsBuilder()
+            .withSession(
+                new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
+                    .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                    .withAttendee(attendee(3, "Bertrand", "Bougon", "REGISTERED"))
+                    .build()
+            )
+            .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+        .request("/clients", "get", [])
+        .request("/sessions/checkin", "post", new APIErrorBody()
+            .dummyDetail()
+            .build(), 422)
+        .build()
+
+        beforeAll(() => server.listen())
+
+        afterEach(() => server.resetHandlers())
+
+        afterAll(() => server.close())
+
+        it("should display the error", async () => {
+            await render(<Calendar date={classroomDate} />)
+
+            userEvent.click(await screen.findByText("Cours Duo"))
+            userEvent.click(await screen.findByRole("checkbox"))
+
+            expect(await screen.findByText("An error occurred (see message below):", {selector: 'h5'})).toBeInTheDocument()
+            expect(await screen.findByText("an error message", {selector: 'p'})).toBeInTheDocument()
+            expect(await screen.findByText("an error type", {selector: 'p'})).toBeInTheDocument()
+        })
+    })
+
+    describe("Proceeding to checkout", function () {
+        const server = new ServerBuilder()
+            .request("/sessions", "get", new SessionsBuilder()
+                .withSession(
+                    new ApiSessionsBuilder().withId("15").withClassroom(1).withName('Cours Trio')
+                        .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                        .withAttendee(attendee(3, "Bertrand", "Bougon", "CHECKED_IN"))
+                        .build()
+                )
+                .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+            .request("/clients", "get", [])
+            .request("/sessions/15/checkout", "post", checkout("15", 1, apiSession("15", 1, "Cours Trio", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", "REGISTERED")])), 200)
+            .build()
+
+        beforeAll(() => server.listen())
+
+        afterEach(() => server.resetHandlers())
+
+        afterAll(() => server.close())
+
+        it("should checkout attendee", async () => {
+            await render(<Calendar date={classroomDate} />)
+
+            userEvent.click(await screen.findByText("Cours Trio"))
+            userEvent.click(await screen.findByRole("checkbox"))
+            await actThenSleep(20)
+            userEvent.click(await screen.findByText("Cours Trio"))
+
+            expect(screen.getByText("R", {selector: "span"})).toBeInTheDocument()
+        })
+
+        describe("when facing an error", function () {
+            const server = new ServerBuilder()
+                .request("/sessions", "get", new SessionsBuilder()
+                    .withSession(
+                        new ApiSessionsBuilder().withId("15").withClassroom(1).withName('Cours Trio')
+                            .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                            .withAttendee(attendee(3, "Bertrand", "Bougon", "CHECKED_IN"))
+                            .build()
+                    )
+                    .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+                .request("/clients", "get", [])
+                .request("/sessions/15/checkout", "post", new APIErrorBody()
+                    .dummyDetail()
+                    .build(), 422)
+                .build()
+
+            beforeAll(() => server.listen())
+
+            afterEach(() => server.resetHandlers())
+
+            afterAll(() => server.close())
+
+            it("should display the error", async () => {
+                await render(<Calendar date={classroomDate} />)
+
+                userEvent.click(await screen.findByText("Cours Trio"))
+                userEvent.click(await screen.findByRole("checkbox"))
+
+                expect(await screen.findByText("An error occurred (see message below):", {selector: 'h5'})).toBeInTheDocument()
+                expect(await screen.findByText("an error message", {selector: 'p'})).toBeInTheDocument()
+                expect(await screen.findByText("an error type", {selector: 'p'})).toBeInTheDocument()
+            })
+
+        })
     })
 })
