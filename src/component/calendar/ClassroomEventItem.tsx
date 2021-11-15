@@ -62,7 +62,7 @@ export const ClassroomEventItem = (session: Session) => {
                             <Fade {...TransitionProps} timeout={350}>
                                 <Card sx={{minWidth: 500, maxWidth: 600, display: 'flex'}}>
                                     <ClickAwayListener onClickAway={closeSessionDisplay}
-                                                       disableReactTree={true}>
+                                                       disableReactTree={false}>
 
                                         <Box sx={{width: 1, display: 'flex', flexDirection: 'column'}}>
                                             <SessionDetails {...session}/>
