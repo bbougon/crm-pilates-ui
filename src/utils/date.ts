@@ -2,9 +2,8 @@ import {intlFormat, parseISO} from "date-fns";
 
 export const formatFullDate = (dateAsString: string): string => {
     return intlFormat(parseISO(dateAsString), {
-        weekday: 'long',
         year: 'numeric',
-        month: 'long',
+        month: 'numeric',
         day: 'numeric',
     })
 }
