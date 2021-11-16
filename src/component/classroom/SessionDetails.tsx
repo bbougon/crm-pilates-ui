@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {Attendance, Attendee, Session, sessionCheckin, sessionCheckout, sessionRevoke} from "../../features/sessionsSlice";
+import {Attendance, Attendee, Session, sessionCheckin, sessionCheckout, sessionCancel} from "../../features/sessionsSlice";
 import {
     Box,
     Card,
@@ -46,7 +46,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     const open = Boolean(anchorEl);
 
     const options = [
-        'Revoke',
+        'Cancel',
     ]
 
     const dispatch = useDispatch();
@@ -60,12 +60,12 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     };
 
     const handleAction = (event: React.MouseEvent<HTMLElement>) => {
-        const revoke = {
+        const cancel = {
             classroomId: session.classroomId,
             start: session.schedule.start,
             attendeeId: attendee.id
         }
-        dispatch(sessionRevoke(revoke))
+        dispatch(sessionCancel(cancel))
         setAnchorEl(null);
     };
 

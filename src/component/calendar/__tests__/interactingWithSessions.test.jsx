@@ -153,7 +153,7 @@ describe("Interacting with session", () => {
         })
     })
 
-    describe("Revoking an attendee from session", function () {
+    describe("Cancelling an attendee from session", function () {
 
         const server = new ServerBuilder()
             .request("/sessions", "get", new SessionsBuilder()
@@ -165,7 +165,7 @@ describe("Interacting with session", () => {
                 )
                 .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
             .request("/clients", "get", [])
-            .request("/sessions/revoke/3", "post",
+            .request("/sessions/cancellation/3", "post",
                 checkin("15", 1, apiSession("15", 1, "Cours Duo", schedule(classroomDate, addHours(classroomDate, 1)), 2, [])),
                 201)
             .build()
@@ -176,13 +176,13 @@ describe("Interacting with session", () => {
 
         afterAll(() => server.close())
 
-        it('should revoke the attendee', async () => {
+        it('should cancel the attendee', async () => {
             await render(<Calendar date={classroomDate} />)
 
             userEvent.click(await screen.findByText("Cours Duo"))
             userEvent.click(screen.getByRole("button", {name: /more/i}))
             const options = screen.getByRole("presentation");
-            userEvent.click(within(options).getByRole("menuitem", {name: /revoke/i}))
+            userEvent.click(within(options).getByRole("menuitem", {name: /cancel/i}))
             userEvent.click(await screen.findByText("Cours Duo"))
 
             expect(screen.queryByText('Bertrand Bougon')).not.toBeInTheDocument()

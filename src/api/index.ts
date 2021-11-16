@@ -1,5 +1,5 @@
 import {ClientCreation} from "../features/clientsSlice";
-import {Checkin, Checkout, Revoke} from "../features/sessionsSlice";
+import {Checkin, Checkout, Cancel} from "../features/sessionsSlice";
 
 type RequestConfig = {
     body?: {}
@@ -78,13 +78,13 @@ api.addClassroom = (body: ApiClassroom) => {
     return api("/classrooms", {customConfig: {}, body})
 }
 
-api.sessionRevoke = (revoke: Revoke) => {
+api.sessionCancel = (cancel: Cancel) => {
     const customConfig = {}
     const body = {
-        classroom_id: revoke.classroomId,
-        session_date: revoke.start
+        classroom_id: cancel.classroomId,
+        session_date: cancel.start
     };
-    return api(`/sessions/revoke/${revoke.attendeeId}`, {customConfig, body})
+    return api(`/sessions/cancellation/${cancel.attendeeId}`, {customConfig, body})
 }
 
 export interface ApiClassroom {

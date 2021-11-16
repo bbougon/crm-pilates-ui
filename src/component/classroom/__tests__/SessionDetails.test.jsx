@@ -6,7 +6,7 @@ import {attendee, AttendeesBuilder, schedule, session} from "../../../test-utils
 
 describe("SessionDetails", function() {
 
-    it("should disable revoke action if attendee is checked in", async () => {
+    it("should disable cancel action if attendee is checked in", async () => {
         let attendees = new AttendeesBuilder()
             .withAttendee(attendee(1, "Bruno", "Germain", "CHECKED_IN")).build();
         render(<SessionDetails {...session("1", "1", "Cours privé",
@@ -16,6 +16,6 @@ describe("SessionDetails", function() {
         userEvent.click(screen.getByRole("button", {name: /more/i}))
 
         const options = screen.getByRole("presentation");
-        expect(within(options).getByRole("menuitem", {name: /revoke/i})).toHaveAttribute("aria-disabled")
+        expect(within(options).getByRole("menuitem", {name: /cancel/i})).toHaveAttribute("aria-disabled")
     })
 })
