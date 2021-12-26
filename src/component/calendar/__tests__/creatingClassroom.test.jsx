@@ -7,6 +7,7 @@ import {fireEvent, screen, within} from "@testing-library/react";
 import React from "react";
 import {client, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
+import {Attendance} from "../../../features/sessionsSlice";
 
 describe('Creating a classroom', () => {
 
@@ -25,48 +26,46 @@ describe('Creating a classroom', () => {
                 .withClient(client("Jacques", "Martin", "4"))
                 .build()
         )
-        .request("/classrooms", "post",
-            {}, 201
-        )
+        .request("/classrooms", "post", {}, 201)
         .request("/sessions", "get", new SessionsBuilder()
             .withSession(
-                new SessionBuilder().withClassroom(1).withName('Cours Duo')
+                new SessionBuilder().withClassroom("1").withName('Cours Duo')
                     .withSchedule(formatISO(classroomDate), 2).withPosition(3)
-                    .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
-                    .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
-                    .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
+                    .withAttendee(attendee("1", "Bougon", "Bertrand", Attendance.REGISTERED))
+                    .withAttendee(attendee("2", "Pierre", "Martin", Attendance.REGISTERED))
+                    .withAttendee(attendee("3", "Jacques", "Martin", Attendance.REGISTERED))
                     .build()
             )
             .withSession(
-                new SessionBuilder().withClassroom(1).withName('Cours Duo')
+                new SessionBuilder().withClassroom("1").withName('Cours Duo')
                     .withSchedule(formatISO(addWeeks(classroomDate, 1)), 2).withPosition(3)
-                    .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
-                    .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
-                    .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
+                    .withAttendee(attendee("1", "Bougon", "Bertrand", Attendance.REGISTERED))
+                    .withAttendee(attendee("2", "Pierre", "Martin", Attendance.REGISTERED))
+                    .withAttendee(attendee("3", "Jacques", "Martin", Attendance.REGISTERED))
                     .build()
             )
             .withSession(
-                new SessionBuilder().withClassroom(1).withName('Cours Duo')
+                new SessionBuilder().withClassroom("1").withName('Cours Duo')
                     .withSchedule(formatISO(addWeeks(classroomDate, 2)), 2).withPosition(3)
-                    .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
-                    .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
-                    .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
+                    .withAttendee(attendee("1", "Bougon", "Bertrand", Attendance.REGISTERED))
+                    .withAttendee(attendee("2", "Pierre", "Martin", Attendance.REGISTERED))
+                    .withAttendee(attendee("3", "Jacques", "Martin", Attendance.REGISTERED))
                     .build()
             )
             .withSession(
-                new SessionBuilder().withClassroom(1).withName('Cours Duo')
+                new SessionBuilder().withClassroom("1").withName('Cours Duo')
                     .withSchedule(formatISO(addWeeks(classroomDate, 3)), 2).withPosition(3)
-                    .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
-                    .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
-                    .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
+                    .withAttendee(attendee("1", "Bougon", "Bertrand", Attendance.REGISTERED))
+                    .withAttendee(attendee("2", "Pierre", "Martin", Attendance.REGISTERED))
+                    .withAttendee(attendee("3", "Jacques", "Martin", Attendance.REGISTERED))
                     .build()
             )
             .withSession(
-                new SessionBuilder().withClassroom(1).withName('Cours Duo')
-                    .withSchedule(formatISO(addWeeks(classroomDate, 4), 2)).withPosition(3)
-                    .withAttendee(attendee(1, "Bougon", "Bertrand", "REGISTERED"))
-                    .withAttendee(attendee(2, "Pierre", "Martin", "REGISTERED"))
-                    .withAttendee(attendee(3, "Jacques", "Martin", "REGISTERED"))
+                new SessionBuilder().withClassroom("1").withName('Cours Duo')
+                    .withSchedule(formatISO(addWeeks(classroomDate, 4))).withPosition(3)
+                    .withAttendee(attendee("1", "Bougon", "Bertrand", Attendance.REGISTERED))
+                    .withAttendee(attendee("2", "Pierre", "Martin", Attendance.REGISTERED))
+                    .withAttendee(attendee("3", "Jacques", "Martin", Attendance.REGISTERED))
                     .build()
             )
             .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
@@ -81,10 +80,6 @@ describe('Creating a classroom', () => {
                 media: query,
                 matches: query === '(pointer: fine)',
                 onchange: () => {
-                },
-                addEventListener: () => {
-                },
-                removeEventListener: () => {
                 },
                 addListener: () => {
                 },
@@ -109,6 +104,11 @@ describe('Creating a classroom', () => {
         expect(within(classroomForm).getByText("Add a classroom on ".concat(format(new Date("2021-10-01"), "yyyy-MM-dd")))).toBeInTheDocument()
 
         userEvent.type(within(classroomForm).getByText("Classroom's name"), "Cours Duo")
+
+        fireEvent.mouseDown(within(classroomForm).getAllByRole("button", {name: /subject/i})[0])
+        const subject = within(screen.getByRole('presentation'));
+        userEvent.click(subject.getByText(/mat/i));
+        expect(within(classroomForm).getByRole("button", {name: /mat/i})).toBeInTheDocument()
 
         fireEvent.mouseDown(within(classroomForm).getAllByRole("button", {name: /1/i})[0])
         const positions = screen.getByRole("presentation");
@@ -145,8 +145,5 @@ describe('Creating a classroom', () => {
         expect(screen.getAllByRole("textbox")[2]).toHaveValue("10/01/2021 04:15 pm")
 
         userEvent.click(screen.getByRole("button", {name: /submit/i}))
-        // await actThenSleep(20)
-
-        // await waitFor(() => expect(screen.getAllByText("Cours Duo")).toHaveLength(5))
     });
 })

@@ -1,5 +1,5 @@
 import {FulFilledAction} from "../../test-utils/features/actionFixtures";
-import reducer, {fetchSessions} from "../sessionsSlice";
+import reducer, {Attendance, fetchSessions} from "../sessionsSlice";
 import {LoadingState} from "../../test-utils/features/sessions/sessionsStateFixtures";
 import {ApiSessionsBuilder, attendee, SessionBuilder, SessionsBuilder} from "../../test-utils/classroom/session";
 import {addHours, format, formatISO, subHours} from "date-fns";
@@ -31,8 +31,8 @@ describe("SessionsSlice", () =>{
                 .withSession(
                     new ApiSessionsBuilder().withClassroom(1).withName('Pilates avancé')
                         .withScheduleAsString(formatISO(subHours(currentDate, 5))).withPosition(3)
-                        .withAttendee(attendee(1, "Laurent", "Gas", "CHECKED_IN"))
-                        .withAttendee(attendee(2, "Pierre", "Bernard", "REGISTERED"))
+                        .withAttendee(attendee(1, "Laurent", "Gas", Attendance.CHECKED_IN))
+                        .withAttendee(attendee(2, "Pierre", "Bernard", Attendance.REGISTERED))
                         .build()
                 )
                 .build()

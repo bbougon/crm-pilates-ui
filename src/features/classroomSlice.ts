@@ -16,6 +16,7 @@ interface Attendee {
 export interface Classroom {
     id?: string
     classroomName: string
+    subject: string
     position: number
     startDate: string
     endDate: string | null

@@ -5,6 +5,7 @@ import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
 import React from "react";
+import {Attendance} from "../../../features/sessionsSlice";
 
 describe("Navigate through calendar", () => {
     const currentDate = new Date("2021-10-01T00:00:00")
@@ -25,7 +26,7 @@ describe("Navigate through calendar", () => {
                 .withSession(
                     new ApiSessionsBuilder().withId("4").withClassroom(1).withName('Stage 2')
                         .withSchedule("2021-11-01T13:20:00Z", 1).withPosition(1)
-                        .withAttendee(attendee(3, "Bertrand", "Bougon", "CHECKED_IN"))
+                        .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN))
                         .build()
                 )
                 .build(),

@@ -1,5 +1,5 @@
 import {addHours, formatISO, parseISO} from "date-fns";
-import {Attendee, Session} from "../../features/sessionsSlice";
+import {Attendance, Attendee, Session} from "../../features/sessionsSlice";
 import {ApiAttendee, ApiSession} from "../../api";
 
 export class AttendeesBuilder {
@@ -142,7 +142,7 @@ export class SessionBuilder {
     }
 }
 
-export const attendee = (id = "1", firstname = "Laurent", lastname = "Gas", attendance = "REGISTERED") => {
+export const attendee = (id: string = "1", firstname: string = "Laurent", lastname: string = "Gas", attendance: Attendance = Attendance.REGISTERED): Attendee => {
     return {id: id, firstname: firstname, lastname: lastname, attendance: attendance}
 }
 

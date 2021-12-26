@@ -20,6 +20,9 @@ describe("Add classroom form", () => {
         render(<AddClassroomForm date={date} onClassroomAdded={handleAddedClassroom} />)
 
         userEvent.type(screen.getByText("Classroom's name"), "Cours Duo")
+        fireEvent.mouseDown(screen.getByRole("button", {name: /subject/i}))
+        const subject = within(screen.getByRole('listbox'));
+        userEvent.click(subject.getByText(/machine duo/i));
         fireEvent.mouseDown(screen.getByRole("button", {name: /position 1/i}))
         const position = within(screen.getByRole('listbox'));
         userEvent.click(position.getByText(/2/i));

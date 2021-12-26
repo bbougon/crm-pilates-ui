@@ -6,6 +6,7 @@ import {addHours, formatISO} from "date-fns";
 import userEvent from "@testing-library/user-event";
 import {ClassroomEventItem} from "../ClassroomEventItem";
 import {formatFullDate, formatHours} from "../../../utils/date";
+import {Attendance} from "../../../features/sessionsSlice";
 
 describe('Classroom Event', function () {
 
@@ -31,7 +32,7 @@ describe('Classroom Event', function () {
     })
 
     it('should display classroom details when clicked with expected attendee status', () => {
-        let attendees = new AttendeesBuilder().withAttendee(attendee(1, "Bruno", "Germain")).withAttendee(attendee(2, "Bertrand", "Bougon", "CHECKED_IN")).build();
+        let attendees = new AttendeesBuilder().withAttendee(attendee(1, "Bruno", "Germain")).withAttendee(attendee(2, "Bertrand", "Bougon", Attendance.CHECKED_IN)).build();
         let classroomSession = session(undefined, undefined, undefined, schedule(), undefined, attendees);
         render(<ClassroomEventItem {...classroomSession}/>)
 

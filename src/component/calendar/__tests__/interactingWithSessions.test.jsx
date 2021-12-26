@@ -13,6 +13,7 @@ import userEvent from "@testing-library/user-event";
 import {screen, waitForElementToBeRemoved, within} from "@testing-library/react";
 import React from "react";
 import {addHours, formatISO} from "date-fns";
+import {Attendance} from "../../../features/sessionsSlice";
 
 describe("Interacting with session", () => {
 
@@ -26,12 +27,12 @@ describe("Interacting with session", () => {
             .withSession(
             new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
                     .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                    .withAttendee(attendee(3, "Bertrand", "Bougon", "REGISTERED"))
+                    .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED))
                     .build()
             )
             .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
         .request("/clients", "get", [])
-        .request("/sessions/checkin", "post", checkin("15", 1, apiSession("15", 1, "Cours Duo", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", "CHECKED_IN")])), 201)
+        .request("/sessions/checkin", "post", checkin("15", 1, apiSession("15", 1, "Cours Duo", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN)])), 201)
         .build()
 
     beforeAll(() => server.listen())
@@ -58,7 +59,7 @@ describe("Interacting with session", () => {
             .withSession(
                 new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
                     .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                    .withAttendee(attendee(3, "Bertrand", "Bougon", "REGISTERED"))
+                    .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED))
                     .build()
             )
             .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
@@ -92,12 +93,12 @@ describe("Interacting with session", () => {
                 .withSession(
                     new ApiSessionsBuilder().withId("15").withClassroom(1).withName('Cours Trio')
                         .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                        .withAttendee(attendee(3, "Bertrand", "Bougon", "CHECKED_IN"))
+                        .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN))
                         .build()
                 )
                 .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
             .request("/clients", "get", [])
-            .request("/sessions/15/checkout", "post", checkout("15", 1, apiSession("15", 1, "Cours Trio", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", "REGISTERED")])), 200)
+            .request("/sessions/15/checkout", "post", checkout("15", 1, apiSession("15", 1, "Cours Trio", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED)])), 200)
             .build()
 
         beforeAll(() => server.listen())
@@ -123,7 +124,7 @@ describe("Interacting with session", () => {
                     .withSession(
                         new ApiSessionsBuilder().withId("15").withClassroom(1).withName('Cours Trio')
                             .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                            .withAttendee(attendee(3, "Bertrand", "Bougon", "CHECKED_IN"))
+                            .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN))
                             .build()
                     )
                     .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
@@ -160,7 +161,7 @@ describe("Interacting with session", () => {
                 .withSession(
                     new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
                         .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                        .withAttendee(attendee(3, "Bertrand", "Bougon", "REGISTERED"))
+                        .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED))
                         .build()
                 )
                 .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})

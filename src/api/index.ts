@@ -91,6 +91,7 @@ export interface ApiClassroom {
     id?: string
     name: string,
     position: number,
+    subject: string,
     start_date: string,
     stop_date: string | null,
     duration: {
@@ -117,4 +118,11 @@ export interface ApiSession {
         stop: string
     }
     attendees?: [ApiAttendee]
+}
+
+export enum Subjects {
+    MACHINE_DUO = "MACHINE_DUO",
+    MACHINE_TRIO = "MACHINE_TRIO",
+    MACHINE_PRIVATE = "MACHINE_PRIVATE",
+    MAT = "MAT"
 }

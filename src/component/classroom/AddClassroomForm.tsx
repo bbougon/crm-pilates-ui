@@ -21,6 +21,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {Client, selectAllClients} from "../../features/clientsSlice";
 import {addClassroom, Classroom} from "../../features/classroomSlice";
 import {format, formatISO} from "date-fns";
+import {Subjects} from "../../api";
 
 type AddClassroomFormProps = {
     date: Date
@@ -42,10 +43,13 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
         {duration: 120, human: "2h00"}];
 
     const available_positions = [1, 2, 3, 4, 5, 6]
+    const subjects = [{subject: Subjects.MAT, title: "Mat"}, {subject: Subjects.MACHINE_DUO, title: "Machine Duo"}, {
+        subject: Subjects.MACHINE_TRIO, title: "Machine Trio"}, {subject: Subjects.MACHINE_PRIVATE, title: "Machine private"}]
 
     const [currentDate] = useState(new Date())
     const [classroomName, setClassroomName] = useState('')
     const [position, setPosition] = useState(1)
+    const [subject, setSubject] = useState<Subjects | "">("")
     const [duration, setDuration] = useState(60)
     const [classroomStartDateTime, setClassroomStartDateTime] = useState<Date | null>(set(date, {
         hours: currentDate.getHours(),
@@ -56,6 +60,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
     const clients: Client[] = useSelector(selectAllClients)
 
     const onClassroomNameChanged = (e: any) => setClassroomName(e.target.value)
+    const onSubjectChanged = (e: any) => setSubject(e.target.value)
     const onPositionChanged = (e: any) => setPosition(e.target.value)
     const onDurationChanged = (e: any) => setDuration(e.target.value)
 
@@ -64,6 +69,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
 
     const fieldsAreNotFilled = () => {
         return classroomName === ""
+            || subject === ""
             || position === null || position < 1
             || !(available_durations.map(duration => duration.duration).includes(duration))
     }
@@ -71,6 +77,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
     const onSubmitClicked = async () => {
         const classroom: Classroom = {
             classroomName,
+            subject,
             startDate: formatISO(classroomStartDateTime || new Date()),
             endDate: classroomEndDateTime != null ? formatISO(classroomEndDateTime) : null,
             position,
@@ -100,6 +107,25 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                            aria-describedby="classroom-name-help"
                                            value={classroomName}
                                 />
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} md={2}>
+                            <FormControl fullWidth>
+                                <InputLabel id="subject-select-label">Subject</InputLabel>
+                                <Select
+                                    labelId="subject-select-label"
+                                    id="subject-select"
+                                    value={subject}
+                                    required
+                                    placeholder="Select a subject"
+                                    label="Subject"
+                                    variant="standard"
+                                    onChange={onSubjectChanged}
+                                    size="small"
+                                >
+                                    {subjects.map(subject => <MenuItem key={subject.subject}
+                                                                       value={subject.subject}>{subject.title}</MenuItem>)}
+                                </Select>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} md={2}>
