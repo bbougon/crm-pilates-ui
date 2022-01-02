@@ -46,20 +46,20 @@
     "extends": [
       "react-app",
       "react-app/jest",
-      "plugin:react/jsx-runtime",
       "plugin:react/recommended"
     ],
     "plugins": [
       "react",
       "react-hooks"
     ],
+    "ignorePatterns": ["**/*.js"],
     "rules": {
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn"
     },
     "overrides": [
       {
-        "files": ["**/*.ts?(x)", "**/*.js?(x)"],
+        "files": ["**/*.ts?(x)", "**/*.jsx"],
         "rules": {
           "react/no-access-state-in-setstate": "warn"
         }

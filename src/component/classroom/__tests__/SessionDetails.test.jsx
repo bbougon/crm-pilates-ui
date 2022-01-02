@@ -20,4 +20,14 @@ describe("SessionDetails", function() {
         const options = screen.getByRole("presentation");
         expect(within(options).getByRole("menuitem", {name: /cancel/i})).toHaveAttribute("aria-disabled")
     })
+
+    it("should display attendees credits", async () => {
+        let attendees = new AttendeesBuilder()
+            .withAttendee(attendee(1, "Bruno", "Germain", Attendance.CHECKED_IN, {amount: 5})).build();
+        render(<SessionDetails {...session("1", "1", "Cours privé", "MAT",
+            schedule("2021-10-09T10:00:00", "2021-10-09T11:00:00"), 1,
+            attendees)} />)
+
+        expect(screen.getByText("5", {selector: 'span'})).toBeInTheDocument()
+    })
 })

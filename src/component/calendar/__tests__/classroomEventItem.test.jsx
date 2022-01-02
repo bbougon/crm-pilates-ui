@@ -27,9 +27,9 @@ describe('Classroom Event', function () {
                 .concat(` ${formatHours(classroomSession.schedule.stop)}`)
             , {selector: 'span'})).toBeInTheDocument()
         expect(screen.getByText("Laurent Gas", {selector: 'p'})).toBeInTheDocument()
-        expect(screen.getByText("0", {selector: 'p'})).toBeInTheDocument()
+        expect(screen.getByText("0", {selector: 'span'})).toBeInTheDocument()
         expect(screen.getByText("Bertrand Bougon", {selector: 'p'})).toBeInTheDocument()
-        expect(screen.getByText("5", {selector: 'p'})).toBeInTheDocument()
+        expect(screen.getByText("5", {selector: 'span'})).toBeInTheDocument()
         expect(screen.getAllByText("R", {selector: 'span'})).toBeTruthy()
     })
 
