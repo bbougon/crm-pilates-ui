@@ -1,0 +1,6 @@
+export enum Subjects {
+    MACHINE_DUO = "MACHINE_DUO",
+    MACHINE_TRIO = "MACHINE_TRIO",
+    MACHINE_PRIVATE = "MACHINE_PRIVATE",
+    MAT = "MAT"
+}

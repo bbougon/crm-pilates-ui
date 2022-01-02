@@ -1,6 +1,7 @@
 import {addHours, formatISO, parseISO} from "date-fns";
-import {Attendance, Attendee, Session} from "../../features/sessionsSlice";
-import {ApiAttendee, ApiSession} from "../../api";
+import {ApiAttendee, ApiCredits, ApiSession} from "../../api";
+import {Attendance, Attendee, Credits, Session} from "../../features/domain/session";
+import {Subjects} from "../../features/domain/subjects";
 
 export class AttendeesBuilder {
 
@@ -37,6 +38,7 @@ export class ApiSessionsBuilder {
         start: formatISO(new Date()),
         stop: formatISO(addHours(new Date(), 1))
     };
+    private subject: string = "MAT"
     private position: number = 1;
     private attendees?: [ApiAttendee];
 
@@ -52,6 +54,11 @@ export class ApiSessionsBuilder {
 
     public withName = (name: string): ApiSessionsBuilder => {
         this.name = name
+        return this
+    }
+
+    public withMachineTrio = (): ApiSessionsBuilder => {
+        this.subject = "MACHINE_TRIO"
         return this
     }
 
@@ -78,14 +85,7 @@ export class ApiSessionsBuilder {
     }
 
     build = (): ApiSession => {
-        return {
-            id: this.id,
-            classroom_id: this.classroomId,
-            name: this.name,
-            schedule: this.schedule,
-            position: this.position,
-            attendees: this.attendees
-        }
+        return apiSession(this.id, this.classroomId, this.name, this.subject, this.schedule, this.position, this.attendees)
     }
 }
 
@@ -98,52 +98,62 @@ export class SessionBuilder {
         stop: formatISO(addHours(new Date(), 1))
     };
     private position: number = 1;
+    private subject: Subjects = Subjects.MAT
     private attendees: Attendee[] = [];
 
-    withId = (id: string | undefined) => {
+    withId = (id: string | undefined): SessionBuilder => {
         this.id = id
         return this
     }
 
-    withClassroom = (classroomId: string) => {
+    withClassroom = (classroomId: string): SessionBuilder => {
         this.classroomId = classroomId
         return this
     }
 
-    withName = (name: string) => {
+    withMachineTrio = (): SessionBuilder => {
+        this.subject = Subjects.MACHINE_TRIO
+        return this
+    }
+
+    withName = (name: string): SessionBuilder => {
         this.name = name
         return this
     }
 
-    withSchedule = (startDate: string, amount = 1) => {
+    withSchedule = (startDate: string, amount = 1): SessionBuilder => {
         this.schedule.start = startDate
         this.schedule.stop = formatISO(addHours(parseISO(startDate), amount))
         return this
     }
 
-    withScheduleAsString = (startDate: string) => {
+    withScheduleAsString = (startDate: string): SessionBuilder => {
         this.schedule.start = startDate
         this.schedule.stop = formatISO(addHours(parseISO(startDate), 1))
         return this
     }
 
-    withPosition = (position: number) => {
+    withPosition = (position: number): SessionBuilder => {
         this.position = position
         return this
     }
 
-    withAttendee = (attendee: Attendee) => {
+    withAttendee = (attendee: Attendee): SessionBuilder => {
         this.attendees.push(attendee)
         return this
     }
 
-    build = () => {
-        return session(this.id, this.classroomId, this.name, this.schedule, this.position, this.attendees)
+    build = (): Session => {
+        return session(this.id, this.classroomId, this.name, this.subject, this.schedule, this.position, this.attendees)
     }
 }
 
-export const attendee = (id: string = "1", firstname: string = "Laurent", lastname: string = "Gas", attendance: Attendance = Attendance.REGISTERED): Attendee => {
-    return {id: id, firstname: firstname, lastname: lastname, attendance: attendance}
+export const attendee = (id: string = "1", firstname: string = "Laurent", lastname: string = "Gas", attendance: Attendance = Attendance.REGISTERED, credits: Credits | undefined = undefined): Attendee => {
+    return {id: id, firstname: firstname, lastname: lastname, attendance: attendance, credits}
+}
+
+export const apiAttendee = (id: string = "1", firstname: string = "Laurent", lastname: string = "Gas", attendance: Attendance = Attendance.REGISTERED, credits: ApiCredits): ApiAttendee => {
+    return {id: id, firstname: firstname, lastname: lastname, attendance: attendance, credits}
 }
 
 export const schedule = (start = formatISO(new Date()), stop = formatISO(addHours(new Date(), 1))) => {
@@ -154,11 +164,12 @@ export const schedule = (start = formatISO(new Date()), stop = formatISO(addHour
 }
 
 export const session = (id: string | undefined, classroomId: string = "1", name: string = "Pilates avancé",
-                        schedule_ = schedule(), position: number = 1,
+                        subject: string = "MAT", schedule_ = schedule(), position: number = 1,
                         attendees: Attendee[] = []): Session => {
     return {
         id: id,
         classroomId: classroomId,
+        subject: subject as Subjects,
         name: name,
         schedule: {...schedule_},
         position: position,
@@ -167,12 +178,13 @@ export const session = (id: string | undefined, classroomId: string = "1", name:
 }
 
 export const apiSession = (id: string | undefined, classroomId: string = "1", name: string = "Pilates avancé",
-                           schedule_ = schedule(), position: number = 1,
-                           attendees: [{ id: string, firstname: string, lastname: string, attendance: string }]): ApiSession => {
+                           subject: string = "MAT", schedule_ = schedule(), position: number = 1,
+                           attendees: [ApiAttendee] | undefined): ApiSession => {
     return {
         id: id,
         classroom_id: classroomId,
         name: name,
+        subject: subject,
         schedule: {...schedule_},
         position: position,
         attendees: attendees

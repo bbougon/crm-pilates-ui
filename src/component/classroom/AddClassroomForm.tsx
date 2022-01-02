@@ -19,9 +19,10 @@ import {useState} from "react";
 import set from "date-fns/set";
 import {useDispatch, useSelector} from "react-redux";
 import {Client, selectAllClients} from "../../features/clientsSlice";
-import {addClassroom, Classroom} from "../../features/classroomSlice";
+import {addClassroom} from "../../features/classroomSlice";
 import {format, formatISO} from "date-fns";
-import {Subjects} from "../../api";
+import {Subjects} from "../../features/domain/subjects";
+import {Classroom} from "../../features/domain/classroom";
 
 type AddClassroomFormProps = {
     date: Date
@@ -77,7 +78,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
     const onSubmitClicked = async () => {
         const classroom: Classroom = {
             classroomName,
-            subject,
+            subject: subject as Subjects,
             startDate: formatISO(classroomStartDateTime || new Date()),
             endDate: classroomEndDateTime != null ? formatISO(classroomEndDateTime) : null,
             position,

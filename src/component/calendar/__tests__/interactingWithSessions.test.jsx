@@ -10,10 +10,10 @@ import {checkin, checkout} from "../../../test-utils/classroom/checkin";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
-import {screen, waitForElementToBeRemoved, within} from "@testing-library/react";
+import {screen, within} from "@testing-library/react";
 import React from "react";
 import {addHours, formatISO} from "date-fns";
-import {Attendance} from "../../../features/sessionsSlice";
+import {Attendance} from "../../../features/domain/session";
 
 describe("Interacting with session", () => {
 
@@ -32,7 +32,7 @@ describe("Interacting with session", () => {
             )
             .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
         .request("/clients", "get", [])
-        .request("/sessions/checkin", "post", checkin("15", 1, apiSession("15", 1, "Cours Duo", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN)])), 201)
+        .request("/sessions/checkin", "post", checkin("15", 1, apiSession("15", 1, "Cours Duo", "MAT", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN)])), 201)
         .build()
 
     beforeAll(() => server.listen())
@@ -98,7 +98,7 @@ describe("Interacting with session", () => {
                 )
                 .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
             .request("/clients", "get", [])
-            .request("/sessions/15/checkout", "post", checkout("15", 1, apiSession("15", 1, "Cours Trio", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED)])), 200)
+            .request("/sessions/15/checkout", "post", checkout("15", 1, apiSession("15", 1, "Cours Trio", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED)])), 200)
             .build()
 
         beforeAll(() => server.listen())
@@ -167,7 +167,7 @@ describe("Interacting with session", () => {
                 .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
             .request("/clients", "get", [])
             .request("/sessions/cancellation/3", "post",
-                checkin("15", 1, apiSession("15", 1, "Cours Duo", schedule(classroomDate, addHours(classroomDate, 1)), 2, [])),
+                checkin("15", 1, apiSession("15", 1, "Cours Duo", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [])),
                 201)
             .build()
 

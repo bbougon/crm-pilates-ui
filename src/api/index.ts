@@ -1,5 +1,5 @@
 import {ClientCreation} from "../features/clientsSlice";
-import {Checkin, Checkout, Cancel} from "../features/sessionsSlice";
+import {Cancel, Checkin, Checkout} from "../features/sessionsSlice";
 
 type RequestConfig = {
     body?: {}
@@ -101,11 +101,16 @@ export interface ApiClassroom {
     attendees: { id: string }[]
 }
 
+export interface ApiCredits {
+    amount: number
+}
+
 export interface ApiAttendee {
     id: string;
     firstname: string;
     lastname: string;
     attendance: string;
+    credits?: ApiCredits
 }
 
 export interface ApiSession {
@@ -113,16 +118,10 @@ export interface ApiSession {
     name: string
     classroom_id: string
     position: number
+    subject: string
     schedule: {
         start: string
         stop: string
     }
     attendees?: [ApiAttendee]
-}
-
-export enum Subjects {
-    MACHINE_DUO = "MACHINE_DUO",
-    MACHINE_TRIO = "MACHINE_TRIO",
-    MACHINE_PRIVATE = "MACHINE_PRIVATE",
-    MAT = "MAT"
 }

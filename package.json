@@ -39,20 +39,32 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint --fix . --ext .ts,.tsx,.jsx"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:react/jsx-runtime",
+      "plugin:react/recommended"
     ],
     "plugins": [
+      "react",
       "react-hooks"
     ],
     "rules": {
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn"
-    }
+    },
+    "overrides": [
+      {
+        "files": ["**/*.ts?(x)", "**/*.js?(x)"],
+        "rules": {
+          "react/no-access-state-in-setstate": "warn"
+        }
+      }
+    ]
   },
   "browserslist": {
     "production": [
@@ -71,6 +83,7 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "eslint-plugin-react-hooks": "^4.2.1-alpha-e0aa5e205-20211109",
+    "eslint-plugin-react": "^7.28.0",
     "msw": "^0.35.0"
   }
 }

@@ -1,7 +1,11 @@
 import * as React from "react";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {Attendance, Attendee, Session, sessionCheckin, sessionCheckout, sessionCancel} from "../../features/sessionsSlice";
+import {
+    sessionCheckin,
+    sessionCheckout,
+    sessionCancel
+} from "../../features/sessionsSlice";
 import {
     Box,
     Card,
@@ -18,6 +22,7 @@ import {
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {formatFullDate, formatHours} from "../../utils/date";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import {Attendance, Attendee, Session} from "../../features/domain/session";
 
 const theme = createTheme({
     components: {
@@ -88,15 +93,35 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
 
     return (
         <Grid container direction="row">
-            <Grid item xs={8} md={8}>
-                <Box sx={{
-                    display: 'flex',
-                    justifyContent: 'flex-start'
+            <Grid item xs={8} md={8} sx={{
+                display: 'flex',
+                alignItems: 'center'
+            }}>
+                <Grid container direction="row" sx={{
+                    display: 'flex'
                 }}>
-                    <Typography variant="body1">
-                        {attendee.firstname.concat(" ").concat(attendee.lastname)}
-                    </Typography>
-                </Box>
+                    <Grid item xs={8} md={8}>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-start',
+                            alignItems: 'center'
+                        }}>
+                            <Typography variant="body1">
+                                {attendee.firstname.concat(" ").concat(attendee.lastname)}
+                            </Typography>
+                        </Box>
+                    </Grid>
+                    <Grid item xs={4} md={4}>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end'
+                        }}>
+                            <Typography variant="body1">
+                                {attendee.credits?.amount ?? 0}
+                            </Typography>
+                        </Box>
+                    </Grid>
+                </Grid>
             </Grid>
             <Grid item xs={4} md={4}>
                 <Grid container direction="row">
@@ -150,7 +175,8 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                             }}
                         >
                             {options.map((option) => (
-                                <MenuItem key={option} onClick={(event) => handleAction(event)} disabled={attendee.attendance === "CHECKED_IN"}>
+                                <MenuItem key={option} onClick={(event) => handleAction(event)}
+                                          disabled={attendee.attendance === "CHECKED_IN"}>
                                     {option}
                                 </MenuItem>
                             ))}
@@ -180,7 +206,7 @@ export const SessionDetails = (session: Session) => {
     let sessionEnd = session.schedule.stop;
     let dateSubheader = formatFullDate(sessionStart)
         .concat(` ${formatHours(sessionStart)}`)
-        .concat(" / ")
+        .concat(" to ")
         .concat(formatFullDate(sessionEnd))
         .concat(` ${formatHours(sessionEnd)}`);
     return (

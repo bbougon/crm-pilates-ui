@@ -7,7 +7,7 @@ import {fireEvent, screen, within} from "@testing-library/react";
 import React from "react";
 import {client, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
-import {Attendance} from "../../../features/sessionsSlice";
+import {Attendance} from "../../../features/domain/session";
 
 describe('Creating a classroom', () => {
 

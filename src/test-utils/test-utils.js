@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import clientsReducer from "../features/clientsSlice"
 import sessionsReducer from "../features/sessionsSlice"
 import classroomsReducer from "../features/classroomSlice"
-// Import your own reducer
+import PropTypes from "prop-types";
 
 const reducer = {
     sessions: sessionsReducer,
@@ -21,8 +21,11 @@ function render(
         ...renderOptions
     } = {}
 ) {
-    function Wrapper({ children }) {
+    const Wrapper = ({ children }) => {
         return <Provider store={store}>{children}</Provider>
+    }
+    Wrapper.propTypes = {
+        children: PropTypes.node.isRequired
     }
     return rtlRender(ui, { wrapper: Wrapper, ...renderOptions })
 }

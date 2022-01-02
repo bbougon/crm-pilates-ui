@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {addMonths, format, getYear, isSameDay, parseISO, startOfMonth, subMonths} from "date-fns";
-import {fetchSessions, Link, selectMonthlySessions, Session, SessionStatus} from "../../features/sessionsSlice";
+import {fetchSessions, selectMonthlySessions, SessionStatus} from "../../features/sessionsSlice";
 import {MonthlyBody, MonthlyCalendar, useMonthlyBody, useMonthlyCalendar} from "@zach.codes/react-calendar";
 import {Box} from "@material-ui/core";
 import {fetchClients} from "../../features/clientsSlice";
@@ -13,6 +13,7 @@ import {ClassroomEventItem} from "./ClassroomEventItem";
 import {AddClassroomItem} from "./AddClassroomItem";
 import {ErrorMessage} from "../../features/errors";
 import {DisplayError} from "../errors/DisplayError";
+import {Session, SessionsLink} from "../../features/domain/session";
 
 
 interface MonthlyDayProps {
@@ -28,7 +29,7 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
     const dispatch = useDispatch();
     let [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
     const sessions = useSelector(selectMonthlySessions)
-    const link = useSelector<RootState, Link | undefined>((state => state.sessions.link))
+    const link = useSelector<RootState, SessionsLink | undefined>((state => state.sessions.link))
     const error: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>((state => state.sessions.error))
     const status: SessionStatus = useSelector<RootState, SessionStatus>((state => state.sessions.status))
 

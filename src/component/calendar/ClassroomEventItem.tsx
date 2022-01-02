@@ -5,8 +5,8 @@ import {blue} from "@mui/material/colors";
 import * as React from "react";
 import {useState} from "react";
 import {formatHours} from "../../utils/date";
-import {Session} from "../../features/sessionsSlice";
 import {SessionDetails} from "../classroom/SessionDetails";
+import {Session} from "../../features/domain/session";
 
 const theme = createTheme({
     typography: {

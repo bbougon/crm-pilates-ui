@@ -1,27 +1,14 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {api, ApiClassroom} from "../api";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
+import {Subjects} from "./domain/subjects";
+import {Classroom} from "./domain/classroom";
 
 export enum ClassroomStatus {
     IDLE = "idle",
     LOADING = "loading",
     SUCCEEDED = "succeeded",
     FAILED = "failed",
-}
-
-interface Attendee {
-    id: string
-}
-
-export interface Classroom {
-    id?: string
-    classroomName: string
-    subject: string
-    position: number
-    startDate: string
-    endDate: string | null
-    duration: number
-    attendees: Attendee[]
 }
 
 interface ClassroomState {
@@ -53,6 +40,7 @@ const mapToApiClassroom = (classroom: Classroom): ApiClassroom => {
 const mapToClassroom = (classroom: ApiClassroom):Classroom => {
     return {
         ...classroom,
+        subject: classroom.subject as Subjects,
         classroomName: classroom.name,
         startDate: classroom.start_date,
         endDate: classroom.stop_date,

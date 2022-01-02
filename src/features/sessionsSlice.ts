@@ -1,9 +1,11 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {api, ApiSession} from "../api";
+import {api, ApiAttendee, ApiSession} from "../api";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 import parse from "parse-link-header"
 import {isEqual, parseISO} from "date-fns";
 import {RootState} from "../app/store";
+import {Attendance, Attendee, Session, SessionsLink} from "./domain/session";
+import {Subjects} from "./domain/subjects";
 
 export enum SessionStatus {
     LOADING = "loading",
@@ -25,7 +27,7 @@ export interface SessionState {
         | SessionStatus.SUCCEEDED | SessionStatus.LOADING | SessionStatus.FAILED | SessionStatus.CHECKOUT_SUCCEEDED | SessionStatus.CHECKOUT_FAILED
         | SessionStatus.CHECKOUT_IN_PROGRESS | SessionStatus.CANCEL_SUCCEEDED,
     error: ErrorMessage[],
-    link: Link | undefined
+    link: SessionsLink | undefined
 }
 
 const initialState: SessionState = {
@@ -33,36 +35,6 @@ const initialState: SessionState = {
     status: SessionStatus.IDLE,
     error: [],
     link: undefined
-}
-
-export interface Session {
-    id?: string | undefined
-    classroomId: string
-    name: string
-    schedule: {
-        start: string
-        stop: string
-    }
-    position: number
-    attendees?: Attendee[]
-}
-
-export enum Attendance {
-    REGISTERED = "REGISTERED",
-    CHECKED_IN = "CHECKED_IN",
-}
-
-export interface Attendee {
-    id: string
-    firstname: string
-    lastname: string
-    attendance: Attendance
-}
-
-export interface Link {
-    current: { url: string }
-    next: { url: string }
-    previous: { url: string }
 }
 
 export interface Checkin {
@@ -137,12 +109,13 @@ const sessionsSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers(builder) {
-        const mapAttendee = (attendee: { id: string; firstname: string; lastname: string; attendance: string }): Attendee => {
+        const mapAttendee = (attendee: ApiAttendee): Attendee => {
             return {
                 id: attendee.id,
                 firstname: attendee.firstname,
                 lastname: attendee.lastname,
-                attendance: attendee.attendance as Attendance
+                attendance: attendee.attendance as Attendance,
+                credits: {amount: attendee.credits?.amount}
             }
         }
         const mapSession = (apiSession: ApiSession): Session => {
@@ -151,6 +124,7 @@ const sessionsSlice = createSlice({
                 id: apiSession.id,
                 classroomId: apiSession.classroom_id,
                 name: apiSession.name,
+                subject: apiSession.subject as Subjects,
                 schedule: {
                     start: apiSession.schedule.start,
                     stop: apiSession.schedule.stop
@@ -158,6 +132,25 @@ const sessionsSlice = createSlice({
                 position: apiSession.position,
                 attendees: apiSession.attendees?.map(attendee => mapAttendee(attendee))
             }
+        }
+
+        function mapAttendees(session: Session | undefined, apiSession: ApiSession) {
+            if (session) {
+                session.attendees = apiSession.attendees?.map(attendee => mapAttendee(attendee))
+                session.id = apiSession.id
+            }
+        }
+
+        function mapCredits(sessions: Session[], apiSession: ApiSession) {
+            sessions.filter(session => session.subject as Subjects === apiSession.subject as Subjects).forEach(session => {
+                apiSession.attendees?.forEach(attendee => {
+                    session.attendees?.forEach(sessionAttendee => {
+                        if (sessionAttendee.id === attendee.id) {
+                            sessionAttendee.credits = attendee.credits
+                        }
+                    })
+                })
+            })
         }
 
         builder
@@ -168,7 +161,7 @@ const sessionsSlice = createSlice({
                 state.status = SessionStatus.SUCCEEDED
 
                 state.sessions = action.payload.sessions.map(apiSession => mapSession(apiSession))
-                let links = (): Link => {
+                let links = (): SessionsLink => {
                     const links = parse(action.payload.link)
                     return {
                         current: {url: links.current.url},
@@ -194,10 +187,8 @@ const sessionsSlice = createSlice({
                 const sessionCheckedin = action.payload
                 let session = state.sessions.find(session => session.id === sessionCheckedin.id
                     || (session.classroomId === sessionCheckedin.classroom_id && isEqual(parseISO(`${session.schedule.start}`), parseISO(`${sessionCheckedin.schedule.start}`))));
-                if (session) {
-                    session.attendees = sessionCheckedin.attendees?.map(attendee => mapAttendee(attendee))
-                    session.id = sessionCheckedin.id
-                }
+                mapAttendees(session, sessionCheckedin)
+                mapCredits(state.sessions, sessionCheckedin);
             })
             .addCase(sessionCheckout.pending, (state, action) => {
                 state.status = SessionStatus.CHECKOUT_IN_PROGRESS
@@ -210,9 +201,8 @@ const sessionsSlice = createSlice({
                 state.status = SessionStatus.CHECKOUT_SUCCEEDED
                 const sessionCheckedOut = action.payload
                 let session = state.sessions.find(session => session.id === sessionCheckedOut.id);
-                if (session) {
-                    session.attendees = sessionCheckedOut.attendees?.map(attendee => mapAttendee(attendee))
-                }
+                mapAttendees(session, sessionCheckedOut);
+                mapCredits(state.sessions, sessionCheckedOut)
             })
             .addCase(sessionCancel.fulfilled, (state, action) => {
                 state.status = SessionStatus.CANCEL_SUCCEEDED
