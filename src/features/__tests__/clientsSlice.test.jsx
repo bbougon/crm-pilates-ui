@@ -9,11 +9,11 @@ describe('ClientsSlice', () => {
         it('should override previous state with fetched clients', async () => {
             const previousState = new LoadingState().withClient(client()).build()
             let all_clients = new ClientsBuilder()
-                .withClient(client())
-                .withClient(client("Pierre", "Martin", "33da6f24-efda-4c16-b8af-e5e822fc5860"))
-                .withClient(client("Henri", "Verneuil", "33da6bca-efda-4c16-b8af-e5e822fc5901"))
+                .withClient(client(undefined, undefined, undefined, undefined))
+                .withClient(client("Pierre", "Martin", "33da6f24-efda-4c16-b8af-e5e822fc5860", undefined))
+                .withClient(client("Henri", "Verneuil", "33da6bca-efda-4c16-b8af-e5e822fc5901", undefined))
                 .build()
-            const action = new FulFilledAction(fetchClients).withPayload(all_clients).build()
+            const action = new FulFilledAction(fetchClients).withPayload({ clients: all_clients}).build()
 
             expect(reducer(previousState, action)).toEqual({
                 clients: all_clients,

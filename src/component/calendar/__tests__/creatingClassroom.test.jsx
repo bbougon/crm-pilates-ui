@@ -5,7 +5,7 @@ import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
 import {fireEvent, screen, within} from "@testing-library/react";
 import React from "react";
-import {client, ClientsBuilder} from "../../../test-utils/clients/clients";
+import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
 import {Attendance} from "../../../features/domain/session";
 
@@ -20,10 +20,10 @@ describe('Creating a classroom', () => {
         .request("/sessions", "get", [], 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
         .request("/clients", "get",
             new ClientsBuilder()
-                .withClient(client())
-                .withClient(client("Bertrand", "Bougon", "2"))
-                .withClient(client("Pierre", "Martin", "3"))
-                .withClient(client("Jacques", "Martin", "4"))
+                .withClient(apiClient())
+                .withClient(apiClient("Bertrand", "Bougon", "2"))
+                .withClient(apiClient("Pierre", "Martin", "3"))
+                .withClient(apiClient("Jacques", "Martin", "4"))
                 .build()
         )
         .request("/classrooms", "post", {}, 201)
@@ -97,7 +97,7 @@ describe('Creating a classroom', () => {
     it('should create a 2 hours classroom on October 1st, 2021 with 3 attendees', async () => {
         await render(<Calendar date={classroomDate}/>)
 
-        await actThenSleep(2)
+        await actThenSleep(20)
         userEvent.click(screen.getAllByRole("button")[2])
         const classroomForm = screen.getByRole("tooltip")
 

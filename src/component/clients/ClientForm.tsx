@@ -28,7 +28,7 @@ const Wrapper = styled.div`
     width: 100%;
 `;
 
-const ClientAccordionSummary = () => {
+const AddClientAccordionSummary = () => {
     const props = {
         expandIcon: <ExpandMoreIcon/>,
         sx: {textAlign: "center"},
@@ -73,7 +73,7 @@ export const AddClientForm = () => {
 
     return (
         <Accordion>
-            <ClientAccordionSummary/>
+            <AddClientAccordionSummary/>
             <AccordionDetails>
                 <Wrapper>
                     <Grid container>

@@ -31,7 +31,7 @@ function render(
 }
 
 export async function actThenSleep(ms) {
-    await act(() => sleep(20));
+    await act(() => sleep(ms));
 }
 
 export function sleep(ms) {

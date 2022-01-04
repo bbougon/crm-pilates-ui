@@ -1,7 +1,9 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {api} from "../api";
+import {api, ApiClient} from "../api";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 import {RootState} from "../app/store";
+import {Client} from "./domain/client";
+import {Subjects} from "./domain/subjects";
 
 export enum ClientStatus {
     IDLE = "idle",
@@ -23,35 +25,29 @@ const initialState: ClientState = {
     error: []
 }
 
-export interface Client {
-    firstname: string
-    lastname: string
-    id: string
-}
-
 export interface ClientCreation {
     firstname: string
     lastname: string
 }
 
-export const createClient = createAsyncThunk<Client, ClientCreation, {rejectValue: ApiError}>(
+export const createClient = createAsyncThunk<ClientCreation, ClientCreation, { rejectValue: ApiError }>(
     'clients/create',
     async (client, thunkAPI) => {
         try {
             const response = await api.createClient(client)
-            return response.data as Client
+            return response.data as ApiClient
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)
         }
     }
 )
 
-export const fetchClients = createAsyncThunk<Client[], undefined, {rejectValue: ApiError}>(
+export const fetchClients = createAsyncThunk<{ clients: ApiClient[] }, undefined, { rejectValue: ApiError }>(
     'clients/fetch',
     async (_, thunkAPI) => {
         try {
             const response = await api.fetchClients()
-            return response.data
+            return {clients: response.data as ApiClient[]}
         } catch (e: any) {
             return thunkAPI.rejectWithValue(e)
         }
@@ -64,13 +60,28 @@ const clientsSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers(builder) {
+        function mapCredits(credits: [{ value: number; subject: string }] | undefined) {
+            return credits?.map(value => {
+                return {value: value.value, subject: value.subject as Subjects}
+            });
+        }
+
+        function mapClient(client: ApiClient): Client {
+            return {
+                id: client.id,
+                firstname: client.firstname,
+                lastname: client.lastname,
+                credits: mapCredits(client.credits)
+            };
+        }
+
         builder
             .addCase(fetchClients.pending, (state, action) => {
                 state.status = ClientStatus.LOADING
             })
             .addCase(fetchClients.fulfilled, (state, action) => {
                 state.status = ClientStatus.SUCCEEDED
-                state.clients = action.payload
+                state.clients = action.payload.clients.map(client => mapClient(client))
             })
             .addCase(fetchClients.rejected, (state, action) => {
                 state.status = ClientStatus.FAILED
@@ -78,7 +89,7 @@ const clientsSlice = createSlice({
             })
             .addCase(createClient.fulfilled, (state, action) => {
                 state.status = ClientStatus.SUCCEEDED
-                state.clients.push(action.payload)
+                state.clients.push(mapClient(action.payload as ApiClient))
             })
             .addCase(createClient.rejected, (state, action) => {
                 state.status = ClientStatus.CREATION_FAILED

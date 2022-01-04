@@ -1,9 +1,9 @@
 import React from "react";
 import {Clients} from "../ClientPage";
-import {prettyDOM, screen, waitFor} from '@testing-library/react';
+import {screen, waitFor} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
-import {render} from "../../../test-utils/test-utils";
-import {client, ClientsBuilder} from "../../../test-utils/clients/clients";
+import {actThenSleep, render} from "../../../test-utils/test-utils";
+import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {APIDetail, APIErrorBody, ServerBuilder} from "../../../test-utils/server/server";
 
 
@@ -16,23 +16,17 @@ describe('ClientPage page', function () {
 
     afterAll(() => server.close())
 
-    it('should be displayed', async () => {
-        const {container} = render(<Clients/>)
-
-        expect(prettyDOM(container)).toMatchSnapshot()
-    })
-
     describe('fetches clients when loading', function () {
         describe("retrieve them", () => {
             const server = new ServerBuilder()
                 .request("/clients", "get", new ClientsBuilder()
-                    .withClient(client())
-                    .withClient(client("Pierre", "Martin", "33da6f24-efda-4c16-b8af-e5e822fc5860"))
-                    .withClient(client("Henri", "Verneuil", "33da6bca-efda-4c16-b8af-e5e822fc5901"))
+                    .withClient(apiClient())
+                    .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}]))
+                    .withClient(apiClient("Henri", "Verneuil", "2"))
                     .build())
                 .build()
 
-            beforeAll(() => server.listen())
+            beforeEach(() => server.listen())
 
             afterEach(() => server.resetHandlers())
 
@@ -40,14 +34,44 @@ describe('ClientPage page', function () {
 
             it('and should display them', async () => {
                 render(<Clients/>)
+                await actThenSleep(20)
 
-                expect(await screen.findByText("Doe", {selector: 'h6'})).toBeInTheDocument()
-                expect(await screen.findByText("John")).toBeInTheDocument()
-                expect(await screen.findByText("Martin", {selector: 'h6'})).toBeInTheDocument()
-                expect(await screen.findByText("Pierre")).toBeInTheDocument()
-                expect(await screen.findByText("Verneuil", {selector: 'h6'})).toBeInTheDocument()
-                expect(await screen.findByText("Henri")).toBeInTheDocument()
+                expect(screen.getByText("Doe", {selector: 'h6'})).toBeInTheDocument()
+                expect(screen.getByText("John")).toBeInTheDocument()
+                expect(screen.getByText("Martin", {selector: 'h6'})).toBeInTheDocument()
+                expect(screen.getByText("Pierre")).toBeInTheDocument()
+                expect(screen.getByText("Verneuil", {selector: 'h6'})).toBeInTheDocument()
+                expect(screen.getByText("Henri")).toBeInTheDocument()
             })
+
+            describe("interacting with them", () => {
+                const server = new ServerBuilder()
+                    .request("/clients", "get", new ClientsBuilder()
+                        .withClient(apiClient())
+                        .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}]))
+                        .withClient(apiClient("Henri", "Verneuil", "2"))
+                        .build())
+                    .build()
+
+                beforeEach(() => server.listen())
+
+                afterEach(() => server.resetHandlers())
+
+                afterAll(() => server.close())
+
+                it('should display credits when clicking on name', async () => {
+                    render(<Clients/>)
+                    await actThenSleep(20)
+
+                    userEvent.click(screen.getByRole("button", {name: /martin/i}))
+
+                    expect(await screen.findByText("2")).toBeInTheDocument()
+                    expect(await screen.findByText(/mat/i)).toBeInTheDocument()
+                    expect(await screen.findByText("5")).toBeInTheDocument()
+                    expect(await screen.findByText(/machine duo/i)).toBeInTheDocument()
+                })
+            })
+
         })
 
         describe("faces an error", () => {
@@ -76,7 +100,7 @@ describe('ClientPage page', function () {
     describe('displays a form to create a client', function () {
         const server = new ServerBuilder()
             .request("/clients", "get", [])
-            .request("/clients", "post", client())
+            .request("/clients", "post", apiClient())
             .build()
 
         beforeAll(() => server.listen())

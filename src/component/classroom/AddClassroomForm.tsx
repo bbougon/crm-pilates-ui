@@ -18,11 +18,13 @@ import * as React from "react";
 import {useState} from "react";
 import set from "date-fns/set";
 import {useDispatch, useSelector} from "react-redux";
-import {Client, selectAllClients} from "../../features/clientsSlice";
+import {selectAllClients} from "../../features/clientsSlice";
 import {addClassroom} from "../../features/classroomSlice";
 import {format, formatISO} from "date-fns";
 import {Subjects} from "../../features/domain/subjects";
 import {Classroom} from "../../features/domain/classroom";
+import {Client} from "../../features/domain/client";
+import {subjects} from "../../utils/translation";
 
 type AddClassroomFormProps = {
     date: Date
@@ -44,8 +46,6 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
         {duration: 120, human: "2h00"}];
 
     const available_positions = [1, 2, 3, 4, 5, 6]
-    const subjects = [{subject: Subjects.MAT, title: "Mat"}, {subject: Subjects.MACHINE_DUO, title: "Machine Duo"}, {
-        subject: Subjects.MACHINE_TRIO, title: "Machine Trio"}, {subject: Subjects.MACHINE_PRIVATE, title: "Machine private"}]
 
     const [currentDate] = useState(new Date())
     const [classroomName, setClassroomName] = useState('')

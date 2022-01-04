@@ -87,6 +87,18 @@ api.sessionCancel = (cancel: Cancel) => {
     return api(`/sessions/cancellation/${cancel.attendeeId}`, {customConfig, body})
 }
 
+export interface ApiClient {
+    "id": string
+    "firstname": string
+    "lastname": string
+    "credits": [
+        {
+            "value": number
+            "subject": string
+        }
+    ] | undefined
+}
+
 export interface ApiClassroom {
     id?: string
     name: string,

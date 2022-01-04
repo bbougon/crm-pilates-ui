@@ -46,7 +46,7 @@ describe("Interacting with session", () => {
 
         userEvent.click(await screen.findByText("Cours Duo"))
         userEvent.click(await screen.findByRole("checkbox"))
-        await actThenSleep(2)
+        await actThenSleep(20)
         userEvent.click(await screen.findByText("Cours Duo"))
 
         expect(screen.getByText("C", {selector: "span"})).toBeInTheDocument()

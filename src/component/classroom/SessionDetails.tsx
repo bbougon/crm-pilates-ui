@@ -1,11 +1,7 @@
 import * as React from "react";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {
-    sessionCheckin,
-    sessionCheckout,
-    sessionCancel
-} from "../../features/sessionsSlice";
+import {sessionCancel, sessionCheckin, sessionCheckout} from "../../features/sessionsSlice";
 import {
     Box,
     Card,
@@ -19,11 +15,11 @@ import {
     Switch,
     Typography
 } from "@mui/material";
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {formatFullDate, formatHours} from "../../utils/date";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {Attendance, Attendee, Session} from "../../features/domain/session";
+import {CreditBox} from "../CreditBox";
 
 const theme = createTheme({
     components: {
@@ -49,8 +45,6 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     const [attendeeLabelStatus] = useState(attendee.attendance === Attendance.REGISTERED ? 'R' : 'C')
     const [attendeeLabelColor] = useState<'primary' | 'success'>(attendee.attendance === Attendance.REGISTERED ? 'primary' : 'success')
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [creditAmountLabel] = useState(attendee.credits?.amount ?? 0)
-    const [creditAmountColor] = useState<"default" | "primary" | "success" | "error" | "warning" | "secondary" | "info" | undefined>(creditAmountLabel <1 ? "error" : creditAmountLabel < 3 ? "warning" : "success")
     const open = Boolean(anchorEl);
 
     const options = [
@@ -115,15 +109,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                         </Box>
                     </Grid>
                     <Grid item xs={4} md={4}>
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-end'
-                        }}>
-                            <Chip size="small" label={creditAmountLabel} color={creditAmountColor}
-                                  icon={<MonetizationOnIcon/>} sx={{
-                                fontWeight: 'bold'
-                            }}/>
-                        </Box>
+                        <CreditBox credit={attendee.credits?.amount}/>
                     </Grid>
                 </Grid>
             </Grid>
