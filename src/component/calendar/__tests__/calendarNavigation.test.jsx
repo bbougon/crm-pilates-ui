@@ -32,6 +32,7 @@ describe("Navigate through calendar", () => {
                 .build(),
             200, {month: nextMonth.toISOString()}, {"X-Link": `</sessions?month=${currentMonth.toISOString()}>; rel="previous", </sessions?month=${nextMonth.toISOString()}>; rel="current", </sessions?month=${lastMonth.toISOString()}>; rel="next"`}
         )
+        .once()
         .build()
 
     beforeAll(() => server.listen())
@@ -47,7 +48,7 @@ describe("Navigate through calendar", () => {
         await waitFor(() => userEvent.click(screen.getByRole("button", {name: /next/i})))
         await actThenSleep(20)
 
-        expect(await screen.findByText("Stage 1")).toBeInTheDocument()
+        await waitFor(() => expect(screen.getByText("Stage 1")).toBeInTheDocument())
         await waitFor(() => expect(screen.getByText("Stage 2")).toBeInTheDocument())
     })
 

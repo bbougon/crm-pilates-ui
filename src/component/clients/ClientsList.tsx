@@ -63,7 +63,6 @@ const ClientDetailsAccordionSummary = ({client}: ClientDetailsAccordionSummaryPr
 
 const CreditItem = (credit: Credits) => {
     const [credits] = useState(credit)
-    console.log(credits)
     return (
         <Grid container direction="row" sx={{
             paddingBottom: "4px"
