@@ -23,14 +23,18 @@ const theme = createTheme({
 
 export const CreditBox = ({credit}: CreditBoxProps) => {
 
-    const [creditAmountColor2] = useState<"default" | "primary" | "success" | "error" | "warning" | "secondary" | "info" | undefined>(credit < 1 ? "error" : credit < 3 ? "warning" : "success")
+    const [creditAmountColor2] = useState<"default" | "primary" | "success" | "error" | "warning" | "secondary" | "info" | undefined>()
+
+    const colorize = (): "success" | "error" | "warning" => {
+        return credit < 1 ? "error" : credit < 3 ? "warning" : "success"
+    }
 
     return <Box sx={{
         display: 'flex',
         justifyContent: 'flex-end'
     }}>
         <ThemeProvider theme={theme}>
-            <Chip size="small" label={credit} color={creditAmountColor2}
+            <Chip size="small" label={credit} color={colorize()}
                   icon={<MonetizationOnIcon/>} sx={{
                 fontWeight: 'bold'
             }}/>

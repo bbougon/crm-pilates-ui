@@ -99,7 +99,7 @@ const CreditItem = ({credit, clientId}: CreditItemProps) => {
                 <CreditBox credit={credits?.value || 0}/>
             </Grid>
             <Grid item xs={9}>
-                <Grid container direction="row">
+                <Grid container direction="row" sx={{ '& button': { m: 2 } }}>
                     <Grid item xs={1}/>
                     <Grid item xs={3} sx={{
                         display: 'flex',
@@ -124,7 +124,7 @@ const CreditItem = ({credit, clientId}: CreditItemProps) => {
                         display: 'flex',
                         justifyContent: 'flex-start',
                     }}>
-                        <Button size="small" onClick={onSubmitClicked}>Submit</Button>
+                        <Button size="small" onClick={onSubmitClicked}>Add credits</Button>
                     </Grid>
                 </Grid>
             </Grid>

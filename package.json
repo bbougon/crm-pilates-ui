@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^6.4.3",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@material-ui/core": "^4.12.3",
@@ -30,16 +31,16 @@
     "web-vitals": "^1.0.1"
   },
   "jest": {
-    "coveragePathIgnorePatterns" : [
+    "coveragePathIgnorePatterns": [
       "src/test-utils",
       "src/app"
     ]
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "coverage": "craco test --coverage",
     "lint": "eslint --fix . --ext .ts,.tsx,.jsx"
   },
   "eslintConfig": {
@@ -52,14 +53,19 @@
       "react",
       "react-hooks"
     ],
-    "ignorePatterns": ["**/*.js"],
+    "ignorePatterns": [
+      "**/*.js"
+    ],
     "rules": {
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn"
     },
     "overrides": [
       {
-        "files": ["**/*.ts?(x)", "**/*.jsx"],
+        "files": [
+          "**/*.ts?(x)",
+          "**/*.jsx"
+        ],
         "rules": {
           "react/no-access-state-in-setstate": "warn"
         }
@@ -82,8 +88,8 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "eslint-plugin-react-hooks": "^4.2.1-alpha-e0aa5e205-20211109",
     "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.2.1-alpha-e0aa5e205-20211109",
     "msw": "^0.35.0"
   }
 }

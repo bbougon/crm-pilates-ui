@@ -79,7 +79,7 @@ describe('ClientPage page', function () {
                     userEvent.click(screen.getByRole("button", {name: /martin/i}))
                     let clientDetails = screen.getByRole("region");
                     userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
-                    userEvent.click(within(clientDetails).getAllByRole("button", {name: /submit/i})[0])
+                    userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0])
 
                     await waitFor(() => expect(within(screen.getByRole("region")).getAllByLabelText(/amount of credits/i, {selector: 'input'})[0]).toHaveValue(null))
                     expect(await within(clientDetails).findByText("12")).toBeInTheDocument()
