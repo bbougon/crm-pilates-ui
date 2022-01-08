@@ -1,6 +1,6 @@
 import React from "react";
 import {Clients} from "../ClientPage";
-import {screen, waitFor} from '@testing-library/react';
+import {screen, waitFor, within} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
@@ -51,6 +51,7 @@ describe('ClientPage page', function () {
                         .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}]))
                         .withClient(apiClient("Henri", "Verneuil", "2"))
                         .build())
+                    .request("/clients/1/credits", "post", [{value: 10, subject: "MAT"}])
                     .build()
 
                 beforeEach(() => server.listen())
@@ -69,6 +70,19 @@ describe('ClientPage page', function () {
                     expect(await screen.findByText(/mat/i)).toBeInTheDocument()
                     expect(await screen.findByText("5")).toBeInTheDocument()
                     expect(await screen.findByText(/machine duo/i)).toBeInTheDocument()
+                })
+
+                it('should add credits to existing credits', async () => {
+                    render(<Clients/>)
+                    await actThenSleep(20)
+
+                    userEvent.click(screen.getByRole("button", {name: /martin/i}))
+                    let clientDetails = screen.getByRole("region");
+                    userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
+                    userEvent.click(within(clientDetails).getAllByRole("button", {name: /submit/i})[0])
+
+                    await waitFor(() => expect(within(screen.getByRole("region")).getAllByLabelText(/amount of credits/i, {selector: 'input'})[0]).toHaveValue(null))
+                    expect(await within(clientDetails).findByText("12")).toBeInTheDocument()
                 })
             })
 

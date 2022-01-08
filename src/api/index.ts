@@ -1,4 +1,4 @@
-import {ClientCreation} from "../features/clientsSlice";
+import {ClientCreation, ClientCredits} from "../features/clientsSlice";
 import {Cancel, Checkin, Checkout} from "../features/sessionsSlice";
 
 type RequestConfig = {
@@ -50,6 +50,15 @@ api.createClient = (body: ClientCreation) => {
 
 api.fetchClients = () => {
     return api("/clients", {customConfig: {method: 'GET'}})
+}
+
+api.addCredits = (clientCredits: ClientCredits) => {
+    const body = [{
+        subject: clientCredits.subject,
+        value: clientCredits.creditsAmount
+    }]
+    const customConfig = {};
+    return api(`/clients/${clientCredits.clientId}/credits`, {customConfig, body})
 }
 
 api.fetchSessions = (link: any) => {

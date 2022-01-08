@@ -109,7 +109,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                         </Box>
                     </Grid>
                     <Grid item xs={4} md={4}>
-                        <CreditBox credit={attendee.credits?.amount}/>
+                        <CreditBox credit={attendee.credits?.amount || 0}/>
                     </Grid>
                 </Grid>
             </Grid>

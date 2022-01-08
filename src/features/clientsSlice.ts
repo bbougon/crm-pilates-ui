@@ -55,6 +55,24 @@ export const fetchClients = createAsyncThunk<{ clients: ApiClient[] }, undefined
     }
 )
 
+export type ClientCredits = {
+    clientId: string,
+    creditsAmount: number,
+    subject: string
+}
+
+export const addCredits = createAsyncThunk<ClientCredits, ClientCredits, { rejectValue: ApiError }>(
+    'clients/addCredits',
+    async (credits, thunkApi) => {
+        try {
+            await api.addCredits(credits)
+            return credits
+        } catch (e: any) {
+            return thunkApi.rejectWithValue(e)
+        }
+    }
+)
+
 const clientsSlice = createSlice({
     name: 'clients',
     initialState,
@@ -95,9 +113,26 @@ const clientsSlice = createSlice({
                 state.status = ClientStatus.CREATION_FAILED
                 state.error = map_action_thunk_error(action.payload as ApiError)
             })
+            .addCase(addCredits.pending, (state, action) => {
+                state.status = ClientStatus.LOADING
+            })
+            .addCase(addCredits.fulfilled, (state, action) => {
+                state.status = ClientStatus.SUCCEEDED
+                const credits = action.payload as ClientCredits
+                let credit = state.clients.find(client => client.id === credits.clientId)?.credits?.find(credit => credit.subject === credits.subject);
+                if (credit)
+                    credit.value += credits.creditsAmount
+            })
+            .addCase(addCredits.rejected, (state, action) => {
+                state.status = ClientStatus.CREATION_FAILED
+                state.error = map_action_thunk_error(action.payload as ApiError)
+            })
     }
 })
 
 export const selectAllClients = (state: RootState) => state.clients.clients
+export const getClientCredits = (clientId: string, subject: string) => (state: RootState) => state.clients.clients
+    .find(client => client.id === clientId)?.credits
+    ?.find(credits => credits.subject === subject)
 
 export default clientsSlice.reducer

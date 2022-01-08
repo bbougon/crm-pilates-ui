@@ -5,7 +5,7 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import {createTheme} from "@mui/material/styles";
 
 type CreditBoxProps = {
-    credit: number | undefined
+    credit: number
 }
 
 const theme = createTheme({
@@ -23,15 +23,14 @@ const theme = createTheme({
 
 export const CreditBox = ({credit}: CreditBoxProps) => {
 
-    const [creditAmountLabel2] = useState(credit ?? 0)
-    const [creditAmountColor2] = useState<"default" | "primary" | "success" | "error" | "warning" | "secondary" | "info" | undefined>(creditAmountLabel2 < 1 ? "error" : creditAmountLabel2 < 3 ? "warning" : "success")
+    const [creditAmountColor2] = useState<"default" | "primary" | "success" | "error" | "warning" | "secondary" | "info" | undefined>(credit < 1 ? "error" : credit < 3 ? "warning" : "success")
 
     return <Box sx={{
         display: 'flex',
         justifyContent: 'flex-end'
     }}>
         <ThemeProvider theme={theme}>
-            <Chip size="small" label={creditAmountLabel2} color={creditAmountColor2}
+            <Chip size="small" label={credit} color={creditAmountColor2}
                   icon={<MonetizationOnIcon/>} sx={{
                 fontWeight: 'bold'
             }}/>

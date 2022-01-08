@@ -1,7 +1,8 @@
-import reducer, {fetchClients} from "../clientsSlice";
+import reducer, {addCredits, fetchClients} from "../clientsSlice";
 import {LoadingState} from "../../test-utils/features/clients/clientStateFixtures";
 import {FulFilledAction, RejectedAction} from "../../test-utils/features/actionFixtures";
 import {client, ClientsBuilder} from "../../test-utils/clients/clients";
+import {Subjects} from "../domain/subjects";
 
 describe('ClientsSlice', () => {
 
@@ -18,7 +19,7 @@ describe('ClientsSlice', () => {
             expect(reducer(previousState, action)).toEqual({
                 clients: all_clients,
                 status: "succeeded",
-                error: null
+                error: []
             })
         })
 
@@ -56,6 +57,28 @@ describe('ClientsSlice', () => {
                     status: "failed",
                     error: [{message: "We could not fetch the request"}]
                 })
+            })
+        })
+    })
+
+    describe("Adding credits", () => {
+        it ("should update client credits", async () => {
+            const previousState = new LoadingState().withClient(client("John", "Doe", "1", [{value: 5, subject: Subjects.MAT}])).build()
+
+            const action = new FulFilledAction(addCredits).withPayload({ clientId: "1", creditsAmount: 10, subject: "MAT"}).build()
+
+            expect(reducer(previousState, action)).toEqual({
+                clients: [{
+                    firstname: "John",
+                    lastname: "Doe",
+                    id: "1",
+                    credits: [{
+                        value: 15,
+                        subject: "MAT"
+                    }]
+                }],
+                status: "succeeded",
+                error: []
             })
         })
     })
