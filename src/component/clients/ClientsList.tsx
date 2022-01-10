@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {
     Avatar,
     Box,
-    FormControl,
+    FormControl, FormHelperText,
     Grid,
     IconButton,
     InputLabel,
@@ -130,6 +130,7 @@ const CreditItem = ({credit, clientId}: CreditItemProps) => {
                     >
                         <FormControl>
                             <TextField id={`credits-amount-`.concat(Math.random().toString())}
+                                       error={creditsAmount ? creditsAmount < 1 : false}
                                        size="small"
                                        type="number"
                                        label="Amount of credits"
@@ -137,14 +138,14 @@ const CreditItem = ({credit, clientId}: CreditItemProps) => {
                                        variant="standard"
                                        onChange={onCreditsAmountChanged}
                                        value={creditsAmount || ""}
-                                       aria-describedby="credits-amount-help"/>
+                            />
                         </FormControl>
                     </Grid>
                     <Grid item xs={5} sx={{
                         display: 'flex',
                         justifyContent: 'flex-start',
                     }}>
-                        <Button size="small" disabled={creditsAmount === null} onClick={onSubmitClicked}>Add credits</Button>
+                        <Button size="small" disabled={creditsAmount === null || creditsAmount < 1} onClick={onSubmitClicked}>Add credits</Button>
                     </Grid>
                 </Grid>
             </Grid>

@@ -105,7 +105,6 @@ describe('ClientPage page', function () {
                     expect(subject.queryByText(/machine duo/i)).not.toBeInTheDocument()
 
                     userEvent.click(subject.getByText(/machine trio/i));
-                    let allByText = within(clientDetails).getAllByText(/amount of credits/i);
                     userEvent.type((within(clientDetails).getAllByText(/amount of credits/i))[2], "10")
                     userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[2])
                     await actThenSleep(20)
@@ -117,6 +116,33 @@ describe('ClientPage page', function () {
                     expect(await within(clientDetails).findByText("10")).toBeInTheDocument()
 
                     expect(screen.queryByRole("button", {name: /subject/i})).not.toBeInTheDocument()
+                })
+
+                describe("faces errors", () => {
+
+                    const server = new ServerBuilder()
+                        .request("/clients", "get", new ClientsBuilder()
+                            .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}]))
+                            .build())
+                        .build()
+
+                    beforeEach(() => server.listen())
+
+                    afterEach(() => server.resetHandlers())
+
+                    afterAll(() => server.close())
+
+                    it("should display amount of credits filed in error when negative value is filled", async () => {
+                        render(<Clients/>)
+                        await actThenSleep(20)
+
+                        userEvent.click(screen.getByRole("button", {name: /martin/i}))
+                        let clientDetails = screen.getByRole("region");
+                        userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "-1")
+
+                        expect(within(clientDetails).getByDisplayValue(/-1/i)).toBeInvalid()
+                        expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
+                    })
                 })
             })
 
