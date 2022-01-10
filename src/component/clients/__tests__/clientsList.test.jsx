@@ -1,6 +1,6 @@
 import React from "react";
 import {Clients} from "../ClientPage";
-import {screen, waitFor, within} from '@testing-library/react';
+import {fireEvent, screen, waitFor, within} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
@@ -52,6 +52,7 @@ describe('ClientPage page', function () {
                         .withClient(apiClient("Henri", "Verneuil", "2"))
                         .build())
                     .request("/clients/1/credits", "post", [{value: 10, subject: "MAT"}])
+                    .request("/clients/1/credits", "post", [{value: 10, subject: "MACHINE_TRIO"}])
                     .build()
 
                 beforeEach(() => server.listen())
@@ -83,6 +84,38 @@ describe('ClientPage page', function () {
 
                     await waitFor(() => expect(within(screen.getByRole("region")).getAllByLabelText(/amount of credits/i, {selector: 'input'})[0]).toHaveValue(null))
                     expect(await within(clientDetails).findByText("12")).toBeInTheDocument()
+                })
+
+                it('should add a form to add credits when clicking on `+`', async () => {
+                    render(<Clients/>)
+                    await actThenSleep(20)
+
+                    userEvent.click(screen.getByRole("button", {name: /martin/i}))
+                    let clientDetails = screen.getByRole("region");
+                    userEvent.click(within(clientDetails).getAllByRole("button")[2])
+
+                    expect(screen.getByRole("button", {name: /subject/i})).toBeInTheDocument()
+
+                    fireEvent.mouseDown(screen.getByRole("button", {name: /subject/i}))
+                    const subject = within(screen.getByRole('listbox'));
+                    expect(subject.getByText(/machine trio/i)).toBeInTheDocument()
+                    expect(subject.getByText(/machine private/i)).toBeInTheDocument()
+                    expect(subject.queryByText(/mat/i)).not.toBeInTheDocument()
+                    expect(subject.queryByText(/machine duo/i)).not.toBeInTheDocument()
+
+                    userEvent.click(subject.getByText(/machine trio/i));
+                    let allByText = within(clientDetails).getAllByText(/amount of credits/i);
+                    userEvent.type((within(clientDetails).getAllByText(/amount of credits/i))[2], "10")
+                    userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[2])
+                    await actThenSleep(20)
+
+                    expect(await within(clientDetails).findByText("2")).toBeInTheDocument()
+                    expect(await screen.findByText(/mat/i)).toBeInTheDocument()
+                    expect(await within(clientDetails).findByText("5")).toBeInTheDocument()
+                    expect(await screen.findByText(/machine duo/i)).toBeInTheDocument()
+                    expect(await within(clientDetails).findByText("10")).toBeInTheDocument()
+
+                    expect(screen.queryByRole("button", {name: /subject/i})).not.toBeInTheDocument()
                 })
             })
 

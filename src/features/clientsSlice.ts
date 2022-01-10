@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {api, ApiClient} from "../api";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 import {RootState} from "../app/store";
-import {Client} from "./domain/client";
+import {Client, Credits} from "./domain/client";
 import {Subjects} from "./domain/subjects";
 
 export enum ClientStatus {
@@ -119,9 +119,12 @@ const clientsSlice = createSlice({
             .addCase(addCredits.fulfilled, (state, action) => {
                 state.status = ClientStatus.SUCCEEDED
                 const credits = action.payload as ClientCredits
-                let credit = state.clients.find(client => client.id === credits.clientId)?.credits?.find(credit => credit.subject === credits.subject);
-                if (credit)
+                let client: Client | undefined = state.clients.find(client => client.id === credits.clientId);
+                let credit: Credits | undefined = client?.credits?.find(credit => credit.subject === credits.subject);
+                if(credit)
                     credit.value += credits.creditsAmount
+                else if(client)
+                    client.credits?.push({value: credits.creditsAmount, subject: credits.subject as Subjects})
             })
             .addCase(addCredits.rejected, (state, action) => {
                 state.status = ClientStatus.CREATION_FAILED
@@ -134,5 +137,6 @@ export const selectAllClients = (state: RootState) => state.clients.clients
 export const getClientCredits = (clientId: string, subject: string) => (state: RootState) => state.clients.clients
     .find(client => client.id === clientId)?.credits
     ?.find(credits => credits.subject === subject)
+export const getClientById = (clientId: string) => (state: RootState) => state.clients.clients.find(client => client.id === clientId)
 
 export default clientsSlice.reducer
