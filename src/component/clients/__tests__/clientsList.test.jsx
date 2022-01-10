@@ -79,6 +79,7 @@ describe('ClientPage page', function () {
 
                     userEvent.click(screen.getByRole("button", {name: /martin/i}))
                     let clientDetails = screen.getByRole("region");
+                    expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
                     userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
                     userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0])
 

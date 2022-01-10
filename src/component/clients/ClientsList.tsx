@@ -144,7 +144,7 @@ const CreditItem = ({credit, clientId}: CreditItemProps) => {
                         display: 'flex',
                         justifyContent: 'flex-start',
                     }}>
-                        <Button size="small" onClick={onSubmitClicked}>Add credits</Button>
+                        <Button size="small" disabled={creditsAmount === null} onClick={onSubmitClicked}>Add credits</Button>
                     </Grid>
                 </Grid>
             </Grid>
