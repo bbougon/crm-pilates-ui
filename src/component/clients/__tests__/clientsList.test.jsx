@@ -50,6 +50,7 @@ describe('ClientPage page', function () {
                         .withClient(apiClient())
                         .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}]))
                         .withClient(apiClient("Henri", "Verneuil", "2"))
+                        .withClient(apiClient("Bertholt", "Brecht", "3", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
                         .build())
                     .request("/clients/1/credits", "post", [{value: 10, subject: "MAT"}])
                     .request("/clients/1/credits", "post", [{value: 10, subject: "MACHINE_TRIO"}])
@@ -67,10 +68,11 @@ describe('ClientPage page', function () {
 
                     userEvent.click(screen.getByRole("button", {name: /martin/i}))
 
-                    expect(await screen.findByText("2")).toBeInTheDocument()
-                    expect(await screen.findByText(/mat/i)).toBeInTheDocument()
-                    expect(await screen.findByText("5")).toBeInTheDocument()
-                    expect(await screen.findByText(/machine duo/i)).toBeInTheDocument()
+                    let clientDetails = screen.getByRole("region");
+                    expect(within(clientDetails).getByText("2", {selector: 'span'})).toBeInTheDocument()
+                    expect(within(clientDetails).getByText(/mat/i, {selector: 'p'})).toBeInTheDocument()
+                    expect(within(clientDetails).getByText("5", {selector: 'span'})).toBeInTheDocument()
+                    expect(within(clientDetails).getByText(/machine duo/i, {selector: 'p'})).toBeInTheDocument()
                 })
 
                 it('should add credits to existing credits', async () => {
@@ -110,12 +112,22 @@ describe('ClientPage page', function () {
                     await actThenSleep(20)
 
                     expect(await within(clientDetails).findByText("2")).toBeInTheDocument()
-                    expect(await screen.findByText(/mat/i)).toBeInTheDocument()
+                    expect(await within(clientDetails).findByText(/mat/i)).toBeInTheDocument()
                     expect(await within(clientDetails).findByText("5")).toBeInTheDocument()
-                    expect(await screen.findByText(/machine duo/i)).toBeInTheDocument()
+                    expect(await within(clientDetails).findByText(/machine duo/i)).toBeInTheDocument()
                     expect(await within(clientDetails).findByText("10")).toBeInTheDocument()
 
                     expect(screen.queryByRole("button", {name: /subject/i})).not.toBeInTheDocument()
+                })
+
+                it("should disabled add form button if no more subjects available for client", async () => {
+                    render(<Clients/>)
+                    await actThenSleep(20)
+
+                    userEvent.click(screen.getByRole("button", {name: /brecht/i}))
+                    let clientDetails = screen.getByRole("region");
+
+                    expect(within(clientDetails).getAllByRole("button")[4]).toBeDisabled()
                 })
 
                 describe("faces errors", () => {

@@ -155,9 +155,10 @@ const CreditItem = ({credit, clientId}: CreditItemProps) => {
 
 type AddCreditButtonProps = {
     onAddCreditButton: any
+    disabled: boolean
 }
 
-const AddCreditButton = ({onAddCreditButton}: AddCreditButtonProps) => {
+const AddCreditButton = ({onAddCreditButton, disabled}: AddCreditButtonProps) => {
 
     return (
         <Grid container direction="row" sx={{
@@ -168,7 +169,7 @@ const AddCreditButton = ({onAddCreditButton}: AddCreditButtonProps) => {
                 display: 'flex',
                 justifyContent: 'flex-end',
             }}>
-                <IconButton aria-label="add" onClick={onAddCreditButton}>
+                <IconButton aria-label="add" disabled={disabled} onClick={onAddCreditButton}>
                     <AddBoxIcon/>
                 </IconButton>
             </Grid>
@@ -281,7 +282,11 @@ const ClientItem = ({clientId}: ClientItemProps) => {
                             <CreditItem key={credit.subject} clientId={client?.id} credit={credit}/>)) || []
                     }
                     {addForm}
-                    <AddCreditButton key={`add-credit-buton-`.concat(client?.id || Math.random().toString())} onAddCreditButton={onAddCreditButton}/>
+                    <AddCreditButton key={`add-credit-buton-`.concat(client?.id || Math.random().toString())} disabled={
+                        Object.keys(Subjects)
+                            .every(subject => client?.credits?.map(credits => credits.subject)
+                                .includes(subject as Subjects))
+                    } onAddCreditButton={onAddCreditButton}/>
                 </Wrapper>
             </AccordionDetails>
         </Accordion>
