@@ -109,7 +109,6 @@ describe('ClientPage page', function () {
                     userEvent.click(subject.getByText(/machine trio/i));
                     userEvent.type((within(clientDetails).getAllByText(/amount of credits/i))[2], "10")
                     userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[2])
-                    await actThenSleep(20)
 
                     expect(await within(clientDetails).findByText("2")).toBeInTheDocument()
                     expect(await within(clientDetails).findByText(/mat/i)).toBeInTheDocument()
