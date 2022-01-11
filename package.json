@@ -38,10 +38,10 @@
     ]
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "coverage": "craco test --coverage",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "coverage": "react-scripts test --coverage --watchAll=false",
     "lint": "eslint --fix . --ext .ts,.tsx,.jsx"
   },
   "eslintConfig": {
