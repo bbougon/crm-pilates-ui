@@ -34,9 +34,8 @@ describe('ClientPage page', function () {
 
             it('and should display them', async () => {
                 render(<Clients/>)
-                await actThenSleep(20)
 
-                expect(screen.getByText("Doe", {selector: 'h6'})).toBeInTheDocument()
+                expect(await waitFor(() => screen.getByText("Doe", {selector: 'h6'}))).toBeInTheDocument()
                 expect(screen.getByText("John")).toBeInTheDocument()
                 expect(screen.getByText("Martin", {selector: 'h6'})).toBeInTheDocument()
                 expect(screen.getByText("Pierre")).toBeInTheDocument()
@@ -64,9 +63,8 @@ describe('ClientPage page', function () {
 
                 it('should display credits when clicking on name', async () => {
                     render(<Clients/>)
-                    await actThenSleep(20)
 
-                    userEvent.click(screen.getByRole("button", {name: /martin/i}))
+                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
 
                     let clientDetails = screen.getByRole("region");
                     expect(within(clientDetails).getByText("2", {selector: 'span'})).toBeInTheDocument()
@@ -77,9 +75,8 @@ describe('ClientPage page', function () {
 
                 it('should add credits to existing credits', async () => {
                     render(<Clients/>)
-                    await actThenSleep(20)
 
-                    userEvent.click(screen.getByRole("button", {name: /martin/i}))
+                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
                     let clientDetails = screen.getByRole("region");
                     expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
                     userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
@@ -91,9 +88,8 @@ describe('ClientPage page', function () {
 
                 it('should add a form to add credits when clicking on `+`', async () => {
                     render(<Clients/>)
-                    await actThenSleep(20)
 
-                    userEvent.click(screen.getByRole("button", {name: /martin/i}))
+                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
                     let clientDetails = screen.getByRole("region");
                     userEvent.click(within(clientDetails).getAllByRole("button")[2])
 
@@ -121,9 +117,8 @@ describe('ClientPage page', function () {
 
                 it("should disabled add form button if no more subjects available for client", async () => {
                     render(<Clients/>)
-                    await actThenSleep(20)
 
-                    userEvent.click(screen.getByRole("button", {name: /brecht/i}))
+                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /brecht/i})))
                     let clientDetails = screen.getByRole("region");
 
                     expect(within(clientDetails).getAllByRole("button")[4]).toBeDisabled()
@@ -145,9 +140,8 @@ describe('ClientPage page', function () {
 
                     it("should display amount of credits filed in error when negative value is filled", async () => {
                         render(<Clients/>)
-                        await actThenSleep(20)
 
-                        userEvent.click(screen.getByRole("button", {name: /martin/i}))
+                        userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
                         let clientDetails = screen.getByRole("region");
                         userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "-1")
 

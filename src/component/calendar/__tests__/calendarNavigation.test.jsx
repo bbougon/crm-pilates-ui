@@ -42,11 +42,10 @@ describe("Navigate through calendar", () => {
     afterAll(() => server.close())
 
     it("should display next month when clicking on 'next' month", async () => {
-        await waitFor(() => render(<Calendar date={currentDate}/>))
+        render(<Calendar date={currentDate}/>)
 
         await actThenSleep(20)
-        await waitFor(() => userEvent.click(screen.getByRole("button", {name: /next/i})))
-        await actThenSleep(20)
+        userEvent.click(await waitFor(() => screen.getByRole("button", {name: /next/i})))
 
         await waitFor(() => expect(screen.getByText("Stage 1")).toBeInTheDocument())
         await waitFor(() => expect(screen.getByText("Stage 2")).toBeInTheDocument())
