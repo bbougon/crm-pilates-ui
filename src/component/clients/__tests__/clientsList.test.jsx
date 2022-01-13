@@ -2,7 +2,7 @@ import React from "react";
 import {Clients} from "../ClientPage";
 import {fireEvent, screen, waitFor, within} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
-import {render} from "../../../test-utils/test-utils";
+import {actThenSleep, render} from "../../../test-utils/test-utils";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {APIDetail, APIErrorBody, ServerBuilder} from "../../../test-utils/server/server";
 
@@ -86,8 +86,9 @@ describe('ClientPage page', function () {
                     expect(await within(clientDetails).findByText("12")).toBeInTheDocument()
                 })
 
-                xit('should add a form to add credits when clicking on `+`', async () => {
+                it('should add a form to add credits when clicking on `+`', async () => {
                     render(<Clients/>)
+                    await actThenSleep(20)
 
                     userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
                     let clientDetails = screen.getByRole("region");
