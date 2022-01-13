@@ -32,16 +32,16 @@ describe('ClientPage page', function () {
 
             afterAll(() => server.close())
 
-            // it('and should display them', async () => {
-            //     render(<Clients/>)
-            //
-            //     expect(await waitFor(() => screen.getByText("Doe", {selector: 'h6'}))).toBeInTheDocument()
-            //     expect(screen.getByText("John")).toBeInTheDocument()
-            //     expect(screen.getByText("Martin", {selector: 'h6'})).toBeInTheDocument()
-            //     expect(screen.getByText("Pierre")).toBeInTheDocument()
-            //     expect(screen.getByText("Verneuil", {selector: 'h6'})).toBeInTheDocument()
-            //     expect(screen.getByText("Henri")).toBeInTheDocument()
-            // })
+            it('and should display them', async () => {
+                render(<Clients/>)
+
+                expect(await waitFor(() => screen.getByText("Doe", {selector: 'h6'}))).toBeInTheDocument()
+                expect(screen.getByText("John")).toBeInTheDocument()
+                expect(screen.getByText("Martin", {selector: 'h6'})).toBeInTheDocument()
+                expect(screen.getByText("Pierre")).toBeInTheDocument()
+                expect(screen.getByText("Verneuil", {selector: 'h6'})).toBeInTheDocument()
+                expect(screen.getByText("Henri")).toBeInTheDocument()
+            })
 
             describe("interacting with them", () => {
                 const server = new ServerBuilder()
@@ -61,32 +61,32 @@ describe('ClientPage page', function () {
 
                 afterAll(() => server.close())
 
-                // it('should display credits when clicking on name', async () => {
-                //     render(<Clients/>)
-                //
-                //     userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
-                //
-                //     let clientDetails = screen.getByRole("region");
-                //     expect(within(clientDetails).getByText("2", {selector: 'span'})).toBeInTheDocument()
-                //     expect(within(clientDetails).getByText(/mat/i, {selector: 'p'})).toBeInTheDocument()
-                //     expect(within(clientDetails).getByText("5", {selector: 'span'})).toBeInTheDocument()
-                //     expect(within(clientDetails).getByText(/machine duo/i, {selector: 'p'})).toBeInTheDocument()
-                // })
+                it('should display credits when clicking on name', async () => {
+                    render(<Clients/>)
 
-                // it('should add credits to existing credits', async () => {
-                //     render(<Clients/>)
-                //
-                //     userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
-                //     let clientDetails = screen.getByRole("region");
-                //     expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
-                //     userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
-                //     userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0])
-                //
-                //     await waitFor(() => expect(within(screen.getByRole("region")).getAllByLabelText(/amount of credits/i, {selector: 'input'})[0]).toHaveValue(null))
-                //     expect(await within(clientDetails).findByText("12")).toBeInTheDocument()
-                // })
+                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
 
-                it('should add a form to add credits when clicking on `+`', async () => {
+                    let clientDetails = screen.getByRole("region");
+                    expect(within(clientDetails).getByText("2", {selector: 'span'})).toBeInTheDocument()
+                    expect(within(clientDetails).getByText(/mat/i, {selector: 'p'})).toBeInTheDocument()
+                    expect(within(clientDetails).getByText("5", {selector: 'span'})).toBeInTheDocument()
+                    expect(within(clientDetails).getByText(/machine duo/i, {selector: 'p'})).toBeInTheDocument()
+                })
+
+                it('should add credits to existing credits', async () => {
+                    render(<Clients/>)
+
+                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
+                    let clientDetails = screen.getByRole("region");
+                    expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
+                    userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
+                    userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0])
+
+                    await waitFor(() => expect(within(screen.getByRole("region")).getAllByLabelText(/amount of credits/i, {selector: 'input'})[0]).toHaveValue(null))
+                    expect(await within(clientDetails).findByText("12")).toBeInTheDocument()
+                })
+
+                xit('should add a form to add credits when clicking on `+`', async () => {
                     render(<Clients/>)
 
                     userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))

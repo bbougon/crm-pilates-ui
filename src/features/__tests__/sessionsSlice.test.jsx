@@ -12,7 +12,7 @@ import {addHours, addWeeks, format, formatISO, subDays, subHours} from "date-fns
 import {Attendance} from "../domain/session";
 import {Subjects} from "../domain/subjects";
 
-xdescribe("SessionsSlice", () =>{
+describe("SessionsSlice", () =>{
 
     describe("Fetching sessions", () => {
         it("should get links header", () => {
