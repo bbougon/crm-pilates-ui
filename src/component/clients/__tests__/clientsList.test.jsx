@@ -73,18 +73,18 @@ describe('ClientPage page', function () {
                     expect(within(clientDetails).getByText(/machine duo/i, {selector: 'p'})).toBeInTheDocument()
                 })
 
-                it('should add credits to existing credits', async () => {
-                    render(<Clients/>)
-
-                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
-                    let clientDetails = screen.getByRole("region");
-                    expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
-                    userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
-                    userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0])
-
-                    await waitFor(() => expect(within(screen.getByRole("region")).getAllByLabelText(/amount of credits/i, {selector: 'input'})[0]).toHaveValue(null))
-                    expect(await within(clientDetails).findByText("12")).toBeInTheDocument()
-                })
+                // it('should add credits to existing credits', async () => {
+                //     render(<Clients/>)
+                //
+                //     userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
+                //     let clientDetails = screen.getByRole("region");
+                //     expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
+                //     userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
+                //     userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0])
+                //
+                //     await waitFor(() => expect(within(screen.getByRole("region")).getAllByLabelText(/amount of credits/i, {selector: 'input'})[0]).toHaveValue(null))
+                //     expect(await within(clientDetails).findByText("12")).toBeInTheDocument()
+                // })
 
                 it('should add a form to add credits when clicking on `+`', async () => {
                     render(<Clients/>)
