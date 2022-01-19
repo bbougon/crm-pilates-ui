@@ -5,6 +5,7 @@ import {render} from "../../../test-utils/test-utils";
 import {SessionDetails} from "../SessionDetails";
 import {attendee, AttendeesBuilder, schedule, session} from "../../../test-utils/classroom/session";
 import {Attendance} from "../../../features/domain/session";
+import {parseISO} from "date-fns";
 
 describe("SessionDetails", function() {
 
@@ -12,7 +13,7 @@ describe("SessionDetails", function() {
         let attendees = new AttendeesBuilder()
             .withAttendee(attendee(1, "Bruno", "Germain", Attendance.CHECKED_IN)).build();
         render(<SessionDetails {...session("1", "1", "Cours privé", "MAT",
-            schedule("2021-10-09T10:00:00", "2021-10-09T11:00:00"), 1,
+            schedule(parseISO("2021-10-09T10:00:00"), parseISO("2021-10-09T11:00:00")), 1,
             attendees)} />)
 
         userEvent.click(screen.getByRole("button", {name: /more/i}))
@@ -25,7 +26,7 @@ describe("SessionDetails", function() {
         let attendees = new AttendeesBuilder()
             .withAttendee(attendee(1, "Bruno", "Germain", Attendance.CHECKED_IN, {amount: 5})).build();
         render(<SessionDetails {...session("1", "1", "Cours privé", "MAT",
-            schedule("2021-10-09T10:00:00", "2021-10-09T11:00:00"), 1,
+            schedule(parseISO("2021-10-09T10:00:00"), parseISO("2021-10-09T11:00:00")), 1,
             attendees)} />)
 
         expect(screen.getByText("5", {selector: 'span'})).toBeInTheDocument()

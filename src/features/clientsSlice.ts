@@ -28,6 +28,7 @@ const initialState: ClientState = {
 export interface ClientCreation {
     firstname: string
     lastname: string
+    credits: [{value: number, subject: string}]  | []
 }
 
 export const createClient = createAsyncThunk<ClientCreation, ClientCreation, { rejectValue: ApiError }>(
@@ -78,7 +79,7 @@ const clientsSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers(builder) {
-        function mapCredits(credits: [{ value: number; subject: string }] | undefined) {
+        function mapCredits(credits: [{ value: number; subject: string }] | []) {
             return credits?.map(value => {
                 return {value: value.value, subject: value.subject as Subjects}
             });

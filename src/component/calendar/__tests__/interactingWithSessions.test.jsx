@@ -6,7 +6,13 @@ import {
     schedule,
     SessionsBuilder
 } from "../../../test-utils/classroom/session";
-import {checkin, checkout} from "../../../test-utils/classroom/checkin";
+import {
+    cancellationRequest,
+    checkinRequest,
+    checkinResponse,
+    checkout,
+    checkoutRequest
+} from "../../../test-utils/classroom/checkin";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
@@ -25,14 +31,16 @@ describe("Interacting with session", () => {
     const server = new ServerBuilder()
         .request("/sessions", "get", new SessionsBuilder()
             .withSession(
-            new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
+            new ApiSessionsBuilder().withClassroom("1").withName('Cours Duo')
                     .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                    .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED))
+                    .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED))
                     .build()
             )
             .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
         .request("/clients", "get", [])
-        .request("/sessions/checkin", "post", checkin("15", 1, apiSession("15", 1, "Cours Duo", "MAT", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN)])), 201)
+        .request("/sessions/checkin", "post",
+            checkinRequest(classroomDate, "1", "3"),201, undefined, undefined,
+            checkinResponse("15", "1", apiSession("15", "1", "Cours Duo", "MAT", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee("3", "Bertrand", "Bougon", Attendance.CHECKED_IN)])))
         .build()
 
     beforeAll(() => server.listen())
@@ -91,14 +99,14 @@ describe("Interacting with session", () => {
         const server = new ServerBuilder()
             .request("/sessions", "get", new SessionsBuilder()
                 .withSession(
-                    new ApiSessionsBuilder().withId("15").withClassroom(1).withName('Cours Trio')
+                    new ApiSessionsBuilder().withId("15").withClassroom("1").withName('Cours Trio')
                         .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                        .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN))
+                        .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.CHECKED_IN))
                         .build()
                 )
                 .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
             .request("/clients", "get", [])
-            .request("/sessions/15/checkout", "post", checkout("15", 1, apiSession("15", 1, "Cours Trio", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED)])), 200)
+            .request("/sessions/15/checkout", "post", checkoutRequest("3"), 200, undefined, undefined, checkout("15", "1", apiSession("15", "1", "Cours Trio", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED)])))
             .build()
 
         beforeAll(() => server.listen())
@@ -154,21 +162,21 @@ describe("Interacting with session", () => {
         })
     })
 
-    describe("Cancelling an attendee from session", function () {
+    describe("Cancelling an attendee of a session", function () {
 
         const server = new ServerBuilder()
             .request("/sessions", "get", new SessionsBuilder()
                 .withSession(
-                    new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
+                    new ApiSessionsBuilder().withClassroom("1").withName('Cours Duo')
                         .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                        .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED))
+                        .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED))
                         .build()
                 )
                 .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
             .request("/clients", "get", [])
             .request("/sessions/cancellation/3", "post",
-                checkin("15", 1, apiSession("15", 1, "Cours Duo", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [])),
-                201)
+                cancellationRequest("1", classroomDate), 201, undefined, undefined,
+                checkinResponse("15", "1", apiSession("15", "1", "Cours Duo", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [])))
             .build()
 
         beforeAll(() => server.listen())

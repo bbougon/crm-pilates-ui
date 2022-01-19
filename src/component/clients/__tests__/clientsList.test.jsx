@@ -3,26 +3,26 @@ import {Clients} from "../ClientPage";
 import {fireEvent, screen, waitFor, within} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
-import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
+import {apiClient, apiClientCreation, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {APIDetail, APIErrorBody, ServerBuilder} from "../../../test-utils/server/server";
 
 
-describe('ClientPage page', function () {
-    const server = new ServerBuilder().request("/clients", "get", []).build()
-
-    beforeAll(() => server.listen())
-
-    afterEach(() => server.resetHandlers())
-
-    afterAll(() => server.close())
+describe('ClientList page', function () {
 
     describe('fetches clients when loading', function () {
         describe("retrieve them", () => {
             const server = new ServerBuilder()
                 .request("/clients", "get", new ClientsBuilder()
                     .withClient(apiClient())
-                    .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}]))
+                    .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
+                        value: 5,
+                        subject: "MACHINE_DUO"
+                    }]))
                     .withClient(apiClient("Henri", "Verneuil", "2"))
+                    .withClient(apiClient("Bertholt", "Brecht", "3", [{value: 2, subject: "MAT"}, {
+                        value: 5,
+                        subject: "MACHINE_DUO"
+                    }, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
                     .build())
                 .build()
 
@@ -45,14 +45,9 @@ describe('ClientPage page', function () {
 
             describe("interacting with them", () => {
                 const server = new ServerBuilder()
-                    .request("/clients", "get", new ClientsBuilder()
-                        .withClient(apiClient())
-                        .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}]))
-                        .withClient(apiClient("Henri", "Verneuil", "2"))
-                        .withClient(apiClient("Bertholt", "Brecht", "3", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
-                        .build())
                     .request("/clients/1/credits", "post", [{value: 10, subject: "MAT"}])
                     .request("/clients/1/credits", "post", [{value: 10, subject: "MACHINE_TRIO"}])
+                    .once()
                     .build()
 
                 beforeEach(() => server.listen())
@@ -129,7 +124,10 @@ describe('ClientPage page', function () {
 
                     const server = new ServerBuilder()
                         .request("/clients", "get", new ClientsBuilder()
-                            .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {value: 5, subject: "MACHINE_DUO"}]))
+                            .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
+                                value: 5,
+                                subject: "MACHINE_DUO"
+                            }]))
                             .build())
                         .build()
 
@@ -178,29 +176,82 @@ describe('ClientPage page', function () {
     })
 
     describe('displays a form to create a client', function () {
-        const server = new ServerBuilder()
-            .request("/clients", "get", [])
-            .request("/clients", "post", apiClient())
-            .build()
 
-        beforeAll(() => server.listen())
+        describe("without credits", () => {
+            const server = new ServerBuilder()
+                .request("/clients", "get", [])
+                .request("/clients", "post", apiClientCreation(), 200, undefined, undefined, apiClient())
+                .once()
+                .build()
 
-        afterEach(() => server.resetHandlers())
+            beforeAll(() => server.listen())
 
-        afterAll(() => server.close())
+            afterEach(() => server.resetHandlers())
 
-        it('and should create John Doe', async () => {
-            render(<Clients/>)
+            afterAll(() => server.close())
 
-            userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
-            userEvent.type(screen.getByText("Client's name"), "Doe")
-            userEvent.type(screen.getByText("Client's firstname"), "John")
-            userEvent.click(screen.getByRole("button", {name: /submit/i}))
+            it('named John Doe', async () => {
+                render(<Clients/>)
 
-            expect(await screen.findByText("Doe", {selector: 'h6'})).toBeInTheDocument()
-            expect(await screen.findByText("John", )).toBeInTheDocument()
-            await waitFor(() => expect(screen.getByLabelText("Client's name *", {selector: 'input'})).toHaveValue(""))
-            await waitFor(() => expect(screen.getByLabelText("Client's firstname *", {selector: 'input'})).toHaveValue(""))
+                userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
+                userEvent.type(screen.getByText("Client's name"), "Doe")
+                userEvent.type(screen.getByText("Client's firstname"), "John")
+                userEvent.click(screen.getByRole("button", {name: /submit/i}))
+
+                expect(await screen.findByText("Doe", {selector: 'h6'})).toBeInTheDocument()
+                expect(await screen.findByText("John",)).toBeInTheDocument()
+                await waitFor(() => expect(screen.getByLabelText("Client's name *", {selector: 'input'})).toHaveValue(""))
+                await waitFor(() => expect(screen.getByLabelText("Client's firstname *", {selector: 'input'})).toHaveValue(""))
+            })
+        })
+
+        describe("with credits", () => {
+
+            const server = new ServerBuilder()
+                .request("/clients", "get", [])
+                .request("/clients", "post", apiClientCreation("Joseph", "Pilates", [{
+                    value: 10,
+                    subject: "MACHINE_TRIO"
+                }]), 200, undefined, undefined, apiClient("Joseph", "Pilates", "2", [{
+                    value: 10,
+                    subject: "MACHINE_TRIO"
+                }]))
+                .once()
+                .build()
+
+            beforeAll(() => server.listen())
+
+            afterEach(() => server.resetHandlers())
+
+            afterAll(() => server.close())
+
+            it('named Joseph Pilates', async () => {
+                render(<Clients/>)
+
+                userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
+                userEvent.type(screen.getByText("Client's name"), "Pilates")
+                userEvent.type(screen.getByText("Client's firstname"), "Joseph")
+
+                userEvent.click(screen.getAllByRole("button")[1])
+                fireEvent.mouseDown(screen.getByRole("button", {name: /subject/i}))
+                const subject = within(screen.getByRole('listbox'));
+                userEvent.click(subject.getByText(/machine trio/i));
+                userEvent.type(screen.getAllByText(/amount of credits/i)[0], "10")
+                userEvent.click(screen.getByRole("button", {name: /add credits/i}))
+
+                userEvent.click(screen.getByRole("button", {name: /submit/i}))
+
+                expect(await screen.findByText("Pilates", {selector: 'h6'})).toBeInTheDocument()
+                expect(await screen.findByText("Joseph",)).toBeInTheDocument()
+                await waitFor(() => expect(screen.getByLabelText("Client's name *", {selector: 'input'})).toHaveValue(""))
+                await waitFor(() => expect(screen.getByLabelText("Client's firstname *", {selector: 'input'})).toHaveValue(""))
+
+                userEvent.click(await waitFor(() => screen.getByRole("button", {name: /pilates/i})))
+
+                let clientDetails = screen.getAllByRole("region")[1];
+                expect(within(clientDetails).getByText("10", {selector: 'span'})).toBeInTheDocument()
+                expect(within(clientDetails).getByText(/machine trio/i, {selector: 'p'})).toBeInTheDocument()
+            })
         })
 
         describe("faces an error when creating a client", function () {

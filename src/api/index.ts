@@ -105,7 +105,7 @@ export interface ApiClient {
             "value": number
             "subject": string
         }
-    ] | undefined
+    ] | []
 }
 
 export interface ApiClassroom {

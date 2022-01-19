@@ -1,18 +1,6 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {
-    Avatar,
-    Box,
-    FormControl,
-    Grid,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Select,
-    TextField,
-    Typography
-} from "@mui/material";
-import AddBoxIcon from '@mui/icons-material/AddBox';
+import {Avatar, Box, FormControl, Grid, TextField, Typography} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {
     addCredits,
@@ -33,6 +21,8 @@ import {subjects, translate} from "../../utils/translation";
 import styled from "styled-components";
 import {CreditBox} from "../CreditBox";
 import {Subjects} from "../../features/domain/subjects";
+import {AddCreditButton} from "./AddCreditButton";
+import {AddCreditForm} from "./AddCreditForm";
 
 type ClientDetailsAccordionSummaryProps = {
     client: Client | undefined
@@ -153,103 +143,6 @@ const CreditItem = ({credit, clientId}: CreditItemProps) => {
     )
 }
 
-type AddCreditButtonProps = {
-    onAddCreditButton: any
-    disabled: boolean
-}
-
-const AddCreditButton = ({onAddCreditButton, disabled}: AddCreditButtonProps) => {
-
-    return (
-        <Grid container direction="row" sx={{
-            paddingBottom: "4px",
-            alignItems: "center"
-        }}>
-            <Grid item xs={12} sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-            }}>
-                <IconButton aria-label="add" disabled={disabled} onClick={onAddCreditButton}>
-                    <AddBoxIcon/>
-                </IconButton>
-            </Grid>
-        </Grid>
-    )
-}
-
-type AddCreditFormProps = {
-    client: Client | undefined
-    onAddCredits: any
-}
-
-const AddCreditForm = ({client, onAddCredits}: AddCreditFormProps) => {
-
-    const [subject, setSubject] = useState<Subjects | "">("")
-    const [creditsAmount, setCreditsAmount] = useState<number | null>(null)
-    let clientSubjects = client?.credits?.map(credits => credits.subject) || [];
-    const availableSubjects = subjects.filter(subject => !clientSubjects.includes(subject.subject))
-
-    const onSubjectChanged = (e: any) => setSubject(e.target.value)
-    const onCreditsAmountChanged = (e: any) => setCreditsAmount(e.target.value)
-    const onSubmitClicked = (e: any) => {
-        onAddCredits(creditsAmount, subject)
-    }
-
-    return (
-        <Grid container direction="row" sx={{
-            paddingBottom: "4px",
-            alignItems: "center"
-        }}>
-            <Grid item xs={2} sx={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-            }}>
-                <FormControl fullWidth>
-                    <InputLabel id="subject-select-label">Subject</InputLabel>
-                    <Select
-                        labelId="subject-select-label"
-                        id="subject-select"
-                        value={subject}
-                        required
-                        placeholder="Select a subject"
-                        label="Subject"
-                        variant="standard"
-                        onChange={onSubjectChanged}
-                        size="small"
-                    >
-                        {availableSubjects.map(subject => <MenuItem key={subject.subject}
-                                                                    value={subject.subject}>{subject.title}</MenuItem>)}
-                    </Select>
-                </FormControl>
-            </Grid>
-            <Grid item xs={4} sx={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                paddingLeft: '16px',
-            }}
-            >
-                <FormControl>
-                    <TextField id="credits-amount"
-                               size="small"
-                               type="number"
-                               label="Amount of credits"
-                               required
-                               variant="standard"
-                               onChange={onCreditsAmountChanged}
-                               value={creditsAmount || ""}
-                               aria-describedby="credits-amount-help"/>
-                </FormControl>
-            </Grid>
-            <Grid item xs={5} sx={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-            }}>
-                <Button size="small" onClick={onSubmitClicked}>Add credits</Button>
-            </Grid>
-        </Grid>
-    )
-}
-
 type ClientItemProps = {
     clientId: string
 }
@@ -269,7 +162,9 @@ const ClientItem = ({clientId}: ClientItemProps) => {
     }
 
     const onAddCreditButton = () => {
-        setAddForm(<AddCreditForm key={`add-credit-form-`.concat(Math.random().toString())} client={client} onAddCredits={onAddCredits}/>)
+        setAddForm(<AddCreditForm key={`add-credit-form-`.concat(Math.random().toString())} subjects={
+            subjects.filter(subject => !(client?.credits?.map(credits => credits.subject) || []).includes(subject.subject))
+        } onAddCredits={onAddCredits}/>)
     }
 
     return (

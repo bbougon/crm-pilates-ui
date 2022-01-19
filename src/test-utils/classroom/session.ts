@@ -156,10 +156,10 @@ export const apiAttendee = (id: string = "1", firstname: string = "Laurent", las
     return {id: id, firstname: firstname, lastname: lastname, attendance: attendance, credits}
 }
 
-export const schedule = (start = formatISO(new Date()), stop = formatISO(addHours(new Date(), 1))) => {
+export const schedule = (start = new Date(), stop = addHours(new Date(), 1)) => {
     return {
-        start: start,
-        stop: stop
+        start: formatISO(start),
+        stop: formatISO(stop)
     }
 }
 

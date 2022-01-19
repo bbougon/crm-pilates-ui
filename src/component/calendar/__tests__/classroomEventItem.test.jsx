@@ -13,7 +13,7 @@ describe('Classroom Event', function () {
     it('should display classroom details when clicked', () => {
         let attendees = new AttendeesBuilder().withAttendee(attendee()).withAttendee(attendee(2, "Bertrand", "Bougon", Attendance.REGISTERED, {amount: 5})).build();
         let session_date = new Date();
-        let classroomSession = session(1, 2, "Cours tapis", "MAT", schedule(formatISO(session_date), formatISO(addHours(session_date, 1))), 3, attendees);
+        let classroomSession = session(1, 2, "Cours tapis", "MAT", schedule(session_date, addHours(session_date, 1)), 3, attendees);
         render(<ClassroomEventItem {...classroomSession}/>)
 
         userEvent.click(screen.getByText("Cours tapis"))

@@ -1,5 +1,6 @@
 import {setupServer} from "msw/node";
 import {compose, context, rest} from "msw";
+import {isDeepStrictEqual} from "util";
 
 type Request = {
     path: string
@@ -8,6 +9,7 @@ type Request = {
     status: number
     queryParam: any
     header: any
+    responseBody: any
 }
 
 export class ServerBuilder {
@@ -15,14 +17,15 @@ export class ServerBuilder {
     private requests: Request[] = []
     private runOnce: boolean = false
 
-    request = (path: string, method: string, body: any, status: number = 200, queryParam: any = {}, header: any = {}): ServerBuilder => {
+    request = (path: string, method: string, body: any, status: number = 200, queryParam: any = {}, header: any = {}, responseBody: any = body): ServerBuilder => {
         this.requests.push({
             path: path,
             method: method,
             body: body,
             status: status,
             queryParam: queryParam,
-            header: header
+            header: header,
+            responseBody: responseBody
         })
         return this
     }
@@ -51,12 +54,17 @@ export class ServerBuilder {
         ))
         const postRequest = this.requests.filter(request => request.method === "post").map(request => rest.post(
             request.path, (req, res, ctx) => {
+                if (!isDeepStrictEqual(req.body, request.body)
+                    && ![400, 401, 402, 404, 422].includes(request.status)) {
+                    request.status = 400
+                    request.body = new APIErrorBody().dummyDetail().build()
+                }
                 return this.runOnce ?
                     res.once(ctx.status(request.status),
-                        ctx.json(request.body)) :
+                        ctx.json(request.responseBody)) :
                     res(
                         ctx.status(request.status),
-                        ctx.json(request.body)
+                        ctx.json(request.responseBody)
                     )
             }
         ))
