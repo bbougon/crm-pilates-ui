@@ -1,5 +1,4 @@
 import * as React from "react";
-import {useState} from "react";
 import {Box, Chip, ThemeProvider} from "@mui/material";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import {createTheme} from "@mui/material/styles";
@@ -22,9 +21,6 @@ const theme = createTheme({
 });
 
 export const CreditBox = ({credit}: CreditBoxProps) => {
-
-    const [creditAmountColor2] = useState<"default" | "primary" | "success" | "error" | "warning" | "secondary" | "info" | undefined>()
-
     const colorize = (): "success" | "error" | "warning" => {
         return credit < 1 ? "error" : credit < 3 ? "warning" : "success"
     }

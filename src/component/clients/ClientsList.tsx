@@ -17,12 +17,12 @@ import {RootState} from "../../app/store";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {Accordion, AccordionDetails, AccordionSummary, Button} from "@material-ui/core";
 import {Client, Credits} from "../../features/domain/client";
-import {subjects, translate} from "../../utils/translation";
+import {subjects} from "../../utils/translation";
 import styled from "styled-components";
-import {CreditBox} from "../CreditBox";
 import {Subjects} from "../../features/domain/subjects";
 import {AddCreditButton} from "./AddCreditButton";
 import {AddCreditForm} from "./AddCreditForm";
+import {CreditItem} from "./CreditItem";
 
 type ClientDetailsAccordionSummaryProps = {
     client: Client | undefined
@@ -71,13 +71,12 @@ const ClientDetailsAccordionSummary = ({client}: ClientDetailsAccordionSummaryPr
     )
 }
 
-
-type CreditItemProps = {
+type CreditItemFormProps = {
     credit: Credits
     clientId: string
 }
 
-const CreditItem = ({credit, clientId}: CreditItemProps) => {
+const CreditItemForm = ({credit, clientId}: CreditItemFormProps) => {
     const dispatch = useDispatch()
     const credits: Credits | undefined = useSelector(getClientCredits(clientId, credit.subject))
     const [creditsAmount, setCreditsAmount] = useState<number | null>(null)
@@ -99,15 +98,7 @@ const CreditItem = ({credit, clientId}: CreditItemProps) => {
             paddingBottom: "4px",
             alignItems: "center"
         }}>
-            <Grid item xs={2} sx={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-            }}>
-                <Typography>{translate(credits?.subject)}</Typography>
-            </Grid>
-            <Grid item xs={1}>
-                <CreditBox credit={credits?.value || 0}/>
-            </Grid>
+            <CreditItem credits={credits} />
             <Grid item xs={9}>
                 <Grid container direction="row" sx={{'& button': {m: 2}}}>
                     <Grid item xs={1}/>
@@ -135,7 +126,8 @@ const CreditItem = ({credit, clientId}: CreditItemProps) => {
                         display: 'flex',
                         justifyContent: 'flex-start',
                     }}>
-                        <Button size="small" disabled={creditsAmount === null || creditsAmount < 1} onClick={onSubmitClicked}>Add credits</Button>
+                        <Button size="small" disabled={creditsAmount === null || creditsAmount < 1}
+                                onClick={onSubmitClicked}>Add credits</Button>
                     </Grid>
                 </Grid>
             </Grid>
@@ -174,7 +166,7 @@ const ClientItem = ({clientId}: ClientItemProps) => {
                 <Wrapper>
                     {
                         client?.credits?.map(credit => (
-                            <CreditItem key={credit.subject} clientId={client?.id} credit={credit}/>)) || []
+                            <CreditItemForm key={credit.subject} clientId={client?.id} credit={credit}/>)) || []
                     }
                     {addForm}
                     <AddCreditButton key={`add-credit-buton-`.concat(client?.id || Math.random().toString())} disabled={

@@ -6,7 +6,6 @@ import {
     Button,
     Divider,
     FormControl,
-    Grid,
     TextField,
     Typography
 } from "@material-ui/core";
@@ -23,19 +22,21 @@ import {Subjects} from "../../features/domain/subjects";
 import {AddCreditButton} from "./AddCreditButton";
 import {AddCreditForm} from "./AddCreditForm";
 import {subjects} from "../../utils/translation";
+import {CreditItem} from "./CreditItem";
+import {Grid} from "@mui/material";
 
 
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     flex: auto;
+    text-align: left;
     width: 100%;
 `;
 
 const AddClientAccordionSummary = () => {
     const props = {
         expandIcon: <ExpandMoreIcon/>,
-        sx: {textAlign: "center"},
         id: "panel1c-header"
     }
     return (
@@ -51,12 +52,15 @@ export const AddClientForm = () => {
 
     const errorMessages: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>((state => state.clients.error))
     const status: ClientStatus = useSelector<RootState, ClientStatus>((state => state.clients.status))
-    const [addCreditForms, setAddCreditForms] = useState<any[]>([])
+    const [addCreditForms, setAddCreditForms] = useState<any>(undefined)
+    const [creditItems, setCreditItems] = useState<any[]>([])
+    const [availableSubjects, setAvailableSubjects] = useState<{subject: Subjects, title: string}[]>(subjects)
+    const [addCreditsInProgress, setAddCreditsInProgress] = useState(false)
     let errorContent = undefined
 
     const [firstname, setFirstname] = useState('')
     const [lastname, setLastname] = useState('')
-    const [credits, setCredits] = useState<[{value: number, subject: string}] | []>([])
+    const [credits, setCredits] = useState<[{ value: number, subject: string }] | []>([])
 
     const onFirstnameChanged = (e: any) => setFirstname(e.target.value)
     const onLastnameChanged = (e: any) => setLastname(e.target.value)
@@ -65,14 +69,27 @@ export const AddClientForm = () => {
         dispatch(createClient({firstname, lastname, credits}))
         setLastname('')
         setFirstname('')
+        setCreditItems([])
     }
 
     const onAddCredits = (creditsAmount: number, subject: Subjects) => {
         setCredits([{value: creditsAmount as number, subject: subject}])
+        setCreditItems([...creditItems,
+            <Grid key={"credit-item-container-".concat(Math.random().toString())} container direction="row" sx={{
+                paddingTop: '4px'
+            }}>
+                <CreditItem key={"credit-item".concat(Math.random().toString())}
+                                                        credits={{value: creditsAmount, subject: subject}}/>
+            </Grid>])
+        setAddCreditForms(undefined)
+        setAddCreditsInProgress(false)
+        setAvailableSubjects(availableSubjects.filter(currentSubject => subject !== currentSubject.subject))
     }
 
     const onAddCreditButton = () => {
-        setAddCreditForms([...addCreditForms, <AddCreditForm key={`add-credit-form-`.concat(Math.random().toString())} subjects={subjects} onAddCredits={onAddCredits}/>])
+        setAddCreditForms(<AddCreditForm key={`add-credit-form-`.concat(Math.random().toString())} subjects={availableSubjects}
+                                         onAddCredits={onAddCredits}/>)
+        setAddCreditsInProgress(true)
     }
 
     if (status === ClientStatus.CREATION_FAILED) {
@@ -116,8 +133,12 @@ export const AddClientForm = () => {
                             </FormControl>
                         </Grid>
                     </Grid>
+                    <Grid key={"credits-items-".concat(Math.random().toString())} container direction="column">
+                        {creditItems}
+                    </Grid>
                     {addCreditForms}
-                    <AddCreditButton key={`add-credit-buton-`.concat(Math.random().toString())} onAddCreditButton={onAddCreditButton}/>
+                    <AddCreditButton key={`add-credit-buton-`.concat(Math.random().toString())}
+                                     disabled={addCreditsInProgress || availableSubjects.length === 0} onAddCreditButton={onAddCreditButton}/>
                     {errorContent}
                 </Wrapper>
             </AccordionDetails>

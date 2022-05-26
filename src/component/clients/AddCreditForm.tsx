@@ -1,8 +1,6 @@
-import {Client} from "../../features/domain/client";
 import * as React from "react";
 import {useState} from "react";
 import {Subjects} from "../../features/domain/subjects";
-import {subjects} from "../../utils/translation";
 import {FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
 import {Button} from "@material-ui/core";
 
@@ -29,6 +27,7 @@ export const AddCreditForm = ({onAddCredits, subjects}: AddCreditFormProps)  => 
         }}>
             <Grid item xs={2} sx={{
                 display: 'flex',
+                textAlign: 'left',
                 justifyContent: 'flex-start',
             }}>
                 <FormControl fullWidth>
