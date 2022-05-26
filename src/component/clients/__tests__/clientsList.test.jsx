@@ -2,29 +2,28 @@ import React from "react";
 import {Clients} from "../ClientPage";
 import {fireEvent, screen, waitFor, within} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
-import {actThenSleep, render} from "../../../test-utils/test-utils";
-import {apiClient, apiClientCreation, ClientsBuilder} from "../../../test-utils/clients/clients";
-import {APIDetail, APIErrorBody, ServerBuilder} from "../../../test-utils/server/server";
+import {render} from "../../../test-utils/test-utils";
+import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
+import {APIDetail, APIErrorBody, RequestHandlerBuilders, ServerBuilder2} from "../../../test-utils/server/server";
 
 
 describe('ClientList page', function () {
 
     describe('fetches clients when loading', function () {
         describe("retrieve them", () => {
-            const server = new ServerBuilder()
-                .request("/clients", "get", new ClientsBuilder()
-                    .withClient(apiClient())
-                    .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
-                        value: 5,
-                        subject: "MACHINE_DUO"
-                    }]))
-                    .withClient(apiClient("Henri", "Verneuil", "2"))
-                    .withClient(apiClient("Bertholt", "Brecht", "3", [{value: 2, subject: "MAT"}, {
-                        value: 5,
-                        subject: "MACHINE_DUO"
-                    }, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
-                    .build())
-                .build()
+            let clients = new ClientsBuilder()
+                .withClient(apiClient())
+                .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
+                    value: 5,
+                    subject: "MACHINE_DUO"
+                }]))
+                .withClient(apiClient("Henri", "Verneuil", "2"))
+                .withClient(apiClient("Bertholt", "Brecht", "3", [{value: 2, subject: "MAT"}, {
+                    value: 5,
+                    subject: "MACHINE_DUO"
+                }, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
+                .build();
+            const server = new ServerBuilder2().serve(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
 
             beforeEach(() => server.listen())
 
@@ -44,17 +43,6 @@ describe('ClientList page', function () {
             })
 
             describe("interacting with them", () => {
-                const server = new ServerBuilder()
-                    .request("/clients/1/credits", "post", [{value: 10, subject: "MAT"}])
-                    .request("/clients/1/credits", "post", [{value: 10, subject: "MACHINE_TRIO"}])
-                    .once()
-                    .build()
-
-                beforeEach(() => server.listen())
-
-                afterEach(() => server.resetHandlers())
-
-                afterAll(() => server.close())
 
                 it('should display credits when clicking on name', async () => {
                     render(<Clients/>)
@@ -69,6 +57,16 @@ describe('ClientList page', function () {
                 })
 
                 it('should add credits to existing credits', async () => {
+                    const clients = new ClientsBuilder()
+                        .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
+                            value: 5,
+                            subject: "MACHINE_DUO"
+                        }]))
+                        .build();
+                    server.resetHandlers(new RequestHandlerBuilders().get("/clients").ok().body(clients).build(), new RequestHandlerBuilders().post("/clients/1/credits").ok().body([{
+                        value: 10,
+                        subject: "MAT"
+                    }]).build())
                     render(<Clients/>)
 
                     userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
@@ -82,8 +80,17 @@ describe('ClientList page', function () {
                 })
 
                 it('should add a form to add credits when clicking on `+`', async () => {
+                    const clients = new ClientsBuilder()
+                        .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
+                            value: 5,
+                            subject: "MACHINE_DUO"
+                        }]))
+                        .build();
+                    server.resetHandlers(new RequestHandlerBuilders().get("/clients").ok().body(clients).build(), new RequestHandlerBuilders().post("/clients/1/credits").ok().body([{
+                        value: 10,
+                        subject: "MACHINE_TRIO"
+                    }]).build())
                     render(<Clients/>)
-                    await actThenSleep(20)
 
                     userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
                     let clientDetails = screen.getByRole("region");
@@ -122,22 +129,14 @@ describe('ClientList page', function () {
 
                 describe("faces errors", () => {
 
-                    const server = new ServerBuilder()
-                        .request("/clients", "get", new ClientsBuilder()
+                    it("should display amount of credits filed in error when negative value is filled", async () => {
+                        let clients = new ClientsBuilder()
                             .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
                                 value: 5,
                                 subject: "MACHINE_DUO"
                             }]))
-                            .build())
-                        .build()
-
-                    beforeEach(() => server.listen())
-
-                    afterEach(() => server.resetHandlers())
-
-                    afterAll(() => server.close())
-
-                    it("should display amount of credits filed in error when negative value is filled", async () => {
+                            .build();
+                        server.resetHandlers(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
                         render(<Clients/>)
 
                         userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
@@ -153,12 +152,10 @@ describe('ClientList page', function () {
         })
 
         describe("faces an error", () => {
-            const server = new ServerBuilder().request("/clients", "get", new APIErrorBody()
-                .dummyDetail()
-                .build(), 422)
-                .build()
 
-            beforeAll(() => server.listen())
+            const server = new ServerBuilder2().serve(new RequestHandlerBuilders().get("/clients").unprocessableEntity().body(new APIErrorBody().dummyDetail().build()).build())
+
+            beforeEach(() => server.listen())
 
             afterEach(() => server.resetHandlers())
 
@@ -176,21 +173,19 @@ describe('ClientList page', function () {
     })
 
     describe('displays a form to create a client', function () {
+        let emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
+        const server = new ServerBuilder2().serve(emptyClients)
+
+        beforeAll(() => server.listen())
+
+        afterEach(() => server.resetHandlers())
+
+        afterAll(() => server.close())
 
         describe("without credits", () => {
-            const server = new ServerBuilder()
-                .request("/clients", "get", [])
-                .request("/clients", "post", apiClientCreation(), 200, undefined, undefined, apiClient())
-                .once()
-                .build()
-
-            beforeAll(() => server.listen())
-
-            afterEach(() => server.resetHandlers())
-
-            afterAll(() => server.close())
 
             it('named John Doe', async () => {
+                server.resetHandlers(emptyClients, new RequestHandlerBuilders().post("/clients").ok().body(apiClient()).build())
                 render(<Clients/>)
 
                 userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
@@ -207,25 +202,11 @@ describe('ClientList page', function () {
 
         describe("with credits", () => {
 
-            const server = new ServerBuilder()
-                .request("/clients", "get", [])
-                .request("/clients", "post", apiClientCreation("Joseph", "Pilates", [{
-                    value: 10,
-                    subject: "MACHINE_TRIO"
-                }]), 200, undefined, undefined, apiClient("Joseph", "Pilates", "2", [{
-                    value: 10,
-                    subject: "MACHINE_TRIO"
-                }]))
-                .once()
-                .build()
-
-            beforeAll(() => server.listen())
-
-            afterEach(() => server.resetHandlers())
-
-            afterAll(() => server.close())
-
             it('named Joseph Pilates', async () => {
+                server.resetHandlers(emptyClients, new RequestHandlerBuilders().post("/clients").ok().body(apiClient("Joseph", "Pilates", "2", [{
+                    value: 10,
+                    subject: "MACHINE_TRIO"
+                }])).build())
                 render(<Clients/>)
 
                 userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
@@ -255,21 +236,12 @@ describe('ClientList page', function () {
         })
 
         describe("faces an error when creating a client", function () {
-            const server = new ServerBuilder()
-                .request("/clients", "get", [])
-                .request("/clients", "post", new APIErrorBody()
-                    .withDetail(APIDetail("You must provide the client firstname", "value_error"))
-                    .withDetail(APIDetail("You must provide the client lastname", "value_error"))
-                    .build(), 422)
-                .build()
-
-            beforeAll(() => server.listen())
-
-            afterEach(() => server.resetHandlers())
-
-            afterAll(() => server.close())
 
             it("should display the error", async () => {
+                server.resetHandlers(emptyClients, new RequestHandlerBuilders().post("/clients").unprocessableEntity().body(new APIErrorBody()
+                    .withDetail(APIDetail("You must provide the client firstname", "value_error"))
+                    .withDetail(APIDetail("You must provide the client lastname", "value_error"))
+                    .build()).build())
                 render(<Clients/>)
 
                 userEvent.click(screen.getByRole("button", {name: /add a new client/i}))

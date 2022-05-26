@@ -15,7 +15,7 @@ export class ClientsBuilder {
     }
 }
 
-export const apiClient = (firstname = "John", lastname = "Doe", id = "33da6f12-efda-4c16-b8af-e5e822fc5459", credits: [{value: number, subject: string}]  | []= []): ApiClient => {
+export const apiClient = (firstname = "John", lastname = "Doe", id = "33da6f12-efda-4c16-b8af-e5e822fc5459", credits: [{value: number, subject: string}]  | [] = []): ApiClient => {
     return {
         firstname: firstname,
         lastname: lastname,

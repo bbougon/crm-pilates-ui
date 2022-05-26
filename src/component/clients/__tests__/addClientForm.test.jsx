@@ -33,7 +33,7 @@ describe('Create Client', () => {
         expect(screen.getByRole("button", {name: /submit/i})).toBeEnabled()
     })
 
-    it("should provide the ability tp add credits", async () => {
+    it("should provide the ability to add credits", async () => {
         render(<AddClientForm/>)
         userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
 

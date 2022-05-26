@@ -1,5 +1,5 @@
 import {setupServer} from "msw/node";
-import {compose, context, rest} from "msw";
+import {compose, context, RequestHandler, rest} from "msw";
 import {isDeepStrictEqual} from "util";
 
 type Request = {
@@ -10,6 +10,79 @@ type Request = {
     queryParam: any
     header: any
     responseBody: any
+}
+
+abstract class RequestHandlerBuilder {
+    protected path: string
+    protected statusCode: number = 200
+    protected _body: any
+
+    constructor(path: string) {
+        this.path = path
+    }
+
+    ok = (): RequestHandlerBuilder => {
+        this.statusCode = 200
+        return this
+    }
+
+    unprocessableEntity = (): RequestHandlerBuilder => {
+        this.statusCode = 422
+        return this
+    }
+
+    body = (body: any): RequestHandlerBuilder => {
+        this._body = body
+        return this
+    }
+
+    abstract build() : RequestHandler
+}
+
+export class GetRequestHandlerBuilder extends RequestHandlerBuilder{
+
+    build(): RequestHandler {
+        return rest.get(this.path, (req, res, ctx) => {
+            let composeResponse = compose(
+                context.status(this.statusCode),
+                context.json(this._body)
+            );
+            return res(composeResponse)
+        });
+    }
+
+}
+
+class PostRequestBuilderHandler extends RequestHandlerBuilder{
+
+    build(): RequestHandler {
+        return rest.post(this.path, (req, res, ctx) => {
+            let composeResponse = compose(
+                context.status(this.statusCode),
+                context.json(this._body)
+            );
+            return res(composeResponse)
+        });
+    }
+}
+
+export class RequestHandlerBuilders {
+
+
+    get = (path: string): GetRequestHandlerBuilder => {
+        return new GetRequestHandlerBuilder(path)
+    }
+
+    post= (path: string): PostRequestBuilderHandler =>  {
+        return new PostRequestBuilderHandler(path);
+    }
+}
+
+export class ServerBuilder2 {
+
+    serve = (resolver: RequestHandler) => {
+        return setupServer(resolver)
+    }
 }
 
 export class ServerBuilder {
