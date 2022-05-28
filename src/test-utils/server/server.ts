@@ -17,6 +17,7 @@ abstract class RequestHandlerBuilder {
     protected statusCode: number = 200
     protected _body: any
     protected _header: any
+    protected _runOnce: boolean = false
 
     constructor(path: string) {
         this.path = path
@@ -42,6 +43,11 @@ abstract class RequestHandlerBuilder {
         return this
     }
 
+    once = (): RequestHandlerBuilder => {
+        this._runOnce = true
+        return this
+    }
+
     abstract build() : RequestHandler
 }
 
@@ -49,17 +55,20 @@ export class GetRequestHandlerBuilder extends RequestHandlerBuilder{
 
     build(): RequestHandler {
         return rest.get(this.path, (req, res, ctx) => {
+            let composedResponse;
             if (this._header) {
-                return res(compose(
+                composedResponse = compose(
                     context.status(this.statusCode),
                     context.json(this._body),
                     context.set(this._header)
-                ))
+                );
+            } else {
+                composedResponse = compose(
+                    context.status(this.statusCode),
+                    context.json(this._body)
+                );
             }
-            return res(compose(
-                context.status(this.statusCode),
-                context.json(this._body)
-            ))
+            return this._runOnce ? res.once(composedResponse) :  res(composedResponse)
         });
     }
 
@@ -92,8 +101,8 @@ export class RequestHandlerBuilders {
 
 export class ServerBuilder2 {
 
-    serve = (resolver: RequestHandler) => {
-        return setupServer(resolver)
+    serve = (...resolver: RequestHandler[]) => {
+        return setupServer(...resolver)
     }
 }
 
