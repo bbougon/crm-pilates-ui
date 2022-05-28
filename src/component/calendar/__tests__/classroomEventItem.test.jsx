@@ -2,7 +2,7 @@ import {render} from "../../../test-utils/test-utils";
 import {screen} from "@testing-library/react";
 import React from "react";
 import {attendee, AttendeesBuilder, schedule, session} from "../../../test-utils/classroom/session";
-import {addHours, formatISO} from "date-fns";
+import {addHours} from "date-fns";
 import userEvent from "@testing-library/user-event";
 import {ClassroomEventItem} from "../ClassroomEventItem";
 import {formatFullDate, formatHours} from "../../../utils/date";

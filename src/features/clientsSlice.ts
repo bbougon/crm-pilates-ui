@@ -104,7 +104,7 @@ const clientsSlice = createSlice({
             })
             .addCase(fetchClients.rejected, (state, action) => {
                 state.status = ClientStatus.FAILED
-                state.error = map_action_thunk_error(action.payload as ApiError)
+                state.error = map_action_thunk_error("Get clients", action.payload as ApiError)
             })
             .addCase(createClient.fulfilled, (state, action) => {
                 state.status = ClientStatus.SUCCEEDED
@@ -112,7 +112,7 @@ const clientsSlice = createSlice({
             })
             .addCase(createClient.rejected, (state, action) => {
                 state.status = ClientStatus.CREATION_FAILED
-                state.error = map_action_thunk_error(action.payload as ApiError)
+                state.error = map_action_thunk_error("Add client", action.payload as ApiError)
             })
             .addCase(addCredits.pending, (state, action) => {
                 state.status = ClientStatus.LOADING
@@ -129,7 +129,7 @@ const clientsSlice = createSlice({
             })
             .addCase(addCredits.rejected, (state, action) => {
                 state.status = ClientStatus.CREATION_FAILED
-                state.error = map_action_thunk_error(action.payload as ApiError)
+                state.error = map_action_thunk_error("Add credits", action.payload as ApiError)
             })
     }
 })

@@ -173,14 +173,14 @@ const sessionsSlice = createSlice({
             })
             .addCase(fetchSessions.rejected, (state, action) => {
                 state.status = SessionStatus.FAILED
-                state.error = map_action_thunk_error(action.payload as ApiError)
+                state.error = map_action_thunk_error("Get sessions", action.payload as ApiError)
             })
             .addCase(sessionCheckin.pending, (state, action) => {
                 state.status = SessionStatus.CHECKIN_IN_PROGRESS
             })
             .addCase(sessionCheckin.rejected, (state, action) => {
                 state.status = SessionStatus.CHECKIN_IN_FAILED
-                state.error = map_action_thunk_error(action.payload as ApiError)
+                state.error = map_action_thunk_error("Checkin", action.payload as ApiError)
             })
             .addCase(sessionCheckin.fulfilled, (state, action) => {
                 state.status = SessionStatus.CHECKIN_IN_SUCCEEDED
@@ -195,7 +195,7 @@ const sessionsSlice = createSlice({
             })
             .addCase(sessionCheckout.rejected, (state, action) => {
                 state.status = SessionStatus.CHECKOUT_FAILED
-                state.error = map_action_thunk_error(action.payload as ApiError)
+                state.error = map_action_thunk_error("Checkout", action.payload as ApiError)
             })
             .addCase(sessionCheckout.fulfilled, (state, action) => {
                 state.status = SessionStatus.CHECKOUT_SUCCEEDED

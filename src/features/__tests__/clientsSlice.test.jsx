@@ -32,7 +32,7 @@ describe('ClientsSlice', () => {
                 expect(reducer(previousState, action)).toEqual({
                     clients: [],
                     status: "failed",
-                    error: [{message: "an error message", type: "an error type"}]
+                    error: [{message: "an error message", type: "an error type", origin: "Get clients"}]
                 })
             })
 
@@ -44,7 +44,7 @@ describe('ClientsSlice', () => {
                 expect(reducer(previousState, action)).toEqual({
                     clients: [],
                     status: "failed",
-                    error: [{message: "error", type: "type"}]
+                    error: [{message: "error", type: "type", origin: "Get clients"}]
                 })
             })
 
@@ -55,7 +55,7 @@ describe('ClientsSlice', () => {
                 expect(reducer(previousState, action)).toEqual({
                     clients: [],
                     status: "failed",
-                    error: [{message: "We could not fetch the request"}]
+                    error: [{message: "We could not fetch the request", origin: "Get clients"}]
                 })
             })
         })

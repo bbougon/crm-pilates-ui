@@ -16,6 +16,7 @@ abstract class RequestHandlerBuilder {
     protected path: string
     protected statusCode: number = 200
     protected _body: any
+    protected _header: any
 
     constructor(path: string) {
         this.path = path
@@ -36,6 +37,11 @@ abstract class RequestHandlerBuilder {
         return this
     }
 
+    header = (header: any): RequestHandlerBuilder => {
+        this._header = header
+        return this
+    }
+
     abstract build() : RequestHandler
 }
 
@@ -43,11 +49,17 @@ export class GetRequestHandlerBuilder extends RequestHandlerBuilder{
 
     build(): RequestHandler {
         return rest.get(this.path, (req, res, ctx) => {
-            let composeResponse = compose(
+            if (this._header) {
+                return res(compose(
+                    context.status(this.statusCode),
+                    context.json(this._body),
+                    context.set(this._header)
+                ))
+            }
+            return res(compose(
                 context.status(this.statusCode),
                 context.json(this._body)
-            );
-            return res(composeResponse)
+            ))
         });
     }
 
@@ -161,7 +173,7 @@ export class APIErrorBody {
 
     private body: BodyErrorDetails = new class implements BodyErrorDetails {
         detail: Array<BodyErrorDetail> = [];
-    }
+    }()
 
     dummyDetail = () => {
         this.body.detail.push(APIDetail())

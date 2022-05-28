@@ -72,7 +72,7 @@ const classroomsSlice = createSlice({
             })
             .addCase(addClassroom.rejected, (state, action) => {
                 state.status = ClassroomStatus.FAILED
-                state.error = map_action_thunk_error(action.payload as ApiError)
+                state.error = map_action_thunk_error("Add classroom", action.payload as ApiError)
             })
     }
 })

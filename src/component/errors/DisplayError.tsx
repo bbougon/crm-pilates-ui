@@ -24,10 +24,14 @@ interface DisplayErrorProps {
 
 export const DisplayError = ({error}: DisplayErrorProps) => {
 
-    let errorMessage
-    errorMessage = error?.map((error) => {
+    const errorMessage = error?.map((error) => {
         return (
             <Stack key={Math.random()}>
+                <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>
+                    <ThemeProvider theme={theme}>
+                        <Typography>[{error.origin}]</Typography>
+                    </ThemeProvider>
+                </Stack>
                 <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>
                     <ThemeProvider theme={theme}>
                         <Typography>{error.message}</Typography>
@@ -40,8 +44,7 @@ export const DisplayError = ({error}: DisplayErrorProps) => {
                 </Stack>
             </Stack>
         )
-    })
-
+    });
     return (
         <Grid item xs={12}>
             <Card>
