@@ -1,4 +1,4 @@
-import {RequestHandlerBuilders, ServerBuilder2} from "../../../test-utils/server/server";
+import {RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
 import {ApiSessionsBuilder, attendee, SessionsBuilder} from "../../../test-utils/classroom/session";
 import {screen, waitFor} from "@testing-library/react";
 import {render} from "../../../test-utils/test-utils";
@@ -13,7 +13,7 @@ describe("Navigate through calendar", () => {
     const currentMonth = new Date("2021-10-01T00:00:00")
     const nextMonth = new Date("2021-11-10T00:00:00")
     const lastMonth = new Date("2021-12-01T00:00:00")
-    let server = new ServerBuilder2().serve(
+    let server = new ServerBuilder().serve(
         new RequestHandlerBuilders().get("/clients")
             .ok()
             .body([])

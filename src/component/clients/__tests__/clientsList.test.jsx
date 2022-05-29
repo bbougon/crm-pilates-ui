@@ -4,7 +4,7 @@ import {fireEvent, screen, waitFor, within} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import {render} from "../../../test-utils/test-utils";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
-import {APIDetail, APIErrorBody, RequestHandlerBuilders, ServerBuilder2} from "../../../test-utils/server/server";
+import {APIDetail, APIErrorBody, RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
 
 
 describe('ClientList page', function () {
@@ -23,7 +23,7 @@ describe('ClientList page', function () {
                     subject: "MACHINE_DUO"
                 }, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
                 .build();
-            const server = new ServerBuilder2().serve(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
+            const server = new ServerBuilder().serve(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
 
             beforeEach(() => server.listen())
 
@@ -153,7 +153,7 @@ describe('ClientList page', function () {
 
         describe("faces an error", () => {
 
-            const server = new ServerBuilder2().serve(new RequestHandlerBuilders().get("/clients").unprocessableEntity().body(new APIErrorBody().dummyDetail().build()).build())
+            const server = new ServerBuilder().serve(new RequestHandlerBuilders().get("/clients").unprocessableEntity().body(new APIErrorBody().dummyDetail().build()).build())
 
             beforeEach(() => server.listen())
 
@@ -174,7 +174,7 @@ describe('ClientList page', function () {
 
     describe('displays a form to create a client', function () {
         let emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
-        const server = new ServerBuilder2().serve(emptyClients)
+        const server = new ServerBuilder().serve(emptyClients)
 
         beforeAll(() => server.listen())
 

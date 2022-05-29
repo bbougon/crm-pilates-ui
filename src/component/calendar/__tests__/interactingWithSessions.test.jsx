@@ -1,4 +1,4 @@
-import {APIErrorBody, RequestHandlerBuilders, ServerBuilder2} from "../../../test-utils/server/server";
+import {APIErrorBody, RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
 import {
     apiSession,
     ApiSessionsBuilder,
@@ -28,7 +28,7 @@ describe("Interacting with session", () => {
     const currentMonth = new Date("2021-11-01T00:00:00");
     const nextMonth = new Date("2021-12-01T00:00:00");
 
-    const server = new ServerBuilder2().serve(
+    const server = new ServerBuilder().serve(
         new RequestHandlerBuilders().get("/sessions")
             .ok()
             .body(new SessionsBuilder()

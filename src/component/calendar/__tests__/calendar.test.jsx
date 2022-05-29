@@ -2,7 +2,7 @@ import {render} from "../../../test-utils/test-utils";
 import {screen} from "@testing-library/react";
 import React from "react";
 import Calendar from "../Calendar";
-import {APIErrorBody, RequestHandlerBuilders, ServerBuilder2} from "../../../test-utils/server/server";
+import {APIErrorBody, RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
 
 describe('Calendar page', () => {
     let currentDate = new Date();
@@ -12,7 +12,7 @@ describe('Calendar page', () => {
 
     const emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
 
-    const server = new ServerBuilder2().serve(emptyClients)
+    const server = new ServerBuilder().serve(emptyClients)
 
     beforeAll(() => server.listen())
 

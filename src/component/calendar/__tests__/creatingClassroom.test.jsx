@@ -1,4 +1,4 @@
-import {RequestHandlerBuilders, ServerBuilder2} from "../../../test-utils/server/server";
+import {RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
 import {addWeeks, format, formatISO} from "date-fns";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
@@ -16,7 +16,7 @@ describe('Creating a classroom', () => {
     const currentMonth = new Date("2021-10-01T00:00:00");
     const nextMonth = new Date("2021-11-01T00:00:00");
 
-    let server = new ServerBuilder2().serve(
+    let server = new ServerBuilder().serve(
         new RequestHandlerBuilders().get("/sessions")
             .ok()
             .once()
@@ -137,7 +137,7 @@ describe('Creating a classroom', () => {
         userEvent.type(within(classroomForm).getByRole("textbox", {name: /attendees/i}), "Bertrand")
         const clients = await screen.findByRole("presentation");
         userEvent.click(within(clients).getByText(/bertrand/i))
-        const attendees = await within(classroomForm).getByRole("textbox", {name: /attendees/i});
+        const attendees = within(classroomForm).getByRole("textbox", {name: /attendees/i});
         userEvent.type(attendees, "Pierre")
         userEvent.click(await screen.findByText(/pierre/i))
         userEvent.type(screen.getByRole("textbox", {name: /attendees/i}), "Jacques")
