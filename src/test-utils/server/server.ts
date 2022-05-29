@@ -28,6 +28,11 @@ abstract class RequestHandlerBuilder {
         return this
     }
 
+    created = (): RequestHandlerBuilder => {
+        this.statusCode = 201
+        return this
+    }
+
     unprocessableEntity = (): RequestHandlerBuilder => {
         this.statusCode = 422
         return this
