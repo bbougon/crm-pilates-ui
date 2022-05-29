@@ -60,7 +60,7 @@ export const AddClientForm = () => {
 
     const [firstname, setFirstname] = useState('')
     const [lastname, setLastname] = useState('')
-    const [credits, setCredits] = useState<[{ value: number, subject: string }] | []>([])
+    const [credits, setCredits] = useState<{ value: number, subject: string }[] | []>([])
 
     const onFirstnameChanged = (e: any) => setFirstname(e.target.value)
     const onLastnameChanged = (e: any) => setLastname(e.target.value)
@@ -73,7 +73,7 @@ export const AddClientForm = () => {
     }
 
     const onAddCredits = (creditsAmount: number, subject: Subjects) => {
-        setCredits([{value: creditsAmount as number, subject: subject}])
+        setCredits([...credits, {value: creditsAmount as number, subject: subject}])
         setCreditItems([...creditItems,
             <Grid key={"credit-item-container-".concat(Math.random().toString())} container direction="row" sx={{
                 paddingTop: '4px'

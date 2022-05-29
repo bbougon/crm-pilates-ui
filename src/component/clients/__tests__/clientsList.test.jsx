@@ -203,10 +203,18 @@ describe('ClientList page', function () {
         describe("with credits", () => {
 
             it('named Joseph Pilates', async () => {
-                server.resetHandlers(emptyClients, new RequestHandlerBuilders().post("/clients").ok().body(apiClient("Joseph", "Pilates", "2", [{
-                    value: 10,
-                    subject: "MACHINE_TRIO"
-                }])).build())
+                server.resetHandlers(
+                    emptyClients,
+                    new RequestHandlerBuilders().post("/clients")
+                        .ok()
+                        .body(apiClient("Joseph", "Pilates", "2", [{value: 10, subject: "MACHINE_TRIO"}, {value: 6, subject: "MACHINE_DUO"}]))
+                        .request({
+                            firstname: "Joseph", lastname: "Pilates", credits: [
+                                {value: 10, subject: "MACHINE_TRIO"},
+                                {value: 6, subject: "MACHINE_DUO"}
+                            ]
+                        })
+                        .build())
                 render(<Clients/>)
 
                 userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
@@ -218,6 +226,13 @@ describe('ClientList page', function () {
                 const subject = within(screen.getByRole('listbox'));
                 userEvent.click(subject.getByText(/machine trio/i));
                 userEvent.type(screen.getAllByText(/amount of credits/i)[0], "10")
+                userEvent.click(screen.getByRole("button", {name: /add credits/i}))
+
+                userEvent.click(screen.getAllByRole("button")[1])
+                fireEvent.mouseDown(screen.getByRole("button", {name: /subject/i}))
+                const newSubject = within(screen.getByRole('listbox'));
+                userEvent.click(newSubject.getByText(/machine duo/i));
+                userEvent.type(screen.getAllByText(/amount of credits/i)[0], "6")
                 userEvent.click(screen.getByRole("button", {name: /add credits/i}))
 
                 userEvent.click(screen.getByRole("button", {name: /submit/i}))
@@ -232,6 +247,8 @@ describe('ClientList page', function () {
                 let clientDetails = screen.getAllByRole("region")[1];
                 expect(within(clientDetails).getByText("10", {selector: 'span'})).toBeInTheDocument()
                 expect(within(clientDetails).getByText(/machine trio/i, {selector: 'p'})).toBeInTheDocument()
+                expect(within(clientDetails).getByText("6", {selector: 'span'})).toBeInTheDocument()
+                expect(within(clientDetails).getByText(/machine duo/i, {selector: 'p'})).toBeInTheDocument()
             })
         })
 

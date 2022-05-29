@@ -28,7 +28,7 @@ const initialState: ClientState = {
 export interface ClientCreation {
     firstname: string
     lastname: string
-    credits: [{value: number, subject: string}]  | []
+    credits: {value: number, subject: string}[]  | []
 }
 
 export const createClient = createAsyncThunk<ClientCreation, ClientCreation, { rejectValue: ApiError }>(
