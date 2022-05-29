@@ -18,6 +18,7 @@ abstract class RequestHandlerBuilder {
     protected _body: any
     protected _header: any
     protected _runOnce: boolean = false
+    protected _request: any
 
     constructor(path: string) {
         this.path = path
@@ -35,6 +36,11 @@ abstract class RequestHandlerBuilder {
 
     unprocessableEntity = (): RequestHandlerBuilder => {
         this.statusCode = 422
+        return this
+    }
+
+    request = (request: any): RequestHandlerBuilder => {
+        this._request = request
         return this
     }
 
@@ -83,7 +89,15 @@ class PostRequestBuilderHandler extends RequestHandlerBuilder{
 
     build(): RequestHandler {
         return rest.post(this.path, (req, res, ctx) => {
-            let composeResponse = compose(
+            let composeResponse
+            if (!isDeepStrictEqual(req.body, this._request)
+                && ![400, 401, 402, 404, 422].includes(this.statusCode)) {
+                composeResponse = compose(
+                    context.status(400),
+                    context.json( new APIErrorBody().dummyDetail().build())
+                )
+            }
+            composeResponse = compose(
                 context.status(this.statusCode),
                 context.json(this._body)
             );

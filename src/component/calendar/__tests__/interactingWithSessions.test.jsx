@@ -1,4 +1,4 @@
-import {APIErrorBody, ServerBuilder} from "../../../test-utils/server/server";
+import {APIErrorBody, RequestHandlerBuilders, ServerBuilder2} from "../../../test-utils/server/server";
 import {
     apiSession,
     ApiSessionsBuilder,
@@ -16,7 +16,7 @@ import {
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
-import {screen, within} from "@testing-library/react";
+import {screen, waitFor, within} from "@testing-library/react";
 import React from "react";
 import {addHours, formatISO} from "date-fns";
 import {Attendance} from "../../../features/domain/session";
@@ -28,20 +28,29 @@ describe("Interacting with session", () => {
     const currentMonth = new Date("2021-11-01T00:00:00");
     const nextMonth = new Date("2021-12-01T00:00:00");
 
-    const server = new ServerBuilder()
-        .request("/sessions", "get", new SessionsBuilder()
-            .withSession(
-            new ApiSessionsBuilder().withClassroom("1").withName('Cours Duo')
-                    .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                    .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED))
-                    .build()
-            )
-            .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
-        .request("/clients", "get", [])
-        .request("/sessions/checkin", "post",
-            checkinRequest(classroomDate, "1", "3"),201, undefined, undefined,
-            checkinResponse("15", "1", apiSession("15", "1", "Cours Duo", "MAT", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee("3", "Bertrand", "Bougon", Attendance.CHECKED_IN)])))
-        .build()
+    const server = new ServerBuilder2().serve(
+        new RequestHandlerBuilders().get("/sessions")
+            .ok()
+            .body(new SessionsBuilder()
+                .withSession(
+                    new ApiSessionsBuilder().withClassroom("1").withName('Cours Duo')
+                        .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                        .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED))
+                        .build()
+                )
+                .build())
+            .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+            .build(),
+        new RequestHandlerBuilders().get("/clients")
+            .ok()
+            .body([])
+            .build(),
+        new RequestHandlerBuilders().post("/sessions/checkin")
+            .created()
+            .request(checkinRequest(classroomDate, "1", "3"))
+            .body(checkinResponse("15", "1", apiSession("15", "1", "Cours Duo", "MAT", schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee("3", "Bertrand", "Bougon", Attendance.CHECKED_IN)])))
+            .build()
+    )
 
     beforeAll(() => server.listen())
 
@@ -57,33 +66,37 @@ describe("Interacting with session", () => {
         await actThenSleep(20)
         userEvent.click(await screen.findByText("Cours Duo"))
 
-        expect(screen.getByText("C", {selector: "span"})).toBeInTheDocument()
+        await waitFor(() => expect(screen.getByText("C", {selector: "span"})).toBeInTheDocument())
     })
 
     describe("Facing an error", function () {
 
-        const server = new ServerBuilder()
-        .request("/sessions", "get", new SessionsBuilder()
-            .withSession(
-                new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
-                    .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                    .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED))
+        it("should display the error", async () => {
+            server.resetHandlers(
+                new RequestHandlerBuilders().get("/sessions")
+                    .ok()
+                    .body(new SessionsBuilder()
+                        .withSession(
+                            new ApiSessionsBuilder().withClassroom(1).withName('Cours Duo')
+                                .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                                .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.REGISTERED))
+                                .build()
+                        )
+                        .build())
+                    .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+                    .build(),
+                new RequestHandlerBuilders().get("/clients")
+                    .ok()
+                    .body([])
+                    .build(),
+                new RequestHandlerBuilders().post("/sessions/checkin")
+                    .unprocessableEntity()
+                    .body(new APIErrorBody()
+                        .dummyDetail()
+                        .build())
                     .build()
             )
-            .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
-        .request("/clients", "get", [])
-        .request("/sessions/checkin", "post", new APIErrorBody()
-            .dummyDetail()
-            .build(), 422)
-        .build()
 
-        beforeAll(() => server.listen())
-
-        afterEach(() => server.resetHandlers())
-
-        afterAll(() => server.close())
-
-        it("should display the error", async () => {
             await render(<Calendar date={classroomDate} />)
 
             userEvent.click(await screen.findByText("Cours Duo"))
@@ -96,26 +109,28 @@ describe("Interacting with session", () => {
     })
 
     describe("Proceeding to checkout", function () {
-        const server = new ServerBuilder()
-            .request("/sessions", "get", new SessionsBuilder()
-                .withSession(
-                    new ApiSessionsBuilder().withId("15").withClassroom("1").withName('Cours Trio')
-                        .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                        .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.CHECKED_IN))
-                        .build()
-                )
-                .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
-            .request("/clients", "get", [])
-            .request("/sessions/15/checkout", "post", checkoutRequest("3"), 200, undefined, undefined, checkout("15", "1", apiSession("15", "1", "Cours Trio", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED)])))
-            .build()
-
-        beforeAll(() => server.listen())
-
-        afterEach(() => server.resetHandlers())
-
-        afterAll(() => server.close())
 
         it("should checkout attendee", async () => {
+            server.resetHandlers(
+                new RequestHandlerBuilders().get("/sessions")
+                    .ok()
+                    .body(new SessionsBuilder()
+                        .withSession(
+                            new ApiSessionsBuilder().withId("15").withClassroom("1").withName('Cours Trio')
+                                .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                                .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.CHECKED_IN))
+                                .build()
+                        )
+                        .build())
+                    .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+                    .build(),
+                new RequestHandlerBuilders().get("/clients").ok().body([]).build(),
+                new RequestHandlerBuilders().post("/sessions/15/checkout")
+                    .ok()
+                    .request(checkoutRequest("3"))
+                    .body(checkout("15", "1", apiSession("15", "1", "Cours Trio", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED)])))
+                    .build()
+            )
             await render(<Calendar date={classroomDate} />)
 
             userEvent.click(await screen.findByText("Cours Trio"))
@@ -127,28 +142,30 @@ describe("Interacting with session", () => {
         })
 
         describe("when facing an error", function () {
-            const server = new ServerBuilder()
-                .request("/sessions", "get", new SessionsBuilder()
-                    .withSession(
-                        new ApiSessionsBuilder().withId("15").withClassroom(1).withName('Cours Trio')
-                            .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                            .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN))
-                            .build()
-                    )
-                    .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
-                .request("/clients", "get", [])
-                .request("/sessions/15/checkout", "post", new APIErrorBody()
-                    .dummyDetail()
-                    .build(), 422)
-                .build()
-
-            beforeAll(() => server.listen())
-
-            afterEach(() => server.resetHandlers())
-
-            afterAll(() => server.close())
 
             it("should display the error", async () => {
+                server.resetHandlers(new RequestHandlerBuilders().get("/sessions")
+                    .ok()
+                    .body(new SessionsBuilder()
+                        .withSession(
+                            new ApiSessionsBuilder().withId("15").withClassroom(1).withName('Cours Trio')
+                                .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                                .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN))
+                                .build()
+                        ).build())
+                    .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+                    .build(),
+                    new RequestHandlerBuilders().get("/clients")
+                        .ok()
+                        .body([])
+                        .build(),
+                    new RequestHandlerBuilders().post("/sessions/15/checkout")
+                        .unprocessableEntity()
+                        .body(new APIErrorBody()
+                            .dummyDetail()
+                            .build())
+                        .build()
+                )
                 await render(<Calendar date={classroomDate} />)
 
                 userEvent.click(await screen.findByText("Cours Trio"))
@@ -164,28 +181,30 @@ describe("Interacting with session", () => {
 
     describe("Cancelling an attendee of a session", function () {
 
-        const server = new ServerBuilder()
-            .request("/sessions", "get", new SessionsBuilder()
-                .withSession(
-                    new ApiSessionsBuilder().withClassroom("1").withName('Cours Duo')
-                        .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                        .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED))
-                        .build()
-                )
-                .build(), 200, undefined, {"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
-            .request("/clients", "get", [])
-            .request("/sessions/cancellation/3", "post",
-                cancellationRequest("1", classroomDate), 201, undefined, undefined,
-                checkinResponse("15", "1", apiSession("15", "1", "Cours Duo", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [])))
-            .build()
-
-        beforeAll(() => server.listen())
-
-        afterEach(() => server.resetHandlers())
-
-        afterAll(() => server.close())
-
         it('should cancel the attendee', async () => {
+            server.resetHandlers(
+                new RequestHandlerBuilders().get("/sessions")
+                    .ok()
+                    .body(new SessionsBuilder()
+                        .withSession(
+                            new ApiSessionsBuilder().withClassroom("1").withName('Cours Duo')
+                                .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                                .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED))
+                                .build()
+                        )
+                        .build())
+                    .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+                    .build(),
+                new RequestHandlerBuilders().get("/clients")
+                    .ok()
+                    .body([])
+                    .build(),
+                new RequestHandlerBuilders().post("/sessions/cancellation/3")
+                    .created()
+                    .request(cancellationRequest("1", classroomDate))
+                    .body(checkinResponse("15", "1", apiSession("15", "1", "Cours Duo", undefined, schedule(classroomDate, addHours(classroomDate, 1)), 2, [])))
+                    .build()
+            )
             await render(<Calendar date={classroomDate} />)
 
             userEvent.click(await screen.findByText("Cours Duo"))
