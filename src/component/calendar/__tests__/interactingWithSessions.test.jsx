@@ -1,4 +1,10 @@
-import {APIErrorBody, RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
+import {
+    APIErrorBody,
+    RequestHandlerBuilders,
+    ServerBuilder,
+    SessionXLinkValueHeaderBuilder,
+    XLinkHeaderBuilder
+} from "../../../test-utils/server/server";
 import {
     apiSession,
     ApiSessionsBuilder,
@@ -24,10 +30,7 @@ import {Attendance} from "../../../features/domain/session";
 describe("Interacting with session", () => {
 
     const classroomDate = new Date("2021-11-01T10:00:00");
-    const previousMonth = new Date("2021-10-01T00:00:00");
-    const currentMonth = new Date("2021-11-01T00:00:00");
-    const nextMonth = new Date("2021-12-01T00:00:00");
-
+    let sessionHeaderBuilder = new XLinkHeaderBuilder().value(new SessionXLinkValueHeaderBuilder().current(new Date("2021-11-01T00:00:00")))
     const server = new ServerBuilder().serve(
         new RequestHandlerBuilders().get("/sessions")
             .ok()
@@ -39,7 +42,7 @@ describe("Interacting with session", () => {
                         .build()
                 )
                 .build())
-            .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+            .header(sessionHeaderBuilder)
             .build(),
         new RequestHandlerBuilders().get("/clients")
             .ok()
@@ -83,7 +86,7 @@ describe("Interacting with session", () => {
                                 .build()
                         )
                         .build())
-                    .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+                    .header(sessionHeaderBuilder)
                     .build(),
                 new RequestHandlerBuilders().get("/clients")
                     .ok()
@@ -111,6 +114,7 @@ describe("Interacting with session", () => {
     describe("Proceeding to checkout", function () {
 
         it("should checkout attendee", async () => {
+
             server.resetHandlers(
                 new RequestHandlerBuilders().get("/sessions")
                     .ok()
@@ -122,7 +126,7 @@ describe("Interacting with session", () => {
                                 .build()
                         )
                         .build())
-                    .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+                    .header(sessionHeaderBuilder)
                     .build(),
                 new RequestHandlerBuilders().get("/clients").ok().body([]).build(),
                 new RequestHandlerBuilders().post("/sessions/15/checkout")
@@ -153,7 +157,7 @@ describe("Interacting with session", () => {
                                 .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN))
                                 .build()
                         ).build())
-                    .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+                    .header(sessionHeaderBuilder)
                     .build(),
                     new RequestHandlerBuilders().get("/clients")
                         .ok()
@@ -193,7 +197,7 @@ describe("Interacting with session", () => {
                                 .build()
                         )
                         .build())
-                    .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+                    .header(sessionHeaderBuilder)
                     .build(),
                 new RequestHandlerBuilders().get("/clients")
                     .ok()

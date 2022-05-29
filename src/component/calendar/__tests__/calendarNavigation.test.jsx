@@ -1,4 +1,9 @@
-import {RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
+import {
+    RequestHandlerBuilders,
+    ServerBuilder,
+    SessionXLinkValueHeaderBuilder,
+    XLinkHeaderBuilder
+} from "../../../test-utils/server/server";
 import {ApiSessionsBuilder, attendee, SessionsBuilder} from "../../../test-utils/classroom/session";
 import {screen, waitFor} from "@testing-library/react";
 import {render} from "../../../test-utils/test-utils";
@@ -8,11 +13,6 @@ import React from "react";
 import {Attendance} from "../../../features/domain/session";
 
 describe("Navigate through calendar", () => {
-    const currentDate = new Date("2021-10-01T00:00:00")
-    const previousMonth = new Date("2021-09-01T00:00:00")
-    const currentMonth = new Date("2021-10-01T00:00:00")
-    const nextMonth = new Date("2021-11-10T00:00:00")
-    const lastMonth = new Date("2021-12-01T00:00:00")
     let server = new ServerBuilder().serve(
         new RequestHandlerBuilders().get("/clients")
             .ok()
@@ -21,7 +21,7 @@ describe("Navigate through calendar", () => {
         new RequestHandlerBuilders().get("/sessions")
             .ok()
             .body([])
-            .header({"X-Link": `</sessions?month=${previousMonth.toISOString()}>; rel="previous", </sessions?month=${currentMonth.toISOString()}>; rel="current", </sessions?month=${nextMonth.toISOString()}>; rel="next"`})
+            .header(new XLinkHeaderBuilder().value(new SessionXLinkValueHeaderBuilder().current(new Date("2021-10-01T00:00:00"))))
             .once()
             .build(),
         new RequestHandlerBuilders().get("/sessions")
@@ -39,7 +39,7 @@ describe("Navigate through calendar", () => {
                         .build()
                 )
                 .build())
-            .header({"X-Link": `</sessions?month=${currentMonth.toISOString()}>; rel="previous", </sessions?month=${nextMonth.toISOString()}>; rel="current", </sessions?month=${lastMonth.toISOString()}>; rel="next"`})
+            .header(new XLinkHeaderBuilder().value(new SessionXLinkValueHeaderBuilder().current(new Date("2021-11-10T00:00:00"))))
             .build()
     );
 
@@ -50,7 +50,7 @@ describe("Navigate through calendar", () => {
     afterAll(() => server.close())
 
     it("should display next month when clicking on 'next' month", async () => {
-        render(<Calendar date={currentDate}/>)
+        render(<Calendar date={new Date("2021-10-01T00:00:00")}/>)
 
         userEvent.click(await waitFor(() => screen.getByRole("button", {name: /next/i})))
 

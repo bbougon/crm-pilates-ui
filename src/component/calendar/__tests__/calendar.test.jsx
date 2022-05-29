@@ -2,14 +2,15 @@ import {render} from "../../../test-utils/test-utils";
 import {screen} from "@testing-library/react";
 import React from "react";
 import Calendar from "../Calendar";
-import {APIErrorBody, RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
+import {
+    APIErrorBody,
+    RequestHandlerBuilders,
+    ServerBuilder,
+    SessionXLinkValueHeaderBuilder,
+    XLinkHeaderBuilder
+} from "../../../test-utils/server/server";
 
 describe('Calendar page', () => {
-    let currentDate = new Date();
-    let currentMonth = currentDate.toISOString()
-    let previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate()).toISOString()
-    let nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate()).toISOString()
-
     const emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
 
     const server = new ServerBuilder().serve(emptyClients)
@@ -25,7 +26,7 @@ describe('Calendar page', () => {
         server.resetHandlers(emptyClients, new RequestHandlerBuilders().get("/sessions")
             .ok()
             .body([])
-            .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+            .header(new XLinkHeaderBuilder().value(new SessionXLinkValueHeaderBuilder().current(new Date())))
             .build()
         )
         render(<Calendar date={new Date("2021-10-10T11:20:00")}/>)

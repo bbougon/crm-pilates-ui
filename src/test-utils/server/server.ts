@@ -2,6 +2,67 @@ import {setupServer} from "msw/node";
 import {compose, context, RequestHandler, rest} from "msw";
 import {isDeepStrictEqual} from "util";
 
+interface ValueHeaderBuilder {
+    value: any | undefined
+    build(): any
+}
+
+interface HeaderBuilder {
+    _key: string
+    _value: any
+    value(builder: ValueHeaderBuilder): any
+    build(): any
+}
+
+type Link = string
+
+type Rel = string
+
+abstract class XLinkValueHeaderBuilder implements ValueHeaderBuilder{
+    value: { link: Link, rel: Rel }[] | undefined;
+
+    build = (): any => {
+        return this.value?.map(xlink => xlink.link.concat("; rel=").concat(xlink.rel)).join(", ")
+    }
+
+}
+
+export class SessionXLinkValueHeaderBuilder extends XLinkValueHeaderBuilder {
+
+    value: { link: Link, rel: Rel }[] | undefined;
+
+    build = (): any => {
+        return this.value?.map(xlink => xlink.link.concat("; rel=").concat(xlink.rel)).join(", ")
+    }
+
+    current = (currentMonth: Date): SessionXLinkValueHeaderBuilder => {
+        const previousMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
+        const nextMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
+        this.value = [
+            {link: `</sessions?month=${previousMonth}>`, rel: "previous"},
+            {link: `</sessions?month=${currentMonth}>` as Link, rel: "current" as Rel},
+            {link: `</sessions?month=${nextMonth}>`, rel: "next"}
+            ]
+        return this
+    }
+}
+
+export class XLinkHeaderBuilder implements HeaderBuilder {
+    _key: string = "X-Link"
+    _value: any;
+
+    build = (): any => {
+        return {
+            [this._key]: this._value
+        }
+    }
+
+    value = (builder: ValueHeaderBuilder): XLinkHeaderBuilder => {
+        this._value = builder.build()
+        return this
+    }
+}
+
 abstract class RequestHandlerBuilder {
     protected path: string
     protected statusCode: number = 200
@@ -39,8 +100,8 @@ abstract class RequestHandlerBuilder {
         return this
     }
 
-    header = (header: any): RequestHandlerBuilder => {
-        this._header = header
+    header = <T extends HeaderBuilder>(header: T): RequestHandlerBuilder => {
+        this._header = header.build()
         return this
     }
 

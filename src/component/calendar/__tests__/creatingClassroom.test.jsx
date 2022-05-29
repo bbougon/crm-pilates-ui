@@ -1,4 +1,9 @@
-import {RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
+import {
+    RequestHandlerBuilders,
+    ServerBuilder,
+    SessionXLinkValueHeaderBuilder,
+    XLinkHeaderBuilder
+} from "../../../test-utils/server/server";
 import {addWeeks, format, formatISO} from "date-fns";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
@@ -12,16 +17,14 @@ import {Attendance} from "../../../features/domain/session";
 describe('Creating a classroom', () => {
 
     const classroomDate = new Date("2021-10-01T15:15:00")
-    const previousMonth = new Date("2021-09-01T00:00:00");
     const currentMonth = new Date("2021-10-01T00:00:00");
-    const nextMonth = new Date("2021-11-01T00:00:00");
 
     let server = new ServerBuilder().serve(
         new RequestHandlerBuilders().get("/sessions")
             .ok()
             .once()
             .body([])
-            .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+            .header(new XLinkHeaderBuilder().value(new SessionXLinkValueHeaderBuilder().current(currentMonth)))
             .build(),
         new RequestHandlerBuilders().get("/clients")
             .ok()
@@ -81,7 +84,7 @@ describe('Creating a classroom', () => {
                 )
                 .build()
             )
-            .header({"X-Link": `</sessions?month=${previousMonth}>; rel="previous", </sessions?month=${currentMonth}>; rel="current", </sessions?month=${nextMonth}>; rel="next"`})
+            .header(new XLinkHeaderBuilder().value(new SessionXLinkValueHeaderBuilder().current(currentMonth)))
             .build()
     );
     beforeAll(() => server.listen())
