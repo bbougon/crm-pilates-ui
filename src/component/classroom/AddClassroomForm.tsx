@@ -15,14 +15,14 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import * as React from "react";
-import {useState} from "react";
+import {useReducer} from "react";
 import set from "date-fns/set";
 import {useDispatch, useSelector} from "react-redux";
 import {selectAllClients} from "../../features/clientsSlice";
 import {addClassroom} from "../../features/classroomSlice";
-import {format, formatISO} from "date-fns";
+import {format, formatISO, isValid, parse} from "date-fns";
 import {Subjects} from "../../features/domain/subjects";
-import {Classroom} from "../../features/domain/classroom";
+import {Attendee, Classroom} from "../../features/domain/classroom";
 import {Client} from "../../features/domain/client";
 import {subjects} from "../../utils/translation";
 
@@ -31,6 +31,104 @@ type AddClassroomFormProps = {
     onClassroomAdded: () => void
 }
 
+enum ActionType {
+    CLASSROOM_NAME_CHANGED = "CLASSROOM_NAME_CHANGED",
+    SUBJECT_CHANGED = "SUBJECT_CHANGED",
+    POSITION_CHANGED = "POSITION_CHANGED",
+    DURATION_UPDATED = "DURATION_UPDATED",
+    ATTENDEES_UPDATED = "ATTENDEES_UPDATED",
+    START_DATE_UPDATED = "START_DATE_UPDATED",
+    END_DATE_UPDATED = "END_DATE_UPDATED",
+}
+
+type State = {
+    currentDate: Date
+    classroomName: string
+    position: number
+    subject?: Subjects | unknown
+    duration: number
+    classroomStartDateTime: string
+    classroomEndDateTime: string
+    attendees: Attendee[]
+}
+
+type Action =
+    | {
+    type: ActionType.CLASSROOM_NAME_CHANGED
+    classroomName: string
+}
+    | {
+    type: ActionType.SUBJECT_CHANGED
+    subject: Subjects
+} | {
+    type: ActionType.POSITION_CHANGED
+    position: number
+}
+    | {
+    type: ActionType.DURATION_UPDATED
+    duration: number
+}
+    | {
+    type: ActionType.ATTENDEES_UPDATED
+    attendees: Client[]
+}
+    | {
+    type: ActionType.START_DATE_UPDATED
+    startDate: Date
+}
+    | {
+    type: ActionType.END_DATE_UPDATED
+    endDate: Date
+}
+
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
+        case ActionType.CLASSROOM_NAME_CHANGED:
+            return {...state, classroomName: action.classroomName}
+        case ActionType.SUBJECT_CHANGED:
+            return {...state, subject: action.subject}
+        case ActionType.POSITION_CHANGED:
+            return {...state, position: action.position}
+        case ActionType.DURATION_UPDATED:
+            return {...state, duration: action.duration}
+        case ActionType.ATTENDEES_UPDATED:
+            return {...state, attendees: action.attendees.map(attendee => ({id: attendee.id})), position: action.attendees.length > state.position ? action.attendees.length : state.position}
+        case ActionType.START_DATE_UPDATED:
+            return {...state, classroomStartDateTime: formatISO(action.startDate)}
+        case ActionType.END_DATE_UPDATED:
+            return {...state, classroomEndDateTime: formatISO(action.endDate)}
+    }
+}
+
+function updateClasrroomName(classroomName: string): Action {
+    return {classroomName, type: ActionType.CLASSROOM_NAME_CHANGED}
+}
+
+function updateSubject(subject: Subjects): Action {
+    return {subject, type: ActionType.SUBJECT_CHANGED}
+}
+
+function updatePosition(position: number): Action {
+    return {position, type: ActionType.POSITION_CHANGED}
+}
+
+function updateDuration(duration: number): Action {
+    return {duration, type: ActionType.DURATION_UPDATED}
+}
+
+function updateAttendees(attendees: Client[]): Action {
+    return {attendees, type: ActionType.ATTENDEES_UPDATED}
+}
+
+function updateClassroomStartDate(startDate: Date): Action {
+    return {startDate, type: ActionType.START_DATE_UPDATED}
+}
+
+function updateClassroomEndDate(endDate: Date): Action {
+    return {endDate, type: ActionType.END_DATE_UPDATED}
+}
+
+const FORMAT = "MM/dd/yyyy HH:mm"
 export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps) => {
 
     const dispatch = useDispatch();
@@ -47,45 +145,42 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
 
     const available_positions = [1, 2, 3, 4, 5, 6]
 
-    const [currentDate] = useState(new Date())
-    const [classroomName, setClassroomName] = useState('')
-    const [position, setPosition] = useState(1)
-    const [subject, setSubject] = useState<Subjects | "">("")
-    const [duration, setDuration] = useState(60)
-    const [classroomStartDateTime, setClassroomStartDateTime] = useState<Date | null>(set(date, {
-        hours: currentDate.getHours(),
-        minutes: currentDate.getMinutes()
-    }))
-    const [classroomEndDateTime, setClassroomEndDateTime] = useState<Date | null>(null)
-    const [attendees, setAttendees] = useState<Client[]>([])
+    const [state, dispatchReducer] = useReducer(reducer, {
+        classroomName: "",
+        currentDate: new Date(),
+        classroomStartDateTime: formatISO(set(date, {hours: date.getHours(), minutes: date.getMinutes()})),
+        classroomEndDateTime: formatISO(set(date, {hours: date.getHours() + 1, minutes: date.getMinutes()})),
+        duration: 60,
+        position: 1,
+        attendees: []
+    })
+
     const clients: Client[] = useSelector(selectAllClients)
 
-    const onClassroomNameChanged = (e: any) => setClassroomName(e.target.value)
-    const onSubjectChanged = (e: any) => setSubject(e.target.value)
-    const onPositionChanged = (e: any) => setPosition(e.target.value)
-    const onDurationChanged = (e: any) => setDuration(e.target.value)
+    const onClassroomNameChanged = (e: any) => dispatchReducer(updateClasrroomName(e.target.value))
+    const onSubjectChanged = (e: any) => dispatchReducer(updateSubject(e.target.value))
+    const onPositionChanged = (e: any) => dispatchReducer(updatePosition(e.target.value))
+    const onDurationChanged = (e: any) => dispatchReducer(updateDuration(e.target.value))
 
     const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
     const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)
 
     const fieldsAreNotFilled = () => {
-        return classroomName === ""
-            || subject === ""
-            || position === null || position < 1
-            || !(available_durations.map(duration => duration.duration).includes(duration))
+        return state.classroomName === ""
+            || state.subject === undefined
+            || state.position === null || state.position < 1
+            || !(available_durations.map(duration => duration.duration).includes(state.duration))
     }
 
     const onSubmitClicked = async () => {
         const classroom: Classroom = {
-            classroomName,
-            subject: subject as Subjects,
-            startDate: formatISO(classroomStartDateTime || new Date()),
-            endDate: classroomEndDateTime != null ? formatISO(classroomEndDateTime) : null,
-            position,
-            duration,
-            attendees: attendees.map(attendee => {
-                return {id: attendee.id}
-            })
+            classroomName: state.classroomName,
+            subject: state.subject as Subjects,
+            startDate: state.classroomStartDateTime,
+            endDate: state.classroomEndDateTime,
+            position: state.position,
+            duration: state.duration,
+            attendees: state.attendees
         }
         await dispatch(addClassroom(classroom))
         onClassroomAdded()
@@ -106,7 +201,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                            variant="standard"
                                            onChange={onClassroomNameChanged}
                                            aria-describedby="classroom-name-help"
-                                           value={classroomName}
+                                           value={state.classroomName}
                                 />
                             </FormControl>
                         </Grid>
@@ -116,7 +211,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                 <Select
                                     labelId="subject-select-label"
                                     id="subject-select"
-                                    value={subject}
+                                    value={state.subject || ""}
                                     required
                                     placeholder="Select a subject"
                                     label="Subject"
@@ -135,7 +230,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                 <Select
                                     labelId="position-select-label"
                                     id="position-select"
-                                    value={position}
+                                    value={state.position}
                                     label="Position"
                                     variant="standard"
                                     onChange={onPositionChanged}
@@ -154,14 +249,16 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                     <DateTimePicker
                                         label="Choose start date"
                                         onChange={(newValue) => {
-                                            setClassroomStartDateTime(newValue);
+                                            if (newValue !== null && isValid(newValue))
+                                                dispatchReducer(updateClassroomStartDate(newValue))
                                         }}
                                         renderInput={(params) => <TextField {...params} label="Choose start date"
                                                                             helperText="Choose start date"
                                                                             variant="standard"/>}
-                                        value={classroomStartDateTime}
+                                        value={state.classroomStartDateTime}
                                         minDateTime={dayStart}
                                         maxDateTime={dayEnd}
+                                        inputFormat={FORMAT}
                                     />
                                 </LocalizationProvider>
                             </FormControl>
@@ -172,11 +269,13 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                     <DateTimePicker
                                         label="Recurrence"
                                         onChange={(newValue) => {
-                                            setClassroomEndDateTime(newValue);
+                                            if(newValue !== null && isValid(newValue))
+                                                dispatchReducer(updateClassroomEndDate(newValue));
                                         }}
                                         minDateTime={dayStart}
-                                        value={classroomEndDateTime}
+                                        value={state.classroomEndDateTime}
                                         renderInput={(props) => <TextField  {...props} variant="standard"/>}
+                                        inputFormat={FORMAT}
                                     />
                                 </LocalizationProvider>
                             </FormControl>
@@ -188,7 +287,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                     labelId="duration-select-label"
                                     id="duration-select"
                                     name="duration-form"
-                                    value={duration}
+                                    value={state.duration}
                                     label="Duration"
                                     onChange={onDurationChanged}
                                     size="small"
@@ -218,9 +317,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                         />
                                     )}
                                     onChange={(event, value) => {
-                                        setAttendees(value)
-                                        if (value.length > position)
-                                            setPosition(value.length)
+                                        dispatchReducer(updateAttendees(value))
                                     }}
                                 />
                             </FormControl>

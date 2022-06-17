@@ -8,7 +8,7 @@ import {addWeeks, format, formatISO} from "date-fns";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
-import {fireEvent, screen, within} from "@testing-library/react";
+import {fireEvent, screen, waitFor, within} from "@testing-library/react";
 import React from "react";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
@@ -153,14 +153,14 @@ describe('Creating a classroom', () => {
         expect(within(attendeesSelect).getByText(/martin jacques/i)).toBeInTheDocument()
         expect(screen.getByRole("button", {name: /position 3/i})).toBeInTheDocument()
 
-        let startDateInput = screen.getAllByRole("textbox")[1];
+        const startDateInput = screen.getAllByRole("textbox")[1];
         userEvent.clear(startDateInput)
-        userEvent.type(startDateInput, "10/01/2021 03:15 pm")
-        let endDateInput = screen.getAllByRole("textbox")[2];
+        userEvent.type(startDateInput, "10/01/2021 15:15")
+        const endDateInput = screen.getAllByRole("textbox")[2];
         userEvent.clear(endDateInput)
-        userEvent.type(endDateInput, "10/01/2021 04:15 pm")
-        expect(screen.getAllByRole("textbox")[1]).toHaveValue("10/01/2021 03:15 pm")
-        expect(screen.getAllByRole("textbox")[2]).toHaveValue("10/01/2021 04:15 pm")
+        userEvent.type(endDateInput, "10/01/2021 16:15")
+        expect(screen.getAllByRole("textbox")[1]).toHaveValue("10/01/2021 15:15")
+        expect(screen.getAllByRole("textbox")[2]).toHaveValue("10/01/2021 16:15")
 
         userEvent.click(screen.getByRole("button", {name: /submit/i}))
     });
