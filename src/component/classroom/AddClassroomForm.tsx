@@ -20,7 +20,7 @@ import set from "date-fns/set";
 import {useDispatch, useSelector} from "react-redux";
 import {selectAllClients} from "../../features/clientsSlice";
 import {addClassroom} from "../../features/classroomSlice";
-import {format, formatISO, isValid, parse} from "date-fns";
+import {format, formatISO, isValid} from "date-fns";
 import {Subjects} from "../../features/domain/subjects";
 import {Attendee, Classroom} from "../../features/domain/classroom";
 import {Client} from "../../features/domain/client";
@@ -50,6 +50,9 @@ type State = {
     classroomStartDateTime: string
     classroomEndDateTime: string
     attendees: Attendee[]
+    availableDurations: { duration: number, human: string }[]
+    availablePositions: number[]
+    fieldsAreFilled: (state: State) => boolean
 }
 
 type Action =
@@ -92,7 +95,11 @@ function reducer(state: State, action: Action): State {
         case ActionType.DURATION_UPDATED:
             return {...state, duration: action.duration}
         case ActionType.ATTENDEES_UPDATED:
-            return {...state, attendees: action.attendees.map(attendee => ({id: attendee.id})), position: action.attendees.length > state.position ? action.attendees.length : state.position}
+            return {
+                ...state,
+                attendees: action.attendees.map(attendee => ({id: attendee.id})),
+                position: action.attendees.length > state.position ? action.attendees.length : state.position
+            }
         case ActionType.START_DATE_UPDATED:
             return {...state, classroomStartDateTime: formatISO(action.startDate)}
         case ActionType.END_DATE_UPDATED:
@@ -133,18 +140,6 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
 
     const dispatch = useDispatch();
 
-    const available_durations = [
-        {duration: 15, human: "0h15"},
-        {duration: 30, human: "Oh30"},
-        {duration: 45, human: "0h45"},
-        {duration: 60, human: "1h00"},
-        {duration: 75, human: "1h15"},
-        {duration: 90, human: "1h30"},
-        {duration: 105, human: "1h45"},
-        {duration: 120, human: "2h00"}];
-
-    const available_positions = [1, 2, 3, 4, 5, 6]
-
     const [state, dispatchReducer] = useReducer(reducer, {
         classroomName: "",
         currentDate: new Date(),
@@ -152,7 +147,23 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
         classroomEndDateTime: formatISO(set(date, {hours: date.getHours() + 1, minutes: date.getMinutes()})),
         duration: 60,
         position: 1,
-        attendees: []
+        attendees: [],
+        availableDurations: [
+            {duration: 15, human: "0h15"},
+            {duration: 30, human: "Oh30"},
+            {duration: 45, human: "0h45"},
+            {duration: 60, human: "1h00"},
+            {duration: 75, human: "1h15"},
+            {duration: 90, human: "1h30"},
+            {duration: 105, human: "1h45"},
+            {duration: 120, human: "2h00"}
+        ],
+        availablePositions: [1, 2, 3, 4, 5, 6],
+        fieldsAreFilled: (state: State) => {
+            return state.classroomName !== ""
+                && state.subject !== undefined
+                && state.availableDurations.map(duration => duration.duration).includes(state.duration)
+        }
     })
 
     const clients: Client[] = useSelector(selectAllClients)
@@ -164,14 +175,6 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
 
     const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
     const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)
-
-    const fieldsAreNotFilled = () => {
-        return state.classroomName === ""
-            || state.subject === undefined
-            || state.position === null || state.position < 1
-            || !(available_durations.map(duration => duration.duration).includes(state.duration))
-    }
-
     const onSubmitClicked = async () => {
         const classroom: Classroom = {
             classroomName: state.classroomName,
@@ -236,7 +239,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                     onChange={onPositionChanged}
                                     size="small"
                                 >
-                                    {available_positions.map(position => <MenuItem key={position}
+                                    {state.availablePositions.map(position => <MenuItem key={position}
                                                                                    value={position}>{position}</MenuItem>)}
                                 </Select>
                             </FormControl>
@@ -269,7 +272,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                     <DateTimePicker
                                         label="Recurrence"
                                         onChange={(newValue) => {
-                                            if(newValue !== null && isValid(newValue))
+                                            if (newValue !== null && isValid(newValue))
                                                 dispatchReducer(updateClassroomEndDate(newValue));
                                         }}
                                         minDateTime={dayStart}
@@ -294,7 +297,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                     variant="standard"
                                     aria-labelledby="duration-select-label"
                                 >
-                                    {available_durations.map(duration => <MenuItem key={duration.duration}
+                                    {state.availableDurations.map(duration => <MenuItem key={duration.duration}
                                                                                    value={duration.duration}>{duration.human}</MenuItem>)}
                                 </Select>
                             </FormControl>
@@ -328,7 +331,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                             display: 'flex',
                             justifyContent: 'flex-end'
                         }}>
-                            <Button onClick={onSubmitClicked} disabled={fieldsAreNotFilled()}>Submit</Button>
+                            <Button onClick={onSubmitClicked} disabled={!state.fieldsAreFilled(state)}>Submit</Button>
                         </Grid>
                     </Grid>
                 </Grid>
