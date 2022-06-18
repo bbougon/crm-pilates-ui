@@ -8,7 +8,7 @@ import {addWeeks, format, formatISO} from "date-fns";
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
-import {fireEvent, screen, waitFor, within} from "@testing-library/react";
+import {fireEvent, screen, within} from "@testing-library/react";
 import React from "react";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";

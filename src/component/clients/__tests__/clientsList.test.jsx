@@ -34,7 +34,7 @@ describe('ClientList page', function () {
             it('and should display them', async () => {
                 render(<Clients/>)
 
-                expect(await waitFor(() => screen.getByText("Doe", {selector: 'h6'}))).toBeInTheDocument()
+                expect(await screen.findByText("Doe", {selector: 'h6'})).toBeInTheDocument()
                 expect(screen.getByText("John")).toBeInTheDocument()
                 expect(screen.getByText("Martin", {selector: 'h6'})).toBeInTheDocument()
                 expect(screen.getByText("Pierre")).toBeInTheDocument()
@@ -47,7 +47,7 @@ describe('ClientList page', function () {
                 it('should display credits when clicking on name', async () => {
                     render(<Clients/>)
 
-                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
+                    userEvent.click(await screen.findByRole("button", {name: /martin/i}))
 
                     let clientDetails = screen.getByRole("region");
                     expect(within(clientDetails).getByText("2", {selector: 'span'})).toBeInTheDocument()
@@ -69,7 +69,7 @@ describe('ClientList page', function () {
                     }]).build())
                     render(<Clients/>)
 
-                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
+                    userEvent.click(await screen.findByRole("button", {name: /martin/i}))
                     let clientDetails = screen.getByRole("region");
                     expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
                     userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
@@ -92,7 +92,7 @@ describe('ClientList page', function () {
                     }]).build())
                     render(<Clients/>)
 
-                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
+                    userEvent.click(await screen.findByRole("button", {name: /martin/i}))
                     let clientDetails = screen.getByRole("region");
                     userEvent.click(within(clientDetails).getAllByRole("button")[2])
 
@@ -121,7 +121,7 @@ describe('ClientList page', function () {
                 it("should disabled add form button if no more subjects available for client", async () => {
                     render(<Clients/>)
 
-                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /brecht/i})))
+                    userEvent.click(await screen.findByRole("button", {name: /brecht/i}))
                     let clientDetails = screen.getByRole("region");
 
                     expect(within(clientDetails).getAllByRole("button")[4]).toBeDisabled()
@@ -139,7 +139,7 @@ describe('ClientList page', function () {
                         server.resetHandlers(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
                         render(<Clients/>)
 
-                        userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
+                        userEvent.click(await screen.findByRole("button", {name: /martin/i}))
                         let clientDetails = screen.getByRole("region");
                         userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "-1")
 
@@ -242,7 +242,7 @@ describe('ClientList page', function () {
                 await waitFor(() => expect(screen.getByLabelText("Client's name *", {selector: 'input'})).toHaveValue(""))
                 await waitFor(() => expect(screen.getByLabelText("Client's firstname *", {selector: 'input'})).toHaveValue(""))
 
-                userEvent.click(await waitFor(() => screen.getByRole("button", {name: /pilates/i})))
+                userEvent.click(await screen.findByRole("button", {name: /pilates/i}))
 
                 let clientDetails = screen.getAllByRole("region")[1];
                 expect(within(clientDetails).getByText("10", {selector: 'span'})).toBeInTheDocument()
@@ -267,9 +267,9 @@ describe('ClientList page', function () {
                 userEvent.click(screen.getByRole("button", {name: /submit/i}))
 
                 expect(await screen.findByText("An error occurred (see message below):", {selector: 'h5'})).toBeInTheDocument()
-                await waitFor(() => expect(screen.queryByText("You must provide the client firstname", {selector: 'p'})).toBeInTheDocument())
-                await waitFor(() => expect(screen.queryByText("You must provide the client lastname", {selector: 'p'})).toBeInTheDocument())
-                await waitFor(() => expect(screen.queryAllByText("value_error", {selector: 'p'})).toBeTruthy())
+                await screen.findByText("You must provide the client firstname", {selector: 'p'})
+                await screen.findByText("You must provide the client lastname", {selector: 'p'})
+                await screen.findAllByText("value_error", {selector: 'p'})
             })
         })
     })

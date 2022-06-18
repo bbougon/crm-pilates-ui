@@ -5,7 +5,7 @@ import {
     XLinkHeaderBuilder
 } from "../../../test-utils/server/server";
 import {ApiSessionsBuilder, attendee, SessionsBuilder} from "../../../test-utils/classroom/session";
-import {screen, waitFor} from "@testing-library/react";
+import {screen} from "@testing-library/react";
 import {render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
@@ -52,10 +52,10 @@ describe("Navigate through calendar", () => {
     it("should display next month when clicking on 'next' month", async () => {
         render(<Calendar date={new Date("2021-10-01T00:00:00")}/>)
 
-        userEvent.click(await waitFor(() => screen.getByRole("button", {name: /next/i})))
+        userEvent.click(await screen.findByRole("button", {name: /next/i}))
 
-        await waitFor(() => expect(screen.getByText("Stage 1")).toBeInTheDocument())
-        await waitFor(() => expect(screen.getByText("Stage 2")).toBeInTheDocument())
+        await screen.findByText("Stage 1")
+        await screen.findByText("Stage 2")
     })
 
 })

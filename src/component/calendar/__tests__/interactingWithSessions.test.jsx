@@ -69,7 +69,7 @@ describe("Interacting with session", () => {
         await actThenSleep(20)
         userEvent.click(await screen.findByText("Cours Duo"))
 
-        await waitFor(() => expect(screen.getByText("C", {selector: "span"})).toBeInTheDocument())
+        await screen.findByText("C", {selector: "span"})
     })
 
     describe("Facing an error", function () {

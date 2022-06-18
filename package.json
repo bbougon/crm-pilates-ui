@@ -96,7 +96,7 @@
     "lint-staged": "^13.0.2"
   },
   "lint-staged": {
-    "*.js": "eslint --fix",
-    "*.ts": "eslint --fix"
+    "*.{js, jsx}": "eslint --fix",
+    "*.{ts, tsx}": "eslint --fix"
   }
 }
