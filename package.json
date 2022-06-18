@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@craco/craco": "^6.4.3",
+    "@craco/craco": "^5.9.0",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@material-ui/core": "^4.12.3",
@@ -26,7 +26,7 @@
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.5",
     "react-router-dom": "^5.3.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
     "styled-components": "^5.3.1",
     "typescript": "^4.4.4",
     "web-vitals": "^1.0.1"
@@ -92,6 +92,11 @@
     "@testing-library/user-event": "^12.1.10",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.2.1-alpha-e0aa5e205-20211109",
-    "husky": "^8.0.1"
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.2"
+  },
+  "lint-staged": {
+    "*.js": "eslint --fix",
+    "*.ts": "eslint --fix"
   }
 }
