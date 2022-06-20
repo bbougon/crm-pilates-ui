@@ -1,23 +1,60 @@
 import * as React from "react";
-import {BaseSyntheticEvent, MouseEvent, useState} from "react";
+import {useReducer} from "react";
 import {Subjects} from "../../features/domain/subjects";
-import {FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField} from "@mui/material";
+import {FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
 import {Button} from "@material-ui/core";
 
 type AddCreditFormProps = {
-    subjects: {subject: Subjects, title: string}[] | []
+    subjects: { subject: Subjects, title: string }[] | []
     onAddCredits: (creditsAmount: number, subject: Subjects) => void
 }
-export const AddCreditForm = ({onAddCredits, subjects}: AddCreditFormProps)  => {
 
-    const [subject, setSubject] = useState<Subjects | "">("")
-    const [creditsAmount, setCreditsAmount] = useState<number>(0)
+enum ActionType {
+    SUBJECT_SELECTED = "SUBJECT_SELECTED",
+    CREDITS_ADDED = "CREDITS_ADDED"
 
-    const onSubjectChanged = (e: SelectChangeEvent<Subjects | unknown>) => setSubject(e.target.value as Subjects)
-    const onCreditsAmountChanged = (e: BaseSyntheticEvent) => setCreditsAmount(e.target.value)
-    const onSubmitClicked = (_: MouseEvent) => {
-        const value: number = +creditsAmount
-        onAddCredits(value, subject as Subjects)
+}
+
+type State = {
+    subject?: Subjects | unknown
+    creditsAmount: number
+}
+
+type Action =
+    | {
+    type: ActionType.SUBJECT_SELECTED
+    subject: Subjects
+}
+| {
+    type: ActionType.CREDITS_ADDED
+    creditsAmount: number
+}
+
+const selectSubject = (subject: Subjects): Action => {
+    return {subject, type: ActionType.SUBJECT_SELECTED}
+}
+
+const addCredits = (creditsAmount: number): Action => {
+    return {creditsAmount, type: ActionType.CREDITS_ADDED}
+}
+
+const reducer = (state: State, action: Action): State => {
+    switch (action.type) {
+        case ActionType.SUBJECT_SELECTED:
+            return {...state, subject: action.subject}
+        case ActionType.CREDITS_ADDED:
+            return {...state, creditsAmount: action.creditsAmount}
+    }
+}
+
+export const AddCreditForm = ({onAddCredits, subjects}: AddCreditFormProps) => {
+
+    const [state, dispatchReducer] = useReducer(reducer, {creditsAmount: 0})
+
+    const onSubjectChanged = (e: any) => dispatchReducer(selectSubject(e.target.value))
+    const onCreditsAmountChanged = (e: any) => dispatchReducer(addCredits(+e.target.value))
+    const onSubmitClicked = (e: any) => {
+        onAddCredits(state.creditsAmount, state.subject)
     }
 
     return (
@@ -35,7 +72,7 @@ export const AddCreditForm = ({onAddCredits, subjects}: AddCreditFormProps)  => 
                     <Select
                         labelId="subject-select-label"
                         id="subject-select"
-                        value={subject || ""}
+                        value={state.subject || ""}
                         required
                         placeholder="Select a subject"
                         label="Subject"
@@ -62,7 +99,7 @@ export const AddCreditForm = ({onAddCredits, subjects}: AddCreditFormProps)  => 
                                required
                                variant="standard"
                                onChange={onCreditsAmountChanged}
-                               value={creditsAmount || ""}
+                               value={state.creditsAmount}
                                aria-describedby="credits-amount-help"/>
                 </FormControl>
             </Grid>

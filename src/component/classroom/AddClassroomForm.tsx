@@ -136,6 +136,7 @@ function updateClassroomEndDate(endDate: Date): Action {
 }
 
 const FORMAT = "MM/dd/yyyy HH:mm"
+
 export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps) => {
 
     const dispatch = useDispatch();
