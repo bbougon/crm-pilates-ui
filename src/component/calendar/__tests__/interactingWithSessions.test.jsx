@@ -22,10 +22,11 @@ import {
 import {actThenSleep, render} from "../../../test-utils/test-utils";
 import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
-import {screen, waitFor, within} from "@testing-library/react";
+import {screen, within} from "@testing-library/react";
 import React from "react";
 import {addHours, formatISO} from "date-fns";
 import {Attendance} from "../../../features/domain/session";
+
 
 describe("Interacting with session", () => {
 

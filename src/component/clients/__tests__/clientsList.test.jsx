@@ -11,7 +11,7 @@ describe('ClientList page', function () {
 
     describe('fetches clients when loading', function () {
         describe("retrieve them", () => {
-            let clients = new ClientsBuilder()
+            const clients = new ClientsBuilder()
                 .withClient(apiClient())
                 .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
                     value: 5,
@@ -49,7 +49,7 @@ describe('ClientList page', function () {
 
                     userEvent.click(await screen.findByRole("button", {name: /martin/i}))
 
-                    let clientDetails = screen.getByRole("region");
+                    const clientDetails = screen.getByRole("region");
                     expect(within(clientDetails).getByText("2", {selector: 'span'})).toBeInTheDocument()
                     expect(within(clientDetails).getByText(/mat/i, {selector: 'p'})).toBeInTheDocument()
                     expect(within(clientDetails).getByText("5", {selector: 'span'})).toBeInTheDocument()
@@ -63,14 +63,23 @@ describe('ClientList page', function () {
                             subject: "MACHINE_DUO"
                         }]))
                         .build();
-                    server.resetHandlers(new RequestHandlerBuilders().get("/clients").ok().body(clients).build(), new RequestHandlerBuilders().post("/clients/1/credits").ok().body([{
-                        value: 10,
-                        subject: "MAT"
-                    }]).build())
+                    server.resetHandlers(
+                        new RequestHandlerBuilders().get("/clients")
+                            .ok()
+                            .body(clients)
+                            .build(),
+                        new RequestHandlerBuilders().post("/clients/1/credits")
+                            .ok()
+                            .body([{
+                                value: 10,
+                                subject: "MAT"
+                            }])
+                            .build()
+                    )
                     render(<Clients/>)
 
                     userEvent.click(await screen.findByRole("button", {name: /martin/i}))
-                    let clientDetails = screen.getByRole("region");
+                    const clientDetails = screen.getByRole("region");
                     expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
                     userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
                     userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0])
@@ -86,14 +95,23 @@ describe('ClientList page', function () {
                             subject: "MACHINE_DUO"
                         }]))
                         .build();
-                    server.resetHandlers(new RequestHandlerBuilders().get("/clients").ok().body(clients).build(), new RequestHandlerBuilders().post("/clients/1/credits").ok().body([{
-                        value: 10,
-                        subject: "MACHINE_TRIO"
-                    }]).build())
+                    server.resetHandlers(
+                        new RequestHandlerBuilders().get("/clients")
+                            .ok()
+                            .body(clients)
+                            .build(),
+                        new RequestHandlerBuilders().post("/clients/1/credits")
+                            .ok()
+                            .body([{
+                                value: 10,
+                                subject: "MACHINE_TRIO"
+                            }])
+                            .build()
+                    )
                     render(<Clients/>)
 
                     userEvent.click(await screen.findByRole("button", {name: /martin/i}))
-                    let clientDetails = screen.getByRole("region");
+                    const clientDetails = screen.getByRole("region");
                     userEvent.click(within(clientDetails).getAllByRole("button")[2])
 
                     expect(screen.getByRole("button", {name: /subject/i})).toBeInTheDocument()
@@ -122,7 +140,7 @@ describe('ClientList page', function () {
                     render(<Clients/>)
 
                     userEvent.click(await screen.findByRole("button", {name: /brecht/i}))
-                    let clientDetails = screen.getByRole("region");
+                    const clientDetails = screen.getByRole("region");
 
                     expect(within(clientDetails).getAllByRole("button")[4]).toBeDisabled()
                 })
@@ -130,7 +148,7 @@ describe('ClientList page', function () {
                 describe("faces errors", () => {
 
                     it("should display amount of credits filed in error when negative value is filled", async () => {
-                        let clients = new ClientsBuilder()
+                        const clients = new ClientsBuilder()
                             .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
                                 value: 5,
                                 subject: "MACHINE_DUO"
@@ -140,7 +158,7 @@ describe('ClientList page', function () {
                         render(<Clients/>)
 
                         userEvent.click(await screen.findByRole("button", {name: /martin/i}))
-                        let clientDetails = screen.getByRole("region");
+                        const clientDetails = screen.getByRole("region");
                         userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "-1")
 
                         expect(within(clientDetails).getByDisplayValue(/-1/i)).toBeInvalid()
@@ -153,7 +171,12 @@ describe('ClientList page', function () {
 
         describe("faces an error", () => {
 
-            const server = new ServerBuilder().serve(new RequestHandlerBuilders().get("/clients").unprocessableEntity().body(new APIErrorBody().dummyDetail().build()).build())
+            const server = new ServerBuilder().serve(
+                new RequestHandlerBuilders().get("/clients")
+                    .unprocessableEntity()
+                    .body(new APIErrorBody().dummyDetail().build())
+                    .build()
+            )
 
             beforeEach(() => server.listen())
 
@@ -173,7 +196,7 @@ describe('ClientList page', function () {
     })
 
     describe('displays a form to create a client', function () {
-        let emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
+        const emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
         const server = new ServerBuilder().serve(emptyClients)
 
         beforeAll(() => server.listen())
@@ -207,7 +230,10 @@ describe('ClientList page', function () {
                     emptyClients,
                     new RequestHandlerBuilders().post("/clients")
                         .ok()
-                        .body(apiClient("Joseph", "Pilates", "2", [{value: 10, subject: "MACHINE_TRIO"}, {value: 6, subject: "MACHINE_DUO"}]))
+                        .body(apiClient("Joseph", "Pilates", "2", [{value: 10, subject: "MACHINE_TRIO"}, {
+                            value: 6,
+                            subject: "MACHINE_DUO"
+                        }]))
                         .request({
                             firstname: "Joseph", lastname: "Pilates", credits: [
                                 {value: 10, subject: "MACHINE_TRIO"},
@@ -244,7 +270,7 @@ describe('ClientList page', function () {
 
                 userEvent.click(await screen.findByRole("button", {name: /pilates/i}))
 
-                let clientDetails = screen.getAllByRole("region")[1];
+                const clientDetails = screen.getAllByRole("region")[1];
                 expect(within(clientDetails).getByText("10", {selector: 'span'})).toBeInTheDocument()
                 expect(within(clientDetails).getByText(/machine trio/i, {selector: 'p'})).toBeInTheDocument()
                 expect(within(clientDetails).getByText("6", {selector: 'span'})).toBeInTheDocument()

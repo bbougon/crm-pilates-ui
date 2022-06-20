@@ -7,7 +7,7 @@ import {
     Grid,
     InputLabel,
     MenuItem,
-    Select,
+    Select, SelectChangeEvent,
     TextField
 } from "@mui/material";
 import {FormControl} from "@material-ui/core";
@@ -15,7 +15,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import * as React from "react";
-import {useReducer} from "react";
+import {BaseSyntheticEvent, useReducer} from "react";
 import set from "date-fns/set";
 import {useDispatch, useSelector} from "react-redux";
 import {selectAllClients} from "../../features/clientsSlice";
@@ -168,10 +168,10 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
 
     const clients: Client[] = useSelector(selectAllClients)
 
-    const onClassroomNameChanged = (e: any) => dispatchReducer(updateClasrroomName(e.target.value))
-    const onSubjectChanged = (e: any) => dispatchReducer(updateSubject(e.target.value))
-    const onPositionChanged = (e: any) => dispatchReducer(updatePosition(e.target.value))
-    const onDurationChanged = (e: any) => dispatchReducer(updateDuration(e.target.value))
+    const onClassroomNameChanged = (e: BaseSyntheticEvent) => dispatchReducer(updateClasrroomName(e.target.value))
+    const onSubjectChanged = (e: SelectChangeEvent<Subjects | unknown>) => dispatchReducer(updateSubject(e.target.value as Subjects))
+    const onPositionChanged = (e: SelectChangeEvent<number>) => dispatchReducer(updatePosition(e.target.value as number))
+    const onDurationChanged = (e: SelectChangeEvent<number>) => dispatchReducer(updateDuration(e.target.value as number))
 
     const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
     const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)

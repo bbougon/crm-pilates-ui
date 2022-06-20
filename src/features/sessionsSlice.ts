@@ -1,11 +1,11 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {api, ApiAttendee, ApiSession} from "../api";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
-import parse from "parse-link-header"
 import {isEqual, parseISO} from "date-fns";
 import {RootState} from "../app/store";
 import {Attendance, Attendee, Session, SessionsLink} from "./domain/session";
 import {Subjects} from "./domain/subjects";
+import parseLinkHeader from "parse-link-header";
 
 export enum SessionStatus {
     LOADING = "loading",
@@ -161,12 +161,12 @@ const sessionsSlice = createSlice({
                 state.status = SessionStatus.SUCCEEDED
 
                 state.sessions = action.payload.sessions.map(apiSession => mapSession(apiSession))
-                let links = (): SessionsLink => {
-                    const links = parse(action.payload.link)
+                const links = (): SessionsLink => {
+                    const links = parseLinkHeader(action.payload.link)
                     return {
-                        current: {url: links.current.url},
-                        next: {url: links.next.url},
-                        previous: {url: links.previous.url}
+                        current: {url: links?.current.url || ""},
+                        next: {url: links?.next.url || ""},
+                        previous: {url: links?.previous.url || ""}
                     }
                 };
                 state.link = links()
@@ -185,7 +185,7 @@ const sessionsSlice = createSlice({
             .addCase(sessionCheckin.fulfilled, (state, action) => {
                 state.status = SessionStatus.CHECKIN_IN_SUCCEEDED
                 const sessionCheckedin = action.payload
-                let session = state.sessions.find(session => session.id === sessionCheckedin.id
+                const session = state.sessions.find(session => session.id === sessionCheckedin.id
                     || (session.classroomId === sessionCheckedin.classroom_id && isEqual(parseISO(`${session.schedule.start}`), parseISO(`${sessionCheckedin.schedule.start}`))));
                 mapAttendees(session, sessionCheckedin)
                 mapCredits(state.sessions, sessionCheckedin);
@@ -200,14 +200,14 @@ const sessionsSlice = createSlice({
             .addCase(sessionCheckout.fulfilled, (state, action) => {
                 state.status = SessionStatus.CHECKOUT_SUCCEEDED
                 const sessionCheckedOut = action.payload
-                let session = state.sessions.find(session => session.id === sessionCheckedOut.id);
+                const session = state.sessions.find(session => session.id === sessionCheckedOut.id);
                 mapAttendees(session, sessionCheckedOut);
                 mapCredits(state.sessions, sessionCheckedOut)
             })
             .addCase(sessionCancel.fulfilled, (state, action) => {
                 state.status = SessionStatus.CANCEL_SUCCEEDED
                 const sessionCancelled = action.payload
-                let session = state.sessions.find(session => session.id === sessionCancelled.id
+                const session = state.sessions.find(session => session.id === sessionCancelled.id
                     || (session.classroomId === sessionCancelled.classroom_id && isEqual(parseISO(`${session.schedule.start}`), parseISO(`${sessionCancelled.schedule.start}`))));
                 if(session) {
                     session.attendees = sessionCancelled.attendees?.map(attendee => mapAttendee(attendee))

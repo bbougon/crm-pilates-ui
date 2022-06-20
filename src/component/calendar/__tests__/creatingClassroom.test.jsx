@@ -95,10 +95,13 @@ describe('Creating a classroom', () => {
             value: (query) => ({
                 media: query,
                 matches: query === '(pointer: fine)',
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 onchange: () => {
                 },
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 addListener: () => {
                 },
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 removeListener: () => {
                 },
                 dispatchEvent: () => false,

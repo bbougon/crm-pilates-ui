@@ -9,7 +9,7 @@ describe('ClientsSlice', () => {
     describe("Fetching clients", () => {
         it('should override previous state with fetched clients', async () => {
             const previousState = new LoadingState().withClient(client()).build()
-            let all_clients = new ClientsBuilder()
+            const all_clients = new ClientsBuilder()
                 .withClient(client(undefined, undefined, undefined, undefined))
                 .withClient(client("Pierre", "Martin", "33da6f24-efda-4c16-b8af-e5e822fc5860", undefined))
                 .withClient(client("Henri", "Verneuil", "33da6bca-efda-4c16-b8af-e5e822fc5901", undefined))

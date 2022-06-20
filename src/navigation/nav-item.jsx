@@ -5,11 +5,13 @@ import styled from "styled-components";
 class NavItem extends React.Component {
 
     handleClick = () => {
+        // eslint-disable-next-line react/prop-types
         const {path, onItemClick} = this.props;
         onItemClick(path);
     };
 
     render() {
+        // eslint-disable-next-line react/prop-types
         const {active} = this.props;
 
         const NavIcon = styled.div``;
@@ -31,12 +33,13 @@ class NavItem extends React.Component {
 
         return (
             <StyledNavItem active={active}>
+                {/* eslint-disable-next-line react/prop-types */}
                 <Link to={this.props.path} className={this.props.css} onClick={this.handleClick}>
                     <NavIcon/>
                 </Link>
             </StyledNavItem>
         );
     }
-};
+}
 
 export default NavItem;

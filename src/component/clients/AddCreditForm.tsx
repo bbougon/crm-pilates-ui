@@ -1,23 +1,23 @@
 import * as React from "react";
-import {useState} from "react";
+import {BaseSyntheticEvent, MouseEvent, useState} from "react";
 import {Subjects} from "../../features/domain/subjects";
-import {FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import {FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField} from "@mui/material";
 import {Button} from "@material-ui/core";
 
 type AddCreditFormProps = {
     subjects: {subject: Subjects, title: string}[] | []
-    onAddCredits: any
+    onAddCredits: (creditsAmount: number, subject: Subjects) => void
 }
 export const AddCreditForm = ({onAddCredits, subjects}: AddCreditFormProps)  => {
 
     const [subject, setSubject] = useState<Subjects | "">("")
-    const [creditsAmount, setCreditsAmount] = useState<number | null>(null)
+    const [creditsAmount, setCreditsAmount] = useState<number>(0)
 
-    const onSubjectChanged = (e: any) => setSubject(e.target.value)
-    const onCreditsAmountChanged = (e: any) => setCreditsAmount(e.target.value)
-    const onSubmitClicked = (e: any) => {
-        const value: number = +creditsAmount!
-        onAddCredits(value, subject)
+    const onSubjectChanged = (e: SelectChangeEvent<Subjects | unknown>) => setSubject(e.target.value as Subjects)
+    const onCreditsAmountChanged = (e: BaseSyntheticEvent) => setCreditsAmount(e.target.value)
+    const onSubmitClicked = (_: MouseEvent) => {
+        const value: number = +creditsAmount
+        onAddCredits(value, subject as Subjects)
     }
 
     return (
@@ -35,7 +35,7 @@ export const AddCreditForm = ({onAddCredits, subjects}: AddCreditFormProps)  => 
                     <Select
                         labelId="subject-select-label"
                         id="subject-select"
-                        value={subject}
+                        value={subject || ""}
                         required
                         placeholder="Select a subject"
                         label="Subject"

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useState} from "react";
+import {BaseSyntheticEvent, useState} from "react";
 import {useDispatch} from "react-redux";
 import {sessionCancel, sessionCheckin, sessionCheckout} from "../../features/sessionsSlice";
 import {
@@ -61,7 +61,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
         setAnchorEl(null);
     };
 
-    const handleAction = (event: React.MouseEvent<HTMLElement>) => {
+    const handleAction = (_: React.MouseEvent<HTMLElement>) => {
         const cancel = {
             classroomId: session.classroomId,
             start: session.schedule.start,
@@ -71,7 +71,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
         setAnchorEl(null);
     };
 
-    const onSessionCheckin = async (e: any) => {
+    const onSessionCheckin = async (e: BaseSyntheticEvent) => {
         if (e.target.checked) {
             const checkin = {
                 classroomId: session.classroomId,
@@ -192,9 +192,9 @@ const SessionAttendees = (session: Session) => {
 
 export const SessionDetails = (session: Session) => {
 
-    let sessionStart = session.schedule.start;
-    let sessionEnd = session.schedule.stop;
-    let dateSubheader = formatFullDate(sessionStart)
+    const sessionStart = session.schedule.start;
+    const sessionEnd = session.schedule.stop;
+    const dateSubheader = formatFullDate(sessionStart)
         .concat(` ${formatHours(sessionStart)}`)
         .concat(" to ")
         .concat(formatFullDate(sessionEnd))

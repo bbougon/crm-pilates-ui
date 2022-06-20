@@ -1,17 +1,19 @@
 import {setupServer} from "msw/node";
 import {compose, context, RequestHandler, rest} from "msw";
 import {isDeepStrictEqual} from "util";
+import {HeadersObject} from "msw/lib/types/context/set";
+import {ApiClient} from "../../api";
 
 interface ValueHeaderBuilder {
-    value: any | undefined
-    build(): any
+    value: { link: Link, rel: Rel }[] | undefined
+    build(): string
 }
 
 interface HeaderBuilder {
     _key: string
-    _value: any
-    value(builder: ValueHeaderBuilder): any
-    build(): any
+    _value: string | undefined
+    value(builder: ValueHeaderBuilder): XLinkHeaderBuilder | unknown
+    build(): HeadersObject
 }
 
 type Link = string
@@ -21,8 +23,8 @@ type Rel = string
 abstract class XLinkValueHeaderBuilder implements ValueHeaderBuilder{
     value: { link: Link, rel: Rel }[] | undefined;
 
-    build = (): any => {
-        return this.value?.map(xlink => xlink.link.concat("; rel=").concat(xlink.rel)).join(", ")
+    build = (): string => {
+        return this.value?.map(xlink => xlink.link.concat("; rel=").concat(xlink.rel)).join(", ") || ""
     }
 
 }
@@ -31,8 +33,8 @@ export class SessionXLinkValueHeaderBuilder extends XLinkValueHeaderBuilder {
 
     value: { link: Link, rel: Rel }[] | undefined;
 
-    build = (): any => {
-        return this.value?.map(xlink => xlink.link.concat("; rel=").concat(xlink.rel)).join(", ")
+    build = (): string => {
+        return this.value?.map(xlink => xlink.link.concat("; rel=").concat(xlink.rel)).join(", ") || ""
     }
 
     current = (currentMonth: Date): SessionXLinkValueHeaderBuilder => {
@@ -46,12 +48,11 @@ export class SessionXLinkValueHeaderBuilder extends XLinkValueHeaderBuilder {
         return this
     }
 }
-
 export class XLinkHeaderBuilder implements HeaderBuilder {
-    _key: string = "X-Link"
-    _value: any;
+    _key = "X-Link"
+    _value = ""
 
-    build = (): any => {
+    build = (): HeadersObject => {
         return {
             [this._key]: this._value
         }
@@ -63,49 +64,50 @@ export class XLinkHeaderBuilder implements HeaderBuilder {
     }
 }
 
-abstract class RequestHandlerBuilder {
+abstract class RequestHandlerBuilder<TBody> {
     protected path: string
-    protected statusCode: number = 200
-    protected _body: any
-    protected _header: any
-    protected _runOnce: boolean = false
-    protected _request: any
+    protected statusCode = 200
+    protected _body: TBody | unknown
+    protected _header: HeadersObject | null = null
+    protected _runOnce = false
+    protected _request: unknown | null = null
 
     constructor(path: string) {
         this.path = path
     }
 
-    ok = (): RequestHandlerBuilder => {
+    ok = (): RequestHandlerBuilder<TBody> => {
         this.statusCode = 200
         return this
     }
 
-    created = (): RequestHandlerBuilder => {
+    created = (): RequestHandlerBuilder<TBody> => {
         this.statusCode = 201
         return this
     }
 
-    unprocessableEntity = (): RequestHandlerBuilder => {
+    unprocessableEntity = (): RequestHandlerBuilder<TBody> => {
         this.statusCode = 422
         return this
     }
 
-    request = (request: any): RequestHandlerBuilder => {
+    request = <TRequest>(request: TRequest): RequestHandlerBuilder<TBody> => {
         this._request = request
         return this
     }
 
-    body = (body: any): RequestHandlerBuilder => {
+    body = <TBody>(body: TBody): RequestHandlerBuilder<TBody> => {
+        console.log(body)
         this._body = body
         return this
     }
 
-    header = <T extends HeaderBuilder>(header: T): RequestHandlerBuilder => {
+    header = <T extends HeaderBuilder>(header: T): RequestHandlerBuilder<TBody> => {
         this._header = header.build()
         return this
     }
 
-    once = (): RequestHandlerBuilder => {
+    once = (): RequestHandlerBuilder<TBody> => {
         this._runOnce = true
         return this
     }
@@ -113,10 +115,11 @@ abstract class RequestHandlerBuilder {
     abstract build() : RequestHandler
 }
 
-export class GetRequestHandlerBuilder extends RequestHandlerBuilder{
+export class GetRequestHandlerBuilder<TBody> extends RequestHandlerBuilder<TBody>{
 
     build(): RequestHandler {
         return rest.get(this.path, (req, res, _) => {
+            console.log('go through msw')
             let composedResponse;
             if (this._header) {
                 composedResponse = compose(
@@ -136,7 +139,7 @@ export class GetRequestHandlerBuilder extends RequestHandlerBuilder{
 
 }
 
-class PostRequestBuilderHandler extends RequestHandlerBuilder{
+class PostRequestBuilderHandler<TBody> extends RequestHandlerBuilder<TBody>{
 
     build(): RequestHandler {
         return rest.post(this.path, (req, res, _) => {
@@ -162,25 +165,30 @@ class PostRequestBuilderHandler extends RequestHandlerBuilder{
 export class RequestHandlerBuilders {
 
 
-    get = (path: string): GetRequestHandlerBuilder => {
+    get = <TBody>(path: string): GetRequestHandlerBuilder<TBody> => {
         return new GetRequestHandlerBuilder(path)
     }
 
-    post= (path: string): PostRequestBuilderHandler =>  {
+    post= <TBody>(path: string): PostRequestBuilderHandler<TBody> =>  {
         return new PostRequestBuilderHandler(path);
     }
 }
 
 export class ServerBuilder {
 
+    constructor() {
+        console.log('ServerBuilder')
+    }
+
     serve = (...resolver: RequestHandler[]) => {
+        console.log(`resolver: ${{...resolver}}`)
         return setupServer(...resolver)
     }
 }
 type BodyErrorDetail = {
     msg: string
     type: string
-    loc: any[]
+    loc: [] | never | unknown
 }
 
 interface BodyErrorDetails {

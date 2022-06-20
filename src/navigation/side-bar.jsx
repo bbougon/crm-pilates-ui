@@ -19,6 +19,7 @@ class SideNav extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            // eslint-disable-next-line react/prop-types
             activePath: props.location.pathname,
             items: [
                 {
@@ -70,7 +71,7 @@ class SideNav extends React.Component {
 
 const RouterSideNav = withRouter(SideNav);
 
-export default class Sidebar extends React.Component {
+export default class SideBar extends React.Component {
     render() {
         return (
             <RouterSideNav/>

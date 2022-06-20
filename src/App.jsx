@@ -4,7 +4,7 @@ import {Home} from "./component/home";
 import {Clients} from "./component/clients/ClientPage";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {NavigationBar} from "./navigation/navigation-bar";
-import Sidebar from "./navigation/side-bar";
+import SideBar from "./navigation/side-bar";
 import Calendar from "./component/calendar/Calendar";
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
     <div className="App">
         <Router>
             <NavigationBar />
-            <Sidebar />
+            <SideBar />
             <Switch>
                 <Route exact path="/" component={Home}/>
                 <Route path="/clients" component={Clients}/>

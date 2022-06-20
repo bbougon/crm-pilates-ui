@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {BaseSyntheticEvent, ReactElement, useEffect, useState} from "react";
 import {Avatar, Box, FormControl, Grid, TextField, Typography} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -81,7 +81,7 @@ const CreditItemForm = ({credit, clientId}: CreditItemFormProps) => {
     const credits: Credits | undefined = useSelector(getClientCredits(clientId, credit.subject))
     const [creditsAmount, setCreditsAmount] = useState<number | null>(null)
 
-    const onCreditsAmountChanged = (e: any) => {
+    const onCreditsAmountChanged = (e: BaseSyntheticEvent) => {
         setCreditsAmount(e.target.value)
     }
 
@@ -142,7 +142,7 @@ type ClientItemProps = {
 const ClientItem = ({clientId}: ClientItemProps) => {
 
     const client:Client | undefined = useSelector(getClientById(clientId))
-    const [addForm, setAddForm] = useState<any>(undefined)
+    const [addForm, setAddForm] = useState<ReactElement | undefined>(undefined)
     const dispatch = useDispatch()
 
     const onAddCredits = (creditsAmount: number, subject: Subjects) => {
@@ -169,7 +169,7 @@ const ClientItem = ({clientId}: ClientItemProps) => {
                             <CreditItemForm key={credit.subject} clientId={client?.id} credit={credit}/>)) || []
                     }
                     {addForm}
-                    <AddCreditButton key={`add-credit-buton-`.concat(client?.id || Math.random().toString())} disabled={
+                    <AddCreditButton key={`add-credit-button-`.concat(client?.id || Math.random().toString())} disabled={
                         Object.keys(Subjects)
                             .every(subject => client?.credits?.map(credits => credits.subject)
                                 .includes(subject as Subjects))

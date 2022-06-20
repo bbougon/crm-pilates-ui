@@ -10,7 +10,7 @@ import {
     Typography
 } from "@material-ui/core";
 import * as React from "react";
-import {useState} from "react";
+import {BaseSyntheticEvent, ReactElement, useState} from "react";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import styled from "styled-components";
 import {useDispatch, useSelector} from "react-redux";
@@ -52,8 +52,8 @@ export const AddClientForm = () => {
 
     const errorMessages: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>((state => state.clients.error))
     const status: ClientStatus = useSelector<RootState, ClientStatus>((state => state.clients.status))
-    const [addCreditForms, setAddCreditForms] = useState<any>(undefined)
-    const [creditItems, setCreditItems] = useState<any[]>([])
+    const [addCreditForms, setAddCreditForms] = useState<ReactElement | undefined>(undefined)
+    const [creditItems, setCreditItems] = useState<ReactElement[]>([])
     const [availableSubjects, setAvailableSubjects] = useState<{subject: Subjects, title: string}[]>(subjects)
     const [addCreditsInProgress, setAddCreditsInProgress] = useState(false)
     let errorContent = undefined
@@ -62,8 +62,8 @@ export const AddClientForm = () => {
     const [lastname, setLastname] = useState('')
     const [credits, setCredits] = useState<{ value: number, subject: string }[] | []>([])
 
-    const onFirstnameChanged = (e: any) => setFirstname(e.target.value)
-    const onLastnameChanged = (e: any) => setLastname(e.target.value)
+    const onFirstnameChanged = (e: BaseSyntheticEvent) => setFirstname(e.target.value)
+    const onLastnameChanged = (e: BaseSyntheticEvent) => setLastname(e.target.value)
 
     const onSubmitClicked = async () => {
         dispatch(createClient({firstname, lastname, credits}))
@@ -137,7 +137,7 @@ export const AddClientForm = () => {
                         {creditItems}
                     </Grid>
                     {addCreditForms}
-                    <AddCreditButton key={`add-credit-buton-`.concat(Math.random().toString())}
+                    <AddCreditButton key={`add-credit-button-`.concat(Math.random().toString())}
                                      disabled={addCreditsInProgress || availableSubjects.length === 0} onAddCreditButton={onAddCreditButton}/>
                     {errorContent}
                 </Wrapper>

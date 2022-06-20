@@ -1,9 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
+import {ReactElement} from "react";
 
 interface Props {
-    className?: any
-    children: any
+    className?: string
+    children: Element | ReactElement
 }
 
 export const Container:React.FC <Props> = ({className, children}: Props) => (
