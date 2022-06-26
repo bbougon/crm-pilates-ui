@@ -1,7 +1,6 @@
-import {defineConfig} from 'vite'
+import {defineConfig, splitVendorChunkPlugin} from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
     optimizeDeps: {
         include: ['parse-link-header']
@@ -9,16 +8,27 @@ export default defineConfig({
     build: {
         commonjsOptions: {
             include: [/parse-link-header/, /node_modules/]
-        }
+        },
+        sourcemap: "hidden"
     },
-    plugins: [react()],
+    plugins: [react(), splitVendorChunkPlugin()],
     define: {
         'process.env': {}
+    },
+    preview: {
+        cors: true
+    },
+    server: {
+        host: true,
+        port: 3000
     },
     test: {
         environment: "jsdom",
         globals: true,
         setupFiles: './setupTests.js',
-        env: "test"
+        env: "test",
+        coverage: {
+            exclude: ['**/src/test-utils/**', '**/__tests__/**']
+        }
     }
 })

@@ -1,35 +1,36 @@
 import React from "react";
+import {afterAll, afterEach, beforeEach, describe, it} from 'vitest'
 import {Clients} from "../ClientPage";
 import {fireEvent, screen, waitFor, within} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import {render} from "../../../test-utils/test-utils";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
-import {APIDetail, APIErrorBody, RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
+import {RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
 
 
 describe('ClientList page', function () {
+    const clients = new ClientsBuilder()
+        .withClient(apiClient())
+        .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
+            value: 5,
+            subject: "MACHINE_DUO"
+        }]))
+        .withClient(apiClient("Henri", "Verneuil", "2"))
+        .withClient(apiClient("Bertholt", "Brecht", "3", [{value: 2, subject: "MAT"}, {
+            value: 5,
+            subject: "MACHINE_DUO"
+        }, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
+        .build();
+    const server = new ServerBuilder().serve(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
+
+    beforeEach(() => server.listen())
+
+    afterEach(() => server.resetHandlers())
+
+    afterAll(() => server.close())
 
     describe('fetches clients when loading', function () {
         describe("retrieve them", () => {
-            const clients = new ClientsBuilder()
-                .withClient(apiClient())
-                .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
-                    value: 5,
-                    subject: "MACHINE_DUO"
-                }]))
-                .withClient(apiClient("Henri", "Verneuil", "2"))
-                .withClient(apiClient("Bertholt", "Brecht", "3", [{value: 2, subject: "MAT"}, {
-                    value: 5,
-                    subject: "MACHINE_DUO"
-                }, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
-                .build();
-            const server = new ServerBuilder().serve(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
-
-            beforeEach(() => server.listen())
-
-            afterEach(() => server.resetHandlers())
-
-            afterAll(() => server.close())
 
             it('and should display them', async () => {
                 render(<Clients/>)
@@ -169,37 +170,12 @@ describe('ClientList page', function () {
 
         })
 
-        describe("faces an error", () => {
-
-            const server = new ServerBuilder().serve(
-                new RequestHandlerBuilders().get("/clients")
-                    .unprocessableEntity()
-                    .body(new APIErrorBody().dummyDetail().build())
-                    .build()
-            )
-
-            beforeEach(() => server.listen())
-
-            afterEach(() => server.resetHandlers())
-
-            afterAll(() => server.close())
-
-            it("and should display it", async () => {
-                render(<Clients/>)
-
-                expect(await screen.findByText("An error occurred (see message below):", {selector: 'h5'})).toBeInTheDocument()
-                expect(await screen.findByText("an error message", {selector: 'p'})).toBeInTheDocument()
-                expect(await screen.findByText("an error type", {selector: 'p'})).toBeInTheDocument()
-            })
-        })
-
     })
 
     describe('displays a form to create a client', function () {
         const emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
-        const server = new ServerBuilder().serve(emptyClients)
 
-        beforeAll(() => server.listen())
+        beforeEach(() => server.listen())
 
         afterEach(() => server.resetHandlers())
 
@@ -227,7 +203,7 @@ describe('ClientList page', function () {
 
             it('named Joseph Pilates', async () => {
                 server.resetHandlers(
-                    emptyClients,
+                    new RequestHandlerBuilders().get("/clients").ok().body([]).build(),
                     new RequestHandlerBuilders().post("/clients")
                         .ok()
                         .body(apiClient("Joseph", "Pilates", "2", [{value: 10, subject: "MACHINE_TRIO"}, {
@@ -275,27 +251,6 @@ describe('ClientList page', function () {
                 expect(within(clientDetails).getByText(/machine trio/i, {selector: 'p'})).toBeInTheDocument()
                 expect(within(clientDetails).getByText("6", {selector: 'span'})).toBeInTheDocument()
                 expect(within(clientDetails).getByText(/machine duo/i, {selector: 'p'})).toBeInTheDocument()
-            })
-        })
-
-        describe("faces an error when creating a client", function () {
-
-            it("should display the error", async () => {
-                server.resetHandlers(emptyClients, new RequestHandlerBuilders().post("/clients").unprocessableEntity().body(new APIErrorBody()
-                    .withDetail(APIDetail("You must provide the client firstname", "value_error"))
-                    .withDetail(APIDetail("You must provide the client lastname", "value_error"))
-                    .build()).build())
-                render(<Clients/>)
-
-                userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
-                userEvent.type(screen.getByText("Client's name"), "{empty}")
-                userEvent.type(screen.getByText("Client's firstname"), "{empty}")
-                userEvent.click(screen.getByRole("button", {name: /submit/i}))
-
-                expect(await screen.findByText("An error occurred (see message below):", {selector: 'h5'})).toBeInTheDocument()
-                await screen.findByText("You must provide the client firstname", {selector: 'p'})
-                await screen.findByText("You must provide the client lastname", {selector: 'p'})
-                await screen.findAllByText("value_error", {selector: 'p'})
             })
         })
     })

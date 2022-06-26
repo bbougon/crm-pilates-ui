@@ -79,7 +79,7 @@ const clientsSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers(builder) {
-        function mapCredits(credits: [{ value: number; subject: string }] | []) {
+        function mapCredits(credits: { value: number; subject: string }[] | []) {
             return credits?.map(value => {
                 return {value: value.value, subject: value.subject as Subjects}
             });

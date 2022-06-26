@@ -27,8 +27,7 @@ export async function api(endpoint: string, requestConfig: RequestConfig = {body
 
     let data
     try {
-        const request = new Request(API_URI + endpoint, config);
-        const response = await fetch(request)
+        const response = await fetch(API_URI + endpoint, config)
         data = await response.json()
         if (response.ok) {
             return {
@@ -40,7 +39,6 @@ export async function api(endpoint: string, requestConfig: RequestConfig = {body
         }
         throw new Error()
     } catch (err: Record<string, unknown> | unknown) {
-        console.log(err)
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return Promise.reject(err.message ? err.message : data)

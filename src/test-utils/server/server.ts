@@ -1,8 +1,7 @@
 import {setupServer} from "msw/node";
 import {compose, context, RequestHandler, rest} from "msw";
 import {isDeepStrictEqual} from "util";
-import {HeadersObject} from "msw/lib/types/context/set";
-import {ApiClient} from "../../api";
+import {API_URI} from "../../utils/constants";
 
 interface ValueHeaderBuilder {
     value: { link: Link, rel: Rel }[] | undefined
@@ -13,7 +12,7 @@ interface HeaderBuilder {
     _key: string
     _value: string | undefined
     value(builder: ValueHeaderBuilder): XLinkHeaderBuilder | unknown
-    build(): HeadersObject
+    build(): Record<string, string>
 }
 
 type Link = string
@@ -52,10 +51,8 @@ export class XLinkHeaderBuilder implements HeaderBuilder {
     _key = "X-Link"
     _value = ""
 
-    build = (): HeadersObject => {
-        return {
-            [this._key]: this._value
-        }
+    build = (): Record<string, string> => {
+        return {[this._key]: this._value}
     }
 
     value = (builder: ValueHeaderBuilder): XLinkHeaderBuilder => {
@@ -68,7 +65,7 @@ abstract class RequestHandlerBuilder<TBody> {
     protected path: string
     protected statusCode = 200
     protected _body: TBody | unknown
-    protected _header: HeadersObject | null = null
+    protected _header: Record<string, string> = { 'Content-Type': 'application/json' }
     protected _runOnce = false
     protected _request: unknown | null = null
 
@@ -97,13 +94,12 @@ abstract class RequestHandlerBuilder<TBody> {
     }
 
     body = <TBody>(body: TBody): RequestHandlerBuilder<TBody> => {
-        console.log(body)
         this._body = body
         return this
     }
 
     header = <T extends HeaderBuilder>(header: T): RequestHandlerBuilder<TBody> => {
-        this._header = header.build()
+        this._header = {...this._header, ...header.build()}
         return this
     }
 
@@ -118,8 +114,7 @@ abstract class RequestHandlerBuilder<TBody> {
 export class GetRequestHandlerBuilder<TBody> extends RequestHandlerBuilder<TBody>{
 
     build(): RequestHandler {
-        return rest.get(this.path, (req, res, _) => {
-            console.log('go through msw')
+        return rest.get(API_URI + this.path, (req, res, _) => {
             let composedResponse;
             if (this._header) {
                 composedResponse = compose(
@@ -142,7 +137,7 @@ export class GetRequestHandlerBuilder<TBody> extends RequestHandlerBuilder<TBody
 class PostRequestBuilderHandler<TBody> extends RequestHandlerBuilder<TBody>{
 
     build(): RequestHandler {
-        return rest.post(this.path, (req, res, _) => {
+        return rest.post(API_URI + this.path, (req, res, _) => {
             let composeResponse
             if (this._request
                 && !isDeepStrictEqual(req.body, this._request)
@@ -181,7 +176,6 @@ export class ServerBuilder {
     }
 
     serve = (...resolver: RequestHandler[]) => {
-        console.log(`resolver: ${{...resolver}}`)
         return setupServer(...resolver)
     }
 }
