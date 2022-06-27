@@ -10,10 +10,9 @@ import {
     Select, SelectChangeEvent,
     TextField
 } from "@mui/material";
+import loadable from "@loadable/component"
 import {FormControl} from "@material-ui/core";
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DateTimePicker from '@mui/lab/DateTimePicker';
 import * as React from "react";
 import {BaseSyntheticEvent, useReducer} from "react";
 import set from "date-fns/set";
@@ -25,6 +24,9 @@ import {Subjects} from "../../features/domain/subjects";
 import {Attendee, Classroom} from "../../features/domain/classroom";
 import {Client} from "../../features/domain/client";
 import {subjects} from "../../utils/translation";
+
+const LocalizationProvider = loadable(() => import('@mui/lab/LocalizationProvider'))
+const DateTimePicker = loadable(() => import('@mui/lab/DateTimePicker'))
 
 type AddClassroomFormProps = {
     date: Date
@@ -254,7 +256,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                         label="Choose start date"
                                         onChange={(newValue) => {
                                             if (newValue !== null && isValid(newValue))
-                                                dispatchReducer(updateClassroomStartDate(newValue))
+                                                dispatchReducer(updateClassroomStartDate(newValue as Date))
                                         }}
                                         renderInput={(params) => <TextField {...params} label="Choose start date"
                                                                             helperText="Choose start date"
@@ -274,7 +276,7 @@ export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps
                                         label="Recurrence"
                                         onChange={(newValue) => {
                                             if (newValue !== null && isValid(newValue))
-                                                dispatchReducer(updateClassroomEndDate(newValue));
+                                                dispatchReducer(updateClassroomEndDate(newValue as Date));
                                         }}
                                         minDateTime={dayStart}
                                         value={state.classroomEndDateTime}

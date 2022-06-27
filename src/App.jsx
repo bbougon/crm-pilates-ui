@@ -5,9 +5,9 @@ import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {NavigationBar} from "./navigation/navigation-bar";
 import SideBar from "./navigation/side-bar";
 
-let Home = loadable(() => import('./component/home'));
-let Clients = loadable(() => import('./component/clients/ClientPage'));
-let Calendar = loadable(() => import('./component/calendar/Calendar'));
+const Home = loadable(() => import('./component/home'));
+const Clients = loadable(() => import('./component/clients/ClientPage'));
+const Calendar = loadable(() => import('./component/calendar/Calendar'));
 
 function App() {
   return (
