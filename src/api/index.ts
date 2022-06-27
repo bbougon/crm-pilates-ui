@@ -1,10 +1,10 @@
 import {ClientCreation, ClientCredits} from "../features/clientsSlice";
 import {Cancel, Checkin, Checkout} from "../features/sessionsSlice";
+import {API_URI} from "../utils/constants.js";
 
 type RequestConfig = {
-    body?: {}
+    body?: unknown
     customConfig : {
-        headers?: any
         method?: string
     }
 }
@@ -17,7 +17,6 @@ export async function api(endpoint: string, requestConfig: RequestConfig = {body
         ...requestConfig.customConfig,
         headers: {
             ...headers,
-            ...requestConfig.customConfig.headers,
         },
         mode: 'cors'
     }
@@ -28,7 +27,7 @@ export async function api(endpoint: string, requestConfig: RequestConfig = {body
 
     let data
     try {
-        const response = await fetch(process.env.REACT_APP_API_URI + endpoint, config)
+        const response = await fetch(API_URI + endpoint, config)
         data = await response.json()
         if (response.ok) {
             return {
@@ -39,7 +38,9 @@ export async function api(endpoint: string, requestConfig: RequestConfig = {body
             }
         }
         throw new Error()
-    } catch (err: any) {
+    } catch (err: Record<string, unknown> | unknown) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         return Promise.reject(err.message ? err.message : data)
     }
 }
@@ -61,7 +62,7 @@ api.addCredits = (clientCredits: ClientCredits) => {
     return api(`/clients/${clientCredits.clientId}/credits`, {customConfig, body})
 }
 
-api.fetchSessions = (link: any) => {
+api.fetchSessions = (link: string) => {
     return api(link, {customConfig: {method: 'GET'}})
 }
 
@@ -100,12 +101,10 @@ export interface ApiClient {
     "id": string
     "firstname": string
     "lastname": string
-    "credits": [
-        {
-            "value": number
-            "subject": string
-        }
-    ] | []
+    "credits": {
+        "value": number
+        "subject": string
+    }[] | []
 }
 
 export interface ApiClassroom {

@@ -16,8 +16,8 @@ import {DisplayError} from "../errors/DisplayError";
 import {Session, SessionsLink} from "../../features/domain/session";
 
 
-interface MonthlyDayProps {
-    render(events: any): any
+interface MonthlyDayProps<TEvent> {
+    render(events: TEvent): JSX.Element[]
 }
 
 export interface PilatesMonthlyCalendarProps {
@@ -27,7 +27,7 @@ export interface PilatesMonthlyCalendarProps {
 export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
 
     const dispatch = useDispatch();
-    let [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
+    const [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
     const sessions = useSelector(selectMonthlySessions)
     const link = useSelector<RootState, SessionsLink | undefined>((state => state.sessions.link))
     const error: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>((state => state.sessions.error))
@@ -42,10 +42,10 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
         dispatch(fetchSessions(link?.current.url))
     }
 
-    const MonthlyDay = (props: MonthlyDayProps) => {
-        let {locale} = useMonthlyCalendar()
-        let {day, events} = useMonthlyBody()
-        let dayNumber = format(day, 'd', {locale});
+    const MonthlyDay = (props: MonthlyDayProps<Session[]>) => {
+        const {locale} = useMonthlyCalendar()
+        const {day, events} = useMonthlyBody<Session>()
+        const dayNumber = format(day, 'd', {locale});
 
         const backgroundColor = isSameDay(day, new Date()) ? blueGrey[50] : "white"
 
@@ -71,7 +71,7 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
 
 
     const MonthlyNav = () => {
-        let {currentMonth, onCurrentMonthChange} = useMonthlyCalendar();
+        const {currentMonth, onCurrentMonthChange} = useMonthlyCalendar();
 
         const onPeriodClick = async (date: Date, link: string | undefined) => {
             await dispatch(fetchSessions(link))
@@ -136,7 +136,7 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
                 <MonthlyDay
                     {...{
                         render: (data) => {
-                            let events = data.map((item: Session, index: number) => (
+                            const events = data.map((item: Session, index: number) => (
                                 <ClassroomEventItem key={index} {...item} />
                             ));
                             events.push(<AddClassroomItem key={Math.random()} onClassroomAdded={handleClassroomAdded}/>)

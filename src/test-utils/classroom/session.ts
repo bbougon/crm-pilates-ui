@@ -18,28 +18,28 @@ export class AttendeesBuilder {
 }
 
 export class SessionsBuilder {
-    sessions: any[] = []
+    sessions: (Session | ApiSession)[] = []
 
     withSession = (session: Session | ApiSession) => {
         this.sessions.push(session)
         return this
     }
 
-    build = (): Session[] | ApiSession[] => {
+    build = (): (Session | ApiSession)[] => {
         return this.sessions
     }
 }
 
 export class ApiSessionsBuilder {
     private id: string | undefined = undefined
-    private classroomId: string = "1";
-    private name: string = "Cours tapis";
+    private classroomId = "1";
+    private name = "Cours tapis";
     private schedule: { stop: string; start: string } = {
         start: formatISO(new Date()),
         stop: formatISO(addHours(new Date(), 1))
     };
-    private subject: string = "MAT"
-    private position: number = 1;
+    private subject = "MAT"
+    private position = 1;
     private attendees?: [ApiAttendee];
 
     public withId = (id: string): ApiSessionsBuilder => {
@@ -91,13 +91,13 @@ export class ApiSessionsBuilder {
 
 export class SessionBuilder {
     private id: string | undefined = undefined;
-    private classroomId: string = "1";
-    private name: string = "Cours tapis";
+    private classroomId = "1";
+    private name = "Cours tapis";
     private schedule: { stop: string; start: string } = {
         start: formatISO(new Date()),
         stop: formatISO(addHours(new Date(), 1))
     };
-    private position: number = 1;
+    private position = 1;
     private subject: Subjects = Subjects.MAT
     private attendees: Attendee[] = [];
 
@@ -148,11 +148,11 @@ export class SessionBuilder {
     }
 }
 
-export const attendee = (id: string = "1", firstname: string = "Laurent", lastname: string = "Gas", attendance: Attendance = Attendance.REGISTERED, credits: Credits | undefined = undefined): Attendee => {
+export const attendee = (id = "1", firstname = "Laurent", lastname = "Gas", attendance: Attendance = Attendance.REGISTERED, credits: Credits | undefined = undefined): Attendee => {
     return {id: id, firstname: firstname, lastname: lastname, attendance: attendance, credits}
 }
 
-export const apiAttendee = (id: string = "1", firstname: string = "Laurent", lastname: string = "Gas", attendance: Attendance = Attendance.REGISTERED, credits: ApiCredits): ApiAttendee => {
+export const apiAttendee = (id = "1", firstname = "Laurent", lastname = "Gas", attendance: Attendance = Attendance.REGISTERED, credits: ApiCredits | undefined = undefined): ApiAttendee => {
     return {id: id, firstname: firstname, lastname: lastname, attendance: attendance, credits}
 }
 
@@ -163,8 +163,8 @@ export const schedule = (start = new Date(), stop = addHours(new Date(), 1)) => 
     }
 }
 
-export const session = (id: string | undefined, classroomId: string = "1", name: string = "Pilates avancé",
-                        subject: string = "MAT", schedule_ = schedule(), position: number = 1,
+export const session = (id: string | undefined, classroomId = "1", name = "Pilates avancé",
+                        subject = "MAT", schedule_ = schedule(), position = 1,
                         attendees: Attendee[] = []): Session => {
     return {
         id: id,
@@ -177,8 +177,8 @@ export const session = (id: string | undefined, classroomId: string = "1", name:
     }
 }
 
-export const apiSession = (id: string | undefined, classroomId: string = "1", name: string = "Pilates avancé",
-                           subject: string = "MAT", schedule_ = schedule(), position: number = 1,
+export const apiSession = (id: string | undefined, classroomId = "1", name = "Pilates avancé",
+                           subject = "MAT", schedule_ = schedule(), position = 1,
                            attendees: [ApiAttendee] | undefined): ApiSession => {
     return {
         id: id,

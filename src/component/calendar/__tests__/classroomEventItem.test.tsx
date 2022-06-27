@@ -11,9 +11,9 @@ import {Attendance} from "../../../features/domain/session";
 describe('Classroom Event', function () {
 
     it('should display classroom details when clicked', () => {
-        let attendees = new AttendeesBuilder().withAttendee(attendee()).withAttendee(attendee(2, "Bertrand", "Bougon", Attendance.REGISTERED, {amount: 5})).build();
-        let session_date = new Date();
-        let classroomSession = session(1, 2, "Cours tapis", "MAT", schedule(session_date, addHours(session_date, 1)), 3, attendees);
+        const attendees = new AttendeesBuilder().withAttendee(attendee()).withAttendee(attendee("2", "Bertrand", "Bougon", Attendance.REGISTERED, {amount: 5})).build();
+        const session_date = new Date();
+        const classroomSession = session("1", "2", "Cours tapis", "MAT", schedule(session_date, addHours(session_date, 1)), 3, attendees);
         render(<ClassroomEventItem {...classroomSession}/>)
 
         userEvent.click(screen.getByText("Cours tapis"))
@@ -34,8 +34,8 @@ describe('Classroom Event', function () {
     })
 
     it('should display classroom details when clicked with expected attendee status', () => {
-        let attendees = new AttendeesBuilder().withAttendee(attendee(1, "Bruno", "Germain")).withAttendee(attendee(2, "Bertrand", "Bougon", Attendance.CHECKED_IN)).build();
-        let classroomSession = session(undefined, undefined, undefined, undefined, schedule(), undefined, attendees);
+        const attendees = new AttendeesBuilder().withAttendee(attendee("1", "Bruno", "Germain")).withAttendee(attendee("2", "Bertrand", "Bougon", Attendance.CHECKED_IN)).build();
+        const classroomSession = session(undefined, undefined, undefined, undefined, schedule(), undefined, attendees);
         render(<ClassroomEventItem {...classroomSession}/>)
 
         userEvent.click(screen.getByText(classroomSession.name))

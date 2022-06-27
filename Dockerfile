@@ -1,4 +1,4 @@
-FROM node:14-alpine AS development
+FROM node:16-alpine AS development
 ENV NODE_ENV development
 
 WORKDIR /app
@@ -13,7 +13,7 @@ EXPOSE 3000
 
 CMD [ "yarn", "start" ]
 
-FROM node:14-alpine AS builder
+FROM node:16-alpine AS builder
 ENV NODE_ENV production
 
 WORKDIR /app
@@ -28,7 +28,7 @@ RUN yarn build
 FROM nginx:1.21.0-alpine AS production
 ENV NODE_ENV production
 # Copy built assets from builder
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 # Add your nginx.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port

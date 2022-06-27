@@ -3,7 +3,7 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import * as React from "react";
 
 type AddCreditButtonProps = {
-    onAddCreditButton: any
+    onAddCreditButton: () => void
     disabled?: boolean
 }
 export const AddCreditButton = ({onAddCreditButton, disabled}: AddCreditButtonProps) => {

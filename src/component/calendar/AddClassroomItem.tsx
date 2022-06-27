@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useState} from "react";
+import {BaseSyntheticEvent, useState} from "react";
 import {Box, Card, ClickAwayListener, Fade, Grid, IconButton, ThemeProvider} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import {Popper} from "@material-ui/core";
@@ -32,12 +32,12 @@ type AddClassroomItemProps = {
 }
 
 export const AddClassroomItem = ({onClassroomAdded}: AddClassroomItemProps) => {
-    let {day} = useMonthlyBody();
+    const {day} = useMonthlyBody();
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false);
 
-    const openAddClassRoomForm = () => (event: any) => {
+    const openAddClassRoomForm = () => (event: BaseSyntheticEvent) => {
         setAnchorEl(event.currentTarget);
         setOpen((prev) => !prev);
     }

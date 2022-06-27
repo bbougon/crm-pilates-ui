@@ -3,7 +3,7 @@ import {Grid} from "@material-ui/core";
 import {Box, Card, ClickAwayListener, Fade, Popper, Typography} from "@mui/material";
 import {blue} from "@mui/material/colors";
 import * as React from "react";
-import {useState} from "react";
+import {BaseSyntheticEvent, useState} from "react";
 import {formatHours} from "../../utils/date";
 import {SessionDetails} from "../classroom/SessionDetails";
 import {Session} from "../../features/domain/session";
@@ -44,7 +44,7 @@ export const ClassroomEventItem = (session: Session) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false);
 
-    const displaySession = () => (event: any) => {
+    const displaySession = () => (event: BaseSyntheticEvent) => {
         setAnchorEl(event.currentTarget);
         setOpen((prev) => !prev);
     }

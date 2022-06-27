@@ -1,40 +1,41 @@
 import React from "react";
+import {afterAll, afterEach, beforeEach, describe, it} from 'vitest'
 import {Clients} from "../ClientPage";
 import {fireEvent, screen, waitFor, within} from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import {render} from "../../../test-utils/test-utils";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
-import {APIDetail, APIErrorBody, RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
+import {RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
 
 
 describe('ClientList page', function () {
+    const clients = new ClientsBuilder()
+        .withClient(apiClient())
+        .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
+            value: 5,
+            subject: "MACHINE_DUO"
+        }]))
+        .withClient(apiClient("Henri", "Verneuil", "2"))
+        .withClient(apiClient("Bertholt", "Brecht", "3", [{value: 2, subject: "MAT"}, {
+            value: 5,
+            subject: "MACHINE_DUO"
+        }, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
+        .build();
+    const server = new ServerBuilder().serve(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
+
+    beforeEach(() => server.listen())
+
+    afterEach(() => server.resetHandlers())
+
+    afterAll(() => server.close())
 
     describe('fetches clients when loading', function () {
         describe("retrieve them", () => {
-            let clients = new ClientsBuilder()
-                .withClient(apiClient())
-                .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
-                    value: 5,
-                    subject: "MACHINE_DUO"
-                }]))
-                .withClient(apiClient("Henri", "Verneuil", "2"))
-                .withClient(apiClient("Bertholt", "Brecht", "3", [{value: 2, subject: "MAT"}, {
-                    value: 5,
-                    subject: "MACHINE_DUO"
-                }, {value: 5, subject: "MACHINE_TRIO"}, {value: 5, subject: "MACHINE_PRIVATE"}]))
-                .build();
-            const server = new ServerBuilder().serve(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
-
-            beforeEach(() => server.listen())
-
-            afterEach(() => server.resetHandlers())
-
-            afterAll(() => server.close())
 
             it('and should display them', async () => {
                 render(<Clients/>)
 
-                expect(await waitFor(() => screen.getByText("Doe", {selector: 'h6'}))).toBeInTheDocument()
+                expect(await screen.findByText("Doe", {selector: 'h6'})).toBeInTheDocument()
                 expect(screen.getByText("John")).toBeInTheDocument()
                 expect(screen.getByText("Martin", {selector: 'h6'})).toBeInTheDocument()
                 expect(screen.getByText("Pierre")).toBeInTheDocument()
@@ -47,9 +48,9 @@ describe('ClientList page', function () {
                 it('should display credits when clicking on name', async () => {
                     render(<Clients/>)
 
-                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
+                    userEvent.click(await screen.findByRole("button", {name: /martin/i}))
 
-                    let clientDetails = screen.getByRole("region");
+                    const clientDetails = screen.getByRole("region");
                     expect(within(clientDetails).getByText("2", {selector: 'span'})).toBeInTheDocument()
                     expect(within(clientDetails).getByText(/mat/i, {selector: 'p'})).toBeInTheDocument()
                     expect(within(clientDetails).getByText("5", {selector: 'span'})).toBeInTheDocument()
@@ -63,14 +64,23 @@ describe('ClientList page', function () {
                             subject: "MACHINE_DUO"
                         }]))
                         .build();
-                    server.resetHandlers(new RequestHandlerBuilders().get("/clients").ok().body(clients).build(), new RequestHandlerBuilders().post("/clients/1/credits").ok().body([{
-                        value: 10,
-                        subject: "MAT"
-                    }]).build())
+                    server.resetHandlers(
+                        new RequestHandlerBuilders().get("/clients")
+                            .ok()
+                            .body(clients)
+                            .build(),
+                        new RequestHandlerBuilders().post("/clients/1/credits")
+                            .ok()
+                            .body([{
+                                value: 10,
+                                subject: "MAT"
+                            }])
+                            .build()
+                    )
                     render(<Clients/>)
 
-                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
-                    let clientDetails = screen.getByRole("region");
+                    userEvent.click(await screen.findByRole("button", {name: /martin/i}))
+                    const clientDetails = screen.getByRole("region");
                     expect(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0]).toBeDisabled()
                     userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "10")
                     userEvent.click(within(clientDetails).getAllByRole("button", {name: /add credits/i})[0])
@@ -86,14 +96,23 @@ describe('ClientList page', function () {
                             subject: "MACHINE_DUO"
                         }]))
                         .build();
-                    server.resetHandlers(new RequestHandlerBuilders().get("/clients").ok().body(clients).build(), new RequestHandlerBuilders().post("/clients/1/credits").ok().body([{
-                        value: 10,
-                        subject: "MACHINE_TRIO"
-                    }]).build())
+                    server.resetHandlers(
+                        new RequestHandlerBuilders().get("/clients")
+                            .ok()
+                            .body(clients)
+                            .build(),
+                        new RequestHandlerBuilders().post("/clients/1/credits")
+                            .ok()
+                            .body([{
+                                value: 10,
+                                subject: "MACHINE_TRIO"
+                            }])
+                            .build()
+                    )
                     render(<Clients/>)
 
-                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
-                    let clientDetails = screen.getByRole("region");
+                    userEvent.click(await screen.findByRole("button", {name: /martin/i}))
+                    const clientDetails = screen.getByRole("region");
                     userEvent.click(within(clientDetails).getAllByRole("button")[2])
 
                     expect(screen.getByRole("button", {name: /subject/i})).toBeInTheDocument()
@@ -121,8 +140,8 @@ describe('ClientList page', function () {
                 it("should disabled add form button if no more subjects available for client", async () => {
                     render(<Clients/>)
 
-                    userEvent.click(await waitFor(() => screen.getByRole("button", {name: /brecht/i})))
-                    let clientDetails = screen.getByRole("region");
+                    userEvent.click(await screen.findByRole("button", {name: /brecht/i}))
+                    const clientDetails = screen.getByRole("region");
 
                     expect(within(clientDetails).getAllByRole("button")[4]).toBeDisabled()
                 })
@@ -130,7 +149,7 @@ describe('ClientList page', function () {
                 describe("faces errors", () => {
 
                     it("should display amount of credits filed in error when negative value is filled", async () => {
-                        let clients = new ClientsBuilder()
+                        const clients = new ClientsBuilder()
                             .withClient(apiClient("Pierre", "Martin", "1", [{value: 2, subject: "MAT"}, {
                                 value: 5,
                                 subject: "MACHINE_DUO"
@@ -139,8 +158,8 @@ describe('ClientList page', function () {
                         server.resetHandlers(new RequestHandlerBuilders().get("/clients").ok().body(clients).build())
                         render(<Clients/>)
 
-                        userEvent.click(await waitFor(() => screen.getByRole("button", {name: /martin/i})))
-                        let clientDetails = screen.getByRole("region");
+                        userEvent.click(await screen.findByRole("button", {name: /martin/i}))
+                        const clientDetails = screen.getByRole("region");
                         userEvent.type(within(clientDetails).getAllByText(/amount of credits/i)[0], "-1")
 
                         expect(within(clientDetails).getByDisplayValue(/-1/i)).toBeInvalid()
@@ -151,32 +170,12 @@ describe('ClientList page', function () {
 
         })
 
-        describe("faces an error", () => {
-
-            const server = new ServerBuilder().serve(new RequestHandlerBuilders().get("/clients").unprocessableEntity().body(new APIErrorBody().dummyDetail().build()).build())
-
-            beforeEach(() => server.listen())
-
-            afterEach(() => server.resetHandlers())
-
-            afterAll(() => server.close())
-
-            it("and should display it", async () => {
-                render(<Clients/>)
-
-                expect(await screen.findByText("An error occurred (see message below):", {selector: 'h5'})).toBeInTheDocument()
-                expect(await screen.findByText("an error message", {selector: 'p'})).toBeInTheDocument()
-                expect(await screen.findByText("an error type", {selector: 'p'})).toBeInTheDocument()
-            })
-        })
-
     })
 
     describe('displays a form to create a client', function () {
-        let emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
-        const server = new ServerBuilder().serve(emptyClients)
+        const emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
 
-        beforeAll(() => server.listen())
+        beforeEach(() => server.listen())
 
         afterEach(() => server.resetHandlers())
 
@@ -204,10 +203,13 @@ describe('ClientList page', function () {
 
             it('named Joseph Pilates', async () => {
                 server.resetHandlers(
-                    emptyClients,
+                    new RequestHandlerBuilders().get("/clients").ok().body([]).build(),
                     new RequestHandlerBuilders().post("/clients")
                         .ok()
-                        .body(apiClient("Joseph", "Pilates", "2", [{value: 10, subject: "MACHINE_TRIO"}, {value: 6, subject: "MACHINE_DUO"}]))
+                        .body(apiClient("Joseph", "Pilates", "2", [{value: 10, subject: "MACHINE_TRIO"}, {
+                            value: 6,
+                            subject: "MACHINE_DUO"
+                        }]))
                         .request({
                             firstname: "Joseph", lastname: "Pilates", credits: [
                                 {value: 10, subject: "MACHINE_TRIO"},
@@ -242,34 +244,13 @@ describe('ClientList page', function () {
                 await waitFor(() => expect(screen.getByLabelText("Client's name *", {selector: 'input'})).toHaveValue(""))
                 await waitFor(() => expect(screen.getByLabelText("Client's firstname *", {selector: 'input'})).toHaveValue(""))
 
-                userEvent.click(await waitFor(() => screen.getByRole("button", {name: /pilates/i})))
+                userEvent.click(await screen.findByRole("button", {name: /pilates/i}))
 
-                let clientDetails = screen.getAllByRole("region")[1];
+                const clientDetails = screen.getAllByRole("region")[1];
                 expect(within(clientDetails).getByText("10", {selector: 'span'})).toBeInTheDocument()
                 expect(within(clientDetails).getByText(/machine trio/i, {selector: 'p'})).toBeInTheDocument()
                 expect(within(clientDetails).getByText("6", {selector: 'span'})).toBeInTheDocument()
                 expect(within(clientDetails).getByText(/machine duo/i, {selector: 'p'})).toBeInTheDocument()
-            })
-        })
-
-        describe("faces an error when creating a client", function () {
-
-            it("should display the error", async () => {
-                server.resetHandlers(emptyClients, new RequestHandlerBuilders().post("/clients").unprocessableEntity().body(new APIErrorBody()
-                    .withDetail(APIDetail("You must provide the client firstname", "value_error"))
-                    .withDetail(APIDetail("You must provide the client lastname", "value_error"))
-                    .build()).build())
-                render(<Clients/>)
-
-                userEvent.click(screen.getByRole("button", {name: /add a new client/i}))
-                userEvent.type(screen.getByText("Client's name"), "{empty}")
-                userEvent.type(screen.getByText("Client's firstname"), "{empty}")
-                userEvent.click(screen.getByRole("button", {name: /submit/i}))
-
-                expect(await screen.findByText("An error occurred (see message below):", {selector: 'h5'})).toBeInTheDocument()
-                await waitFor(() => expect(screen.queryByText("You must provide the client firstname", {selector: 'p'})).toBeInTheDocument())
-                await waitFor(() => expect(screen.queryByText("You must provide the client lastname", {selector: 'p'})).toBeInTheDocument())
-                await waitFor(() => expect(screen.queryAllByText("value_error", {selector: 'p'})).toBeTruthy())
             })
         })
     })

@@ -49,8 +49,8 @@ export const fetchClients = createAsyncThunk<{ clients: ApiClient[] }, undefined
         try {
             const response = await api.fetchClients()
             return {clients: response.data as ApiClient[]}
-        } catch (e: any) {
-            return thunkAPI.rejectWithValue(e)
+        } catch (e: ApiError | unknown) {
+            return thunkAPI.rejectWithValue(e as ApiError)
         }
 
     }
@@ -68,8 +68,8 @@ export const addCredits = createAsyncThunk<ClientCredits, ClientCredits, { rejec
         try {
             await api.addCredits(credits)
             return credits
-        } catch (e: any) {
-            return thunkApi.rejectWithValue(e)
+        } catch (e: ApiError | unknown) {
+            return thunkApi.rejectWithValue(e as ApiError)
         }
     }
 )
@@ -79,7 +79,7 @@ const clientsSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers(builder) {
-        function mapCredits(credits: [{ value: number; subject: string }] | []) {
+        function mapCredits(credits: { value: number; subject: string }[] | []) {
             return credits?.map(value => {
                 return {value: value.value, subject: value.subject as Subjects}
             });
@@ -95,7 +95,7 @@ const clientsSlice = createSlice({
         }
 
         builder
-            .addCase(fetchClients.pending, (state, action) => {
+            .addCase(fetchClients.pending, (state, _) => {
                 state.status = ClientStatus.LOADING
             })
             .addCase(fetchClients.fulfilled, (state, action) => {
@@ -114,14 +114,14 @@ const clientsSlice = createSlice({
                 state.status = ClientStatus.CREATION_FAILED
                 state.error = map_action_thunk_error("Add client", action.payload as ApiError)
             })
-            .addCase(addCredits.pending, (state, action) => {
+            .addCase(addCredits.pending, (state, _) => {
                 state.status = ClientStatus.LOADING
             })
             .addCase(addCredits.fulfilled, (state, action) => {
                 state.status = ClientStatus.SUCCEEDED
                 const credits = action.payload as ClientCredits
-                let client: Client | undefined = state.clients.find(client => client.id === credits.clientId);
-                let credit: Credits | undefined = client?.credits?.find(credit => credit.subject === credits.subject);
+                const client: Client | undefined = state.clients.find(client => client.id === credits.clientId);
+                const credit: Credits | undefined = client?.credits?.find(credit => credit.subject === credits.subject);
                 if(credit)
                     credit.value += credits.creditsAmount
                 else if(client)

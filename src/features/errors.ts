@@ -15,7 +15,7 @@ export type ErrorMessage =
     }
 
 
-let map_action_thunk_error = (request: string, payload: ApiError): ErrorMessage[] => {
+const map_action_thunk_error = (request: string, payload: ApiError): ErrorMessage[] => {
     if (payload?.detail) {
         return payload.detail.map(detail => {
             return {message: detail.msg, type: detail.type, origin: request}
