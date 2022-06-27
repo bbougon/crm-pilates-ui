@@ -171,10 +171,6 @@ export class RequestHandlerBuilders {
 
 export class ServerBuilder {
 
-    constructor() {
-        console.log('ServerBuilder')
-    }
-
     serve = (...resolver: RequestHandler[]) => {
         return setupServer(...resolver)
     }

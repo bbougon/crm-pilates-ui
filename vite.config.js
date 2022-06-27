@@ -1,5 +1,6 @@
 import {defineConfig, splitVendorChunkPlugin} from 'vite'
 import react from '@vitejs/plugin-react'
+//import visualizer from "rollup-plugin-visualizer";
 
 export default defineConfig({
     optimizeDeps: {
@@ -9,7 +10,10 @@ export default defineConfig({
         commonjsOptions: {
             include: [/parse-link-header/, /node_modules/]
         },
-        sourcemap: "hidden"
+        sourcemap: "hidden",
+        // rollupOptions: {
+        //     plugins: [visualizer()]
+        // }
     },
     plugins: [react(), splitVendorChunkPlugin()],
     define: {

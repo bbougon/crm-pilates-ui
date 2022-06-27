@@ -1,7 +1,6 @@
 {
   "extends": [
     "react-app",
-    "react-app/jest",
     "plugin:react/recommended",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended"
@@ -10,6 +9,7 @@
     "react",
     "react-hooks"
   ],
+  "parser": "@typescript-eslint/parser",
   "ignorePatterns": [
     "**/*.js"
   ],
@@ -17,7 +17,6 @@
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn"
   },
-  "parser": "@typescript-eslint/parser",
   "overrides": [
     {
       "files": [
