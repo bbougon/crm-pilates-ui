@@ -16,7 +16,7 @@ function App() {
             <NavigationBar />
             <SideBar />
             <Switch>
-                <Route exact path="/" component={Home}/>
+                <Route exact path="/" element={Home}/>
                 <Route path="/clients" component={Clients}/>
                 <Route path="/calendar" component={Calendar}/>
             </Switch>
