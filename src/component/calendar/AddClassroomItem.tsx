@@ -79,7 +79,7 @@ export const AddClassroomItem = ({onClassroomAdded}: AddClassroomItemProps) => {
                         justifyContent: 'flex-end'
                     }}>
 
-                        <IconButton onClick={openAddClassRoomForm()}>
+                        <IconButton onClick={openAddClassRoomForm()} >
                             <AddIcon fontSize="small"/>
                         </IconButton>
                     </Box>

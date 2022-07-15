@@ -5,15 +5,15 @@ import {
     XLinkHeaderBuilder
 } from "../../../test-utils/server/server";
 import {afterAll, afterEach, beforeAll, beforeEach, describe} from "vitest"
-import {addWeeks, format, formatISO} from "date-fns";
+import {addWeeks, format, formatISO, parseISO} from "date-fns";
 import {render} from "../../../test-utils/test-utils";
-import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
 import {fireEvent, screen, waitFor, within} from "@testing-library/react";
 import React from "react";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
 import {attendee, SessionBuilder, SessionsBuilder} from "../../../test-utils/classroom/session";
 import {Attendance} from "../../../features/domain/session";
+import {PilatesMonthlyCalendar} from "../PilatesMonthlyCalendar";
 
 describe.skip('Creating a classroom', () => {
 
@@ -115,13 +115,15 @@ describe.skip('Creating a classroom', () => {
     afterAll(() => server.close())
 
     it('should create a 2 hours classroom on October 1st, 2021 with 3 attendees', async () => {
-        await render(<Calendar date={classroomDate}/>)
+        await render(<PilatesMonthlyCalendar date={classroomDate}/>)
 
         const buttons = await waitFor(() => screen.findAllByRole("button"))
         userEvent.click(buttons[2])
         const classroomForm = await screen.findByRole("tooltip")
 
-        expect(within(classroomForm).getByText("Add a classroom on ".concat(format(new Date("2021-10-01"), "yyyy-MM-dd")))).toBeInTheDocument()
+
+        const classroomTitle = "Add a classroom on ".concat(format(parseISO("2021-10-01"), "yyyy-MM-dd"));
+        expect(within(classroomForm).getByText(classroomTitle)).toBeInTheDocument()
 
         userEvent.type(within(classroomForm).getByText("Classroom's name"), "Cours Duo")
 

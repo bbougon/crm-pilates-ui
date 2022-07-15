@@ -7,10 +7,10 @@ import {
     Grid,
     InputLabel,
     MenuItem,
-    Select, SelectChangeEvent,
+    Select,
+    SelectChangeEvent,
     TextField
 } from "@mui/material";
-import loadable from "@loadable/component"
 import {FormControl} from "@material-ui/core";
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import * as React from "react";
@@ -24,11 +24,9 @@ import {Subjects} from "../../features/domain/subjects";
 import {Attendee, Classroom} from "../../features/domain/classroom";
 import {Client} from "../../features/domain/client";
 import {subjects} from "../../utils/translation";
+import {DateTimePicker, LocalizationProvider} from "@mui/lab";
 
-const LocalizationProvider = loadable(() => import('@mui/lab/LocalizationProvider'))
-const DateTimePicker = loadable(() => import('@mui/lab/DateTimePicker'))
-
-type AddClassroomFormProps = {
+export type AddClassroomFormProps = {
     date: Date
     onClassroomAdded: () => void
 }
@@ -139,7 +137,7 @@ function updateClassroomEndDate(endDate: Date): Action {
 
 const FORMAT = "MM/dd/yyyy HH:mm"
 
-export const AddClassroomForm = ({date, onClassroomAdded}: AddClassroomFormProps) => {
+export const AddClassroomForm:React.FC<AddClassroomFormProps> = ({date, onClassroomAdded}: AddClassroomFormProps) => {
 
     const dispatch = useDispatch();
 

@@ -1,13 +1,11 @@
 import React from "react";
 import './App.css';
-import loadable from '@loadable/component'
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {NavigationBar} from "./navigation/navigation-bar";
 import SideBar from "./navigation/side-bar";
-
-const Home = loadable(() => import('./component/home'));
-const Clients = loadable(() => import('./component/clients/ClientPage'));
-const Calendar = loadable(() => import('./component/calendar/Calendar'));
+import {Home} from "./component/home";
+import {Clients} from "./component/clients/ClientPage";
+import Calendar from "./component/calendar/Calendar";
 
 function App() {
   return (
