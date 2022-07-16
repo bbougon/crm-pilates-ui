@@ -4,8 +4,7 @@ import {MainContainer} from "../../const/containers";
 import {Grid} from "@material-ui/core";
 import {PilatesMonthlyCalendar} from "./PilatesMonthlyCalendar";
 
-
-export class Calendar extends React.Component<{date: Date}> {
+export class Calendar extends React.Component<{ date: Date }> {
 
     render() {
         return (

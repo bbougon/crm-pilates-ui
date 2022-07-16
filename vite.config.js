@@ -1,5 +1,6 @@
 import {defineConfig, splitVendorChunkPlugin} from 'vite'
 import react from '@vitejs/plugin-react'
+//import visualizer from "rollup-plugin-visualizer";
 
 export default defineConfig({
     optimizeDeps: {
@@ -9,7 +10,18 @@ export default defineConfig({
         commonjsOptions: {
             include: [/parse-link-header/, /node_modules/]
         },
-        sourcemap: "hidden"
+        sourcemap: "hidden",
+        rollupOptions: {
+            //plugins: [visualizer({template: "sunburst"})],
+            output: {
+                manualChunks: {
+                    calendar: ['@zach.codes/react-calendar'],
+                    datefns: ['date-fns'],
+                    mui: ['@material-ui/core', '@material-ui/icons', '@mui/icons-material', '@mui/lab', '@mui/material'],
+                    react: ['react', 'react-dom', 'react-redux', 'react-router-dom']
+                }
+            }
+        }
     },
     plugins: [react(), splitVendorChunkPlugin()],
     define: {

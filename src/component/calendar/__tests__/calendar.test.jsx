@@ -1,5 +1,5 @@
 import {render} from "../../../test-utils/test-utils";
-import {screen} from "@testing-library/react";
+import {screen, waitFor} from "@testing-library/react";
 import React from "react";
 import Calendar from "../Calendar";
 import {
@@ -31,7 +31,7 @@ describe('Calendar page', () => {
         )
         render(<Calendar date={new Date("2021-10-10T11:20:00")}/>)
 
-        expect(screen.getAllByTestId("AddIcon")).toHaveLength(26)
+        expect(await waitFor(() =>screen.getAllByTestId("AddIcon"))).toHaveLength(26)
     })
 
 

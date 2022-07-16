@@ -4,17 +4,17 @@ import {
     SessionXLinkValueHeaderBuilder,
     XLinkHeaderBuilder
 } from "../../../test-utils/server/server";
-import { afterAll, afterEach, beforeAll } from 'vitest'
+import {afterAll, afterEach, beforeEach} from 'vitest'
 import {ApiSessionsBuilder, attendee, SessionsBuilder} from "../../../test-utils/classroom/session";
-import {screen} from "@testing-library/react";
+import {screen, waitFor} from "@testing-library/react";
 import {render} from "../../../test-utils/test-utils";
-import Calendar from "../Calendar";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import {Attendance} from "../../../features/domain/session";
+import {PilatesMonthlyCalendar} from "../PilatesMonthlyCalendar";
 
 describe("Navigate through calendar", () => {
-    let server = new ServerBuilder().serve(
+    const server = new ServerBuilder().serve(
         new RequestHandlerBuilders().get("/clients")
             .ok()
             .body([])
@@ -44,18 +44,18 @@ describe("Navigate through calendar", () => {
             .build()
     );
 
-    beforeAll(() => server.listen())
+    beforeEach(() => server.listen())
 
     afterEach(() => server.resetHandlers())
 
     afterAll(() => server.close())
 
     it("should display next month when clicking on 'next' month", async () => {
-        render(<Calendar date={new Date("2021-10-01T00:00:00")}/>)
+        render(<PilatesMonthlyCalendar date={new Date("2021-10-01T00:00:00")}/>)
 
         userEvent.click(await screen.findByRole("button", {name: /next/i}))
 
-        await screen.findByText("Stage 1")
+        expect(await waitFor(() => screen.getByText("Stage 1"))).toBeInTheDocument()
         await screen.findByText("Stage 2")
     })
 
