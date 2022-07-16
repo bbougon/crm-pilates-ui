@@ -1753,13 +1753,6 @@
   "resolved" "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz"
   "version" "0.0.29"
 
-"@types/loadable__component@^5.13.4":
-  "integrity" "sha512-YhoCCxyuvP2XeZNbHbi8Wb9EMaUJuA2VGHxJffcQYrJKIKSkymJrhbzsf9y4zpTmr5pExAAEh5hbF628PAZ8Dg=="
-  "resolved" "https://registry.npmjs.org/@types/loadable__component/-/loadable__component-5.13.4.tgz"
-  "version" "5.13.4"
-  dependencies:
-    "@types/react" "*"
-
 "@types/node@*", "@types/node@^16.11.7":
   "integrity" "sha512-QB5D2sqfSjCmTuWcBWyJ+/44bcjO7VbjSbOE0ucoVbAsSNQc4Lt6QkgkVXkTDwkL4z/beecZNDvVX15D4P8Jbw=="
   "resolved" "https://registry.npmjs.org/@types/node/-/node-16.11.7.tgz"
