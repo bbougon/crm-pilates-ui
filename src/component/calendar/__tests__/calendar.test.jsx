@@ -10,7 +10,7 @@ import {
     XLinkHeaderBuilder
 } from "../../../test-utils/server/server";
 
-describe('Calendar page', () => {
+describe('Calendar', () => {
     const emptyClients = new RequestHandlerBuilders().get("/clients").ok().body([]).build();
 
     const server = new ServerBuilder().serve(emptyClients)
