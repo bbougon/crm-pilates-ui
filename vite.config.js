@@ -18,7 +18,6 @@ export default defineConfig({
                     calendar: ['@zach.codes/react-calendar'],
                     datefns: ['date-fns'],
                     mui: ['@material-ui/core', '@material-ui/icons', '@mui/icons-material', '@mui/lab', '@mui/material'],
-                    react: ['react', 'react-dom', 'react-redux', 'react-router-dom']
                 }
             }
         }
