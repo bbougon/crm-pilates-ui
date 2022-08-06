@@ -5,12 +5,14 @@ import { Provider } from 'react-redux'
 import clientsReducer from "../features/clientsSlice"
 import sessionsReducer from "../features/sessionsSlice"
 import classroomsReducer from "../features/classroomSlice"
+import loginReducer from "../features/login"
 import PropTypes from "prop-types";
 
 const reducer = {
     sessions: sessionsReducer,
     clients: clientsReducer,
-    classrooms: classroomsReducer
+    classrooms: classroomsReducer,
+    login: loginReducer
 }
 
 function render(

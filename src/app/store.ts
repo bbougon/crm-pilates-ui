@@ -2,13 +2,15 @@ import {configureStore} from "@reduxjs/toolkit";
 import clientsReducer from "../features/clientsSlice";
 import sessionsReducer from "../features/sessionsSlice";
 import classroomsReducer from "../features/classroomSlice";
+import loginReducer from "../features/login";
 
 /* eslint-disable no-underscore-dangle */
 export const store =  configureStore({
     reducer: {
         clients: clientsReducer,
         sessions: sessionsReducer,
-        classrooms: classroomsReducer
+        classrooms: classroomsReducer,
+        login: loginReducer
     },
 })
 

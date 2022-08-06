@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import NavItem from "./nav-item";
-import {withRouter} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 
 const StyledSideNav = styled.div`
   position: fixed;
@@ -20,7 +20,7 @@ class SideNav extends React.Component {
         super(props);
         this.state = {
             // eslint-disable-next-line react/prop-types
-            activePath: props.location.pathname,
+            activePath: props.router.location.pathname,
             items: [
                 {
                     path: '/',
@@ -67,6 +67,22 @@ class SideNav extends React.Component {
                 }
             </StyledSideNav>);
     }
+}
+
+function withRouter(Component) {
+    function ComponentWithRouterProp(props) {
+        let location = useLocation();
+        let navigate = useNavigate();
+        let params = useParams();
+        return (
+            <Component
+                {...props}
+                router={{ location, navigate, params }}
+            />
+        );
+    }
+
+    return ComponentWithRouterProp;
 }
 
 const RouterSideNav = withRouter(SideNav);

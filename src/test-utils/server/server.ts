@@ -68,6 +68,7 @@ abstract class RequestHandlerBuilder<TBody> {
     protected _header: Record<string, string> = { 'Content-Type': 'application/json' }
     protected _runOnce = false
     protected _request: unknown | null = null
+    protected _searchParams: object | null = null;
 
     constructor(path: string) {
         this.path = path
@@ -83,6 +84,11 @@ abstract class RequestHandlerBuilder<TBody> {
         return this
     }
 
+    unauthorized = (): RequestHandlerBuilder<TBody> => {
+        this.statusCode = 401
+        return this
+    }
+
     unprocessableEntity = (): RequestHandlerBuilder<TBody> => {
         this.statusCode = 422
         return this
@@ -95,6 +101,11 @@ abstract class RequestHandlerBuilder<TBody> {
 
     body = <TBody>(body: TBody): RequestHandlerBuilder<TBody> => {
         this._body = body
+        return this
+    }
+
+    searchParams = <TSearchParams extends object>(params: TSearchParams): RequestHandlerBuilder<TSearchParams> => {
+        this._searchParams = params
         return this
     }
 
@@ -116,7 +127,18 @@ export class GetRequestHandlerBuilder<TBody> extends RequestHandlerBuilder<TBody
     build(): RequestHandler {
         return rest.get(API_URI + this.path, (req, res, _) => {
             let composedResponse;
-            if (this._header) {
+            if (this._searchParams !== null) {
+                let statusCode: number = this.statusCode
+                if(Object.entries(req.url.searchParams).toString() !== Object.entries(this._searchParams).toString()) {
+                    statusCode = 400
+                }
+                composedResponse = compose(
+                    context.status(statusCode),
+                    context.json(this._body),
+                    context.set({'Content-Type': "application/x-www-form-urlencoded"})
+                )
+            }
+            else if (this._header) {
                 composedResponse = compose(
                     context.status(this.statusCode),
                     context.json(this._body),
