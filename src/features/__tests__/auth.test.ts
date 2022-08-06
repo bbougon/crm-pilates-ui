@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {FulFilledAction, RejectedAction} from "../../test-utils/features/actionFixtures";
+import {FulFilledAction, IdleAction, RejectedAction} from "../../test-utils/features/actionFixtures";
 import reducer, {AuthState, AuthStatus, getAuthToken, login} from "../auth";
 import {RootState} from "../../app/store";
 
@@ -41,6 +41,19 @@ describe('Authentication reducer', () => {
         sessionStorage.setItem("token", JSON.stringify({token: "my-token", type: "bearer"}))
         const rootState: AuthState = {token: {token: "", type: "bearer"}, status: AuthStatus.IDLE, error: []}
 
-        expect(getAuthToken({login: rootState} as RootState)).toEqual(JSON.stringify({token: 'my-token', type: "bearer"}))
+        expect(getAuthToken({login: rootState} as RootState)).toEqual({token: 'my-token', type: "bearer"})
+    })
+
+    it('should initialise auth state with session storage', async () => {
+        const token = {token: "my-token", type: "bearer"};
+        sessionStorage.setItem("token", JSON.stringify(token))
+        const previousState: AuthState = {token: {token: "", type: "bearer"}, status: AuthStatus.IDLE, error: []}
+        const action = new IdleAction(login).build()
+
+        expect(reducer(previousState, action)).toEqual({
+            token,
+            status: "idle",
+            error: []
+        })
     })
 })

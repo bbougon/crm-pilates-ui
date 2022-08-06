@@ -53,3 +53,12 @@ export function FulFilledAction(type) {
 
     this.build = () => this.action
 }
+
+export function IdleAction(type) {
+    this.action = {
+        type: type.pending.type,
+        payload: {}
+    }
+
+    this.build = () => this.action
+}

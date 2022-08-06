@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 import {api, ApiToken} from "../api";
-import { Token } from "./domain/token";
+import {Token} from "./domain/token";
 import {RootState} from "../app/store";
 
 export enum AuthStatus {
@@ -21,11 +21,20 @@ export interface AuthState {
     error: ErrorMessage[]
 }
 
-const initialState: AuthState = {
-    token: {token: "", type: "bearer"},
-    status: AuthStatus.IDLE,
-    error: [],
+const getToken = (): Token => {
+    const value = sessionStorage.getItem("token");
+    return (sessionStorage && value !== null) ? JSON.parse(value) : {token: "", type: "bearer"};
 }
+
+const initializeState = (): AuthState => {
+    return {
+        token: getToken(),
+        status: AuthStatus.IDLE,
+        error: [],
+    };
+}
+
+const initialState: AuthState = initializeState()
 
 export const login = createAsyncThunk<ApiToken, Login, { rejectValue: ApiError }>(
     'login', async (login, thunkAPI) => {
@@ -54,10 +63,16 @@ const authSlice = createSlice({
                 state.token = {token: "", type: "bearer"}
                 sessionStorage.removeItem("token")
             })
+            .addCase(login.pending, (state, _) => {
+                const initializedState: AuthState = initializeState()
+                state.status = initializedState.status
+                state.error = initializedState.error
+                state.token = initializedState.token
+            })
     }
 })
 
 export const getAuthToken = (state: RootState) => {
-    return state.login.token.token ? state.login.token : sessionStorage.getItem("token")
-        }
+    return state.login.token.token ? state.login.token : getToken()
+}
 export default authSlice.reducer
