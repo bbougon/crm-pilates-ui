@@ -5,7 +5,7 @@ import {MainContainer} from "../../const/containers";
 import {FormControl} from "@material-ui/core";
 import {Button, Card, CardContent, CardHeader, Grid, TextField} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import {login, LoginStatus} from "../../features/login";
+import {login, AuthStatus} from "../../features/auth";
 import {RootState} from "../../app/store";
 import {DisplayError} from "../errors/DisplayError";
 import {ErrorMessage} from "../../features/errors";
@@ -19,7 +19,7 @@ const Login = () => {
     const [password, setPassword] = useState<string>("")
 
     const errorMessages: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>((state => state.login.error))
-    const status: LoginStatus = useSelector<RootState, LoginStatus>((state => state.login.status))
+    const status: AuthStatus = useSelector<RootState, AuthStatus>((state => state.login.status))
     let errorContent = undefined
 
     const onUsernameChanged = (e: BaseSyntheticEvent) => {
@@ -35,13 +35,13 @@ const Login = () => {
     }
 
     useEffect(() => {
-        if (status === LoginStatus.SUCCEEDED) {
+        if (status === AuthStatus.SUCCEEDED) {
             navigate("/")
         }
     })
 
 
-    if (status === LoginStatus.FAILED) {
+    if (status === AuthStatus.FAILED) {
         errorContent = (
             <Grid container>
                 <Grid item xs={12} md={12}>

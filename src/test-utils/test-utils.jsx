@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import clientsReducer from "../features/clientsSlice"
 import sessionsReducer from "../features/sessionsSlice"
 import classroomsReducer from "../features/classroomSlice"
-import loginReducer from "../features/login"
+import loginReducer from "../features/auth"
 import PropTypes from "prop-types";
 
 const reducer = {

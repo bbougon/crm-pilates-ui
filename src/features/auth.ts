@@ -3,7 +3,7 @@ import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 import {api, ApiToken} from "../api";
 import { Token } from "./domain/token";
 
-export enum LoginStatus {
+export enum AuthStatus {
     SUCCEEDED = "succeeded",
     FAILED = "failed",
     IDLE = "idle",
@@ -14,15 +14,15 @@ export interface Login {
     password: string
 }
 
-interface LoginState {
+interface AuthState {
     token: Token,
-    status: LoginStatus,
+    status: AuthStatus,
     error: ErrorMessage[]
 }
 
-const initialState: LoginState = {
+const initialState: AuthState = {
     token: {token: "", type: "bearer"},
-    status: LoginStatus.IDLE,
+    status: AuthStatus.IDLE,
     error: [],
 }
 
@@ -36,21 +36,21 @@ export const login = createAsyncThunk<ApiToken, Login, { rejectValue: ApiError }
         }
     })
 
-const loginSlice = createSlice({
+const authSlice = createSlice({
     name: 'login',
     initialState,
     reducers: {},
     extraReducers(builder) {
         builder
             .addCase(login.fulfilled, (state, action) => {
-                state.status = LoginStatus.SUCCEEDED
+                state.status = AuthStatus.SUCCEEDED
                 state.token = action.payload as Token
             })
             .addCase(login.rejected, (state, action) => {
-                state.status = LoginStatus.FAILED
+                state.status = AuthStatus.FAILED
                 state.error = map_action_thunk_error("Create token", action.payload as ApiError)
             })
     }
 })
 
-export default loginSlice.reducer
+export default authSlice.reducer

@@ -1,7 +1,7 @@
 import {ClientCreation, ClientCredits} from "../features/clientsSlice";
 import {Cancel, Checkin, Checkout} from "../features/sessionsSlice";
 import {API_URI} from "../utils/constants.js";
-import {Login} from "../features/login";
+import {Login} from "../features/auth";
 
 type Request = {
     customConfig: {

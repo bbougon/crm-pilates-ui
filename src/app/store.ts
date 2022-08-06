@@ -2,7 +2,7 @@ import {configureStore} from "@reduxjs/toolkit";
 import clientsReducer from "../features/clientsSlice";
 import sessionsReducer from "../features/sessionsSlice";
 import classroomsReducer from "../features/classroomSlice";
-import loginReducer from "../features/login";
+import loginReducer from "../features/auth";
 
 /* eslint-disable no-underscore-dangle */
 export const store =  configureStore({
