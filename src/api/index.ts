@@ -7,13 +7,13 @@ type Request = {
     customConfig: {
         body?: null | undefined | string | URLSearchParams
         method: string | 'GET' | 'POST'
-        headers: { 'Content-type'?: string, 'Content-Type'?: string }
+        headers: { 'Content-type'?: string, 'Content-Type'?: string, 'Authorization'?: string }
     }
 }
 
-export async function api(endpoint: string, request: Request = {
+export const api = async(endpoint: string, request: Request = {
     customConfig: {method: 'GET', headers: {'Content-Type': 'application/json'}}
-}) {
+}) => {
     const config: RequestInit = {
         ...request.customConfig,
         mode: 'cors'
@@ -139,6 +139,8 @@ api.login = (login: Login) => {
     }
     return api(`/token`, {customConfig})
 }
+
+export default api
 
 export interface ApiClient {
     "id": string

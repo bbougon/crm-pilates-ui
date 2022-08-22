@@ -72,7 +72,7 @@ const authSlice = createSlice({
     }
 })
 
-export const getAuthToken = (state: RootState) => {
-    return state.login.token.token ? state.login.token : getToken()
+export const getAuthToken = (state: RootState): Token => {
+    return state.login.token.token && state.login.token.token !== "" ? state.login.token : getToken()
 }
 export default authSlice.reducer
