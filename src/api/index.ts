@@ -39,25 +39,6 @@ export const api = async(endpoint: string, request: Request = {
     }
 }
 
-
-
-
-
-api.addCredits = (clientCredits: ClientCredits) => {
-    const body = JSON.stringify([{
-        subject: clientCredits.subject,
-        value: clientCredits.creditsAmount
-    }])
-    const customConfig = {
-        body,
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    };
-    return api(`/clients/${clientCredits.clientId}/credits`, {customConfig})
-}
-
-
-
 api.sessionCheckin = (checkin: Checkin) => {
     const body = JSON.stringify({
         classroom_id: checkin.classroomId,

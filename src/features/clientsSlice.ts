@@ -79,7 +79,17 @@ export const addCredits = createAsyncThunk<ClientCredits, ClientCredits, { rejec
     'clients/addCredits',
     async (credits, thunkApi) => {
         try {
-            await api.addCredits(credits)
+            const {login} = thunkApi.getState() as unknown as RootState;
+            const body = JSON.stringify([{
+                subject: credits.subject,
+                value: credits.creditsAmount
+            }])
+            const customConfig = {
+                body,
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
+            };
+            await api(`/clients/${credits.clientId}/credits`, {customConfig})
             return credits
         } catch (e: ApiError | unknown) {
             return thunkApi.rejectWithValue(e as ApiError)
