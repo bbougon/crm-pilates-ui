@@ -39,15 +39,7 @@ export const api = async(endpoint: string, request: Request = {
     }
 }
 
-api.createClient = (body: ClientCreation) => {
-    return api("/clients", {
-        customConfig: {
-            body: JSON.stringify(body),
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'}
-        }
-    })
-}
+
 
 
 

@@ -35,7 +35,14 @@ export const createClient = createAsyncThunk<ClientCreation, ClientCreation, { r
     'clients/create',
     async (client, thunkAPI) => {
         try {
-            const response = await api.createClient(client)
+            const {login} = thunkAPI.getState() as unknown as RootState;
+            const response = await api("/clients", {
+                customConfig: {
+                    body: JSON.stringify(client),
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
+                }
+            })
             return response.data as ApiClient
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)
