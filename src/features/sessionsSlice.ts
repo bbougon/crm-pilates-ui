@@ -122,7 +122,17 @@ export const sessionCancel = createAsyncThunk<ApiSession, Cancel, { rejectValue:
     'sessions/revoke',
     async (cancel, thunkAPI) => {
         try {
-            const response = await api.sessionCancel(cancel)
+            const {login} = thunkAPI.getState() as unknown as RootState;
+            const body = JSON.stringify({
+                classroom_id: cancel.classroomId,
+                session_date: cancel.start
+            });
+            const customConfig = {
+                body,
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
+            }
+            const response = await api(`/sessions/cancellation/${cancel.attendeeId}`, {customConfig})
             return response.data as ApiSession
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)

@@ -1,5 +1,3 @@
-import {ClientCreation, ClientCredits} from "../features/clientsSlice";
-import {Cancel, Checkin, Checkout} from "../features/sessionsSlice";
 import {API_URI} from "../utils/constants.js";
 import {Login} from "../features/auth";
 
@@ -37,19 +35,6 @@ export const api = async(endpoint: string, request: Request = {
         // @ts-ignore
         return Promise.reject(err.message ? err.message : data)
     }
-}
-
-api.sessionCancel = (cancel: Cancel) => {
-    const body = JSON.stringify({
-        classroom_id: cancel.classroomId,
-        session_date: cancel.start
-    });
-    const customConfig = {
-        body,
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    }
-    return api(`/sessions/cancellation/${cancel.attendeeId}`, {customConfig})
 }
 
 api.login = (login: Login) => {
