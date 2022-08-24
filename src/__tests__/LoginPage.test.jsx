@@ -14,24 +14,10 @@ describe('App', () => {
         expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     });
 
-    it('should display login page when trying to reach client page if not authenticated', () => {
+    it('side bar should not be displayed if not authenticated', () => {
         render(<App/>);
 
-        userEvent.click(screen.getAllByRole("link")[3])
-
-        expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-        expect(screen.queryByText(/add a new client/i)).not.toBeInTheDocument()
-    });
-
-    it('should display login page when trying to reach calendar page if not authenticated', () => {
-        render(<App/>);
-
-        userEvent.click(screen.getAllByRole("link")[4])
-
-        expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-        expect(screen.queryByText(/next/i)).not.toBeInTheDocument()
+        expect(screen.getAllByRole("link")).toHaveLength(2)
     });
 
 })
