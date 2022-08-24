@@ -3,6 +3,8 @@ import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 import {api, ApiToken} from "../api";
 import {Token} from "./domain/token";
 import {RootState} from "../app/store";
+import jwtDecode, {JwtPayload} from "jwt-decode";
+import {compareAsc, fromUnixTime} from "date-fns";
 
 export enum AuthStatus {
     SUCCEEDED = "succeeded",
@@ -21,14 +23,30 @@ export interface AuthState {
     error: ErrorMessage[]
 }
 
-const getToken = (): Token => {
+const getToken = (token: Token): Token => {
+    const retrieveToken = (token: string): Token => {
+        const exp = jwtDecode<JwtPayload>(token).exp || 0;
+        const isTokenExpirationInTheFuture = compareAsc(fromUnixTime(exp), new Date()) >= 0;
+        return isTokenExpirationInTheFuture ? {token: token, type: "bearer"} : {token: "", type: "bearer"}
+    }
+
+    if (token.token && token.token !== '') {
+        return retrieveToken(token.token);
+    }
     const value = sessionStorage.getItem("token");
-    return (sessionStorage && value !== null) ? JSON.parse(value) : {token: "", type: "bearer"};
+    if (value) {
+        const retrievedToken: Token = JSON.parse(value)
+        if (!retrievedToken.token) {
+            return {token: "", type: "bearer"}
+        }
+        return retrieveToken(retrievedToken.token)
+    }
+    return {token: "", type: "bearer"}
 }
 
 const initializeState = (): AuthState => {
     return {
-        token: getToken(),
+        token: getToken({token: '', type: 'bearer'}),
         status: AuthStatus.IDLE,
         error: [],
     };
@@ -73,6 +91,6 @@ const authSlice = createSlice({
 })
 
 export const getAuthToken = (state: RootState): Token => {
-    return state.login.token.token && state.login.token.token !== "" ? state.login.token : getToken()
+    return getToken(state.login.token)
 }
 export default authSlice.reducer

@@ -8,14 +8,18 @@ import Home from "../../home";
 import React from "react";
 import userEvent from "@testing-library/user-event";
 import {RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
+import sign from "jwt-encode";
+import {add} from "date-fns";
 
 describe('Login', () => {
+
+    const token = sign({exp: add(new Date(), {minutes: 2}).getTime()}, 'secret');
 
     const server = new ServerBuilder().serve(new RequestHandlerBuilders()
         .post("/token")
         .searchParams({username: "John", password: "password"})
         .created()
-        .body({token: "a-token", type: "bearer"})
+        .body({token: token, type: "bearer"})
         .build())
 
     beforeEach(() => server.listen())

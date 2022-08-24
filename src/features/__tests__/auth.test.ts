@@ -1,4 +1,4 @@
-import {describe, expect, it} from "vitest";
+import {afterAll, beforeAll, describe, expect, it, vitest} from "vitest";
 import {FulFilledAction, IdleAction, RejectedAction} from "../../test-utils/features/actionFixtures";
 import reducer, {AuthState, AuthStatus, getAuthToken, login} from "../auth";
 import {RootState} from "../../app/store";
@@ -37,23 +37,38 @@ describe('Authentication reducer', () => {
         expect(getAuthToken({login: rootState} as RootState)).toEqual({token: 'my-token', type: "bearer"})
     })
 
-    it('should retrieve token from selector with session storage', async () => {
-        sessionStorage.setItem("token", JSON.stringify({token: "my-token", type: "bearer"}))
-        const rootState: AuthState = {token: {token: "", type: "bearer"}, status: AuthStatus.IDLE, error: []}
+    describe('Session storage', () => {
 
-        expect(getAuthToken({login: rootState} as RootState)).toEqual({token: 'my-token', type: "bearer"})
-    })
+        beforeAll(() => {
+            vitest.mock('date-fns', () => ({
+                compareAsc: vitest.fn().mockReturnValue(1),
+                fromUnixTime: vitest.fn()
+            }))
+            vitest.mock('jwt-decode', () => ({default: vitest.fn().mockReturnValue({exp: new Date().getTime()})}))
+        })
 
-    it('should initialise auth state with session storage', async () => {
-        const token = {token: "my-token", type: "bearer"};
-        sessionStorage.setItem("token", JSON.stringify(token))
-        const previousState: AuthState = {token: {token: "", type: "bearer"}, status: AuthStatus.IDLE, error: []}
-        const action = new IdleAction(login).build()
+        afterAll(() => {
+            vitest.restoreAllMocks()
+        })
 
-        expect(reducer(previousState, action)).toEqual({
-            token,
-            status: "idle",
-            error: []
+        it('should retrieve token from selector with session storage', async () => {
+            sessionStorage.setItem("token", JSON.stringify({token: "my-token", type: "bearer"}))
+            const rootState: AuthState = {token: {token: "", type: "bearer"}, status: AuthStatus.IDLE, error: []}
+
+            expect(getAuthToken({login: rootState} as RootState)).toEqual({token: 'my-token', type: "bearer"})
+        })
+
+        it('should initialise auth state with session storage', async () => {
+            const token = {token: "my-token", type: "bearer"};
+            sessionStorage.setItem("token", JSON.stringify(token))
+            const previousState: AuthState = {token: {token: "", type: "bearer"}, status: AuthStatus.IDLE, error: []}
+            const action = new IdleAction(login).build()
+
+            expect(reducer(previousState, action)).toEqual({
+                token,
+                status: "idle",
+                error: []
+            })
         })
     })
 })

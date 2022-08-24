@@ -4,11 +4,18 @@ import App from "../App";
 import {screen, waitFor} from "@testing-library/react";
 import React from "react";
 import userEvent from "@testing-library/user-event";
+import sign from 'jwt-encode'
+import {add} from "date-fns";
 
 
 describe("App", () => {
 
-    beforeEach(() => sessionStorage.setItem("token", JSON.stringify({token: "my-token", type: "bearer"})))
+    beforeEach(() => {
+        const token = sign({exp: add(new Date(), {minutes: 2}).getTime()}, 'secret');
+        sessionStorage.setItem("token", JSON.stringify({
+            token, type: "bearer"
+        }))
+    })
     afterEach(() => sessionStorage.removeItem("token"))
 
     it('should display home page if authenticated', async () => {
