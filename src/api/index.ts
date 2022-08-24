@@ -71,14 +71,7 @@ api.addCredits = (clientCredits: ClientCredits) => {
     return api(`/clients/${clientCredits.clientId}/credits`, {customConfig})
 }
 
-api.fetchSessions = (link: string) => {
-    return api(link, {
-        customConfig: {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        }
-    })
-}
+
 
 api.sessionCheckin = (checkin: Checkin) => {
     const body = JSON.stringify({

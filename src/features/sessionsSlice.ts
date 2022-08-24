@@ -59,7 +59,13 @@ export const fetchSessions = createAsyncThunk<{ sessions: ApiSession[], link: st
     'sessions/fetch',
     async (link = "/sessions", thunkAPI) => {
         try {
-            const response = await api.fetchSessions(link)
+            const {login} = thunkAPI.getState() as unknown as RootState;
+            const response = await api(link, {
+                customConfig: {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
+                }
+            })
             return {sessions: response.data as ApiSession[], link: response.headers.get("X-Link")}
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)
