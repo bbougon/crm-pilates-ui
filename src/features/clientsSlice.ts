@@ -47,7 +47,13 @@ export const fetchClients = createAsyncThunk<{ clients: ApiClient[] }, undefined
     'clients/fetch',
     async (_, thunkAPI) => {
         try {
-            const response = await api.fetchClients()
+            const {login} = thunkAPI.getState() as unknown as RootState;
+            const response = await api("/clients", {
+                customConfig: {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
+                }
+            })
             return {clients: response.data as ApiClient[]}
         } catch (e: ApiError | unknown) {
             return thunkAPI.rejectWithValue(e as ApiError)

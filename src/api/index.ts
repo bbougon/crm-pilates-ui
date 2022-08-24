@@ -49,14 +49,7 @@ api.createClient = (body: ClientCreation) => {
     })
 }
 
-api.fetchClients = () => {
-    return api("/clients", {
-        customConfig: {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        }
-    })
-}
+
 
 api.addCredits = (clientCredits: ClientCredits) => {
     const body = JSON.stringify([{
