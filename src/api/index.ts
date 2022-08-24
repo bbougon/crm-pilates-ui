@@ -39,20 +39,6 @@ export const api = async(endpoint: string, request: Request = {
     }
 }
 
-api.sessionCheckin = (checkin: Checkin) => {
-    const body = JSON.stringify({
-        classroom_id: checkin.classroomId,
-        session_date: checkin.start,
-        attendee: checkin.attendeeId
-    });
-    const customConfig = {
-        body,
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    }
-    return api("/sessions/checkin", {customConfig})
-}
-
 api.sessionCheckout = (checkout: Checkout) => {
     const body = JSON.stringify({
         attendee: checkout.attendeeId

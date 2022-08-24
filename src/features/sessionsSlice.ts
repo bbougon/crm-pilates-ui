@@ -78,7 +78,18 @@ export const sessionCheckin = createAsyncThunk<ApiSession, Checkin, { rejectValu
     'sessions/checkin',
     async (checkin, thunkAPI) => {
         try {
-            const response = await api.sessionCheckin(checkin)
+            const {login} = thunkAPI.getState() as unknown as RootState;
+            const body = JSON.stringify({
+                classroom_id: checkin.classroomId,
+                session_date: checkin.start,
+                attendee: checkin.attendeeId
+            });
+            const customConfig = {
+                body,
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
+            }
+            const response = await api("/sessions/checkin", {customConfig})
             return response.data as ApiSession
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)
