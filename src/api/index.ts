@@ -106,15 +106,6 @@ api.sessionCheckout = (checkout: Checkout) => {
     return api(`/sessions/${checkout.sessionId}/checkout`, {customConfig})
 }
 
-api.addClassroom = (body: ApiClassroom) => {
-    return api("/classrooms", {
-        customConfig: {
-            body: JSON.stringify(body),
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'}
-        }})
-}
-
 api.sessionCancel = (cancel: Cancel) => {
     const body = JSON.stringify({
         classroom_id: cancel.classroomId,

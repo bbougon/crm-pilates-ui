@@ -3,6 +3,7 @@ import {api, ApiClassroom} from "../api";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 import {Subjects} from "./domain/subjects";
 import {Classroom} from "./domain/classroom";
+import {RootState} from "../app/store";
 
 export enum ClassroomStatus {
     IDLE = "idle",
@@ -52,7 +53,14 @@ export const addClassroom = createAsyncThunk<Classroom|undefined, Classroom, { r
     'classroom/add',
     async (classroom, thunkAPI) => {
         try {
-            const response = await api.addClassroom(mapToApiClassroom(classroom))
+            const {login} = thunkAPI.getState() as unknown as RootState;
+            const response = await api("/classrooms", {
+                customConfig: {
+                    body: JSON.stringify(mapToApiClassroom(classroom)),
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
+                }
+            })
             return mapToClassroom(response.data as ApiClassroom) as Classroom
         } catch (e) {
             thunkAPI.rejectWithValue(e as ApiError)
