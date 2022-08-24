@@ -53,7 +53,7 @@ const Login = () => {
 
     return (
         <MainContainer>
-            <Grid container>
+            <Grid container alignContent="center" justifyContent="center">
                 <Card>
                     <CardHeader title="Login" component="div"/>
                     <CardContent>
