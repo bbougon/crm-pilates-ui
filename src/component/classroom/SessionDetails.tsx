@@ -108,8 +108,8 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                 start: state.session.schedule.start,
                 attendeeId: state.attendee.id
             }
-            dispatchReducer(attendeeCheckedIn())
             await dispatch(sessionCheckin(checkin))
+            dispatchReducer(attendeeCheckedIn())
         } else {
             const checkout = {
                 sessionId: state.session.id || "",

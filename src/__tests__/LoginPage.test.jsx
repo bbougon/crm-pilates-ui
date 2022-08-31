@@ -1,9 +1,8 @@
 import React from "react";
-import {screen, waitFor} from '@testing-library/react';
+import {screen} from '@testing-library/react';
 import {render} from "../test-utils/test-utils";
 import App from '../App';
 import {describe, it} from 'vitest'
-import userEvent from "@testing-library/user-event";
 
 describe('App', () => {
 
