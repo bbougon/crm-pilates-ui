@@ -1,5 +1,5 @@
 import * as React from "react";
-import {BaseSyntheticEvent, useState} from "react";
+import {BaseSyntheticEvent, useReducer} from "react";
 import {useDispatch} from "react-redux";
 import {sessionCancel, sessionCheckin, sessionCheckout} from "../../features/sessionsSlice";
 import {
@@ -38,14 +38,44 @@ interface SessionAttendeeProps {
     session: Session
 }
 
+enum ActionType {
+    CHECKED_IN = "CHECKED_IN"
+
+}
+
+type State = {
+    attendee: Attendee
+    session: Session
+    attendeeLabelStatus: 'R' | 'C'
+    attendeeLabelColor: 'primary' | 'success'
+}
+
+type Action =
+    | {
+    type: ActionType.CHECKED_IN
+}
+
+function reducer(state: State, action:Action): State {
+    switch (action.type) {
+        case ActionType.CHECKED_IN:
+            return {...state, attendeeLabelStatus: "C", attendeeLabelColor: "success"}
+    }
+}
+
+const attendeeCheckedIn = (): Action => {
+    return {type: ActionType.CHECKED_IN}
+}
+
 const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
 
-    const [attendee] = useState(sessionAttendeeProps.attendee);
-    const [session] = useState(sessionAttendeeProps.session);
-    const [attendeeLabelStatus] = useState(attendee.attendance === Attendance.REGISTERED ? 'R' : 'C')
-    const [attendeeLabelColor] = useState<'primary' | 'success'>(attendee.attendance === Attendance.REGISTERED ? 'primary' : 'success')
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const [state, dispatchReducer] = useReducer(reducer, {
+        attendee: sessionAttendeeProps.attendee,
+        attendeeLabelColor: sessionAttendeeProps.attendee.attendance === Attendance.REGISTERED ? 'primary' : 'success',
+        attendeeLabelStatus: sessionAttendeeProps.attendee.attendance === Attendance.REGISTERED ? 'R' : 'C',
+        session: sessionAttendeeProps.session
+    })
 
     const options = [
         'Cancel',
@@ -63,9 +93,9 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
 
     const handleAction = (_: React.MouseEvent<HTMLElement>) => {
         const cancel = {
-            classroomId: session.classroomId,
-            start: session.schedule.start,
-            attendeeId: attendee.id
+            classroomId: state.session.classroomId,
+            start: state.session.schedule.start,
+            attendeeId: state.attendee.id
         }
         dispatch(sessionCancel(cancel))
         setAnchorEl(null);
@@ -74,15 +104,16 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     const onSessionCheckin = async (e: BaseSyntheticEvent) => {
         if (e.target.checked) {
             const checkin = {
-                classroomId: session.classroomId,
-                start: session.schedule.start,
-                attendeeId: attendee.id
+                classroomId: state.session.classroomId,
+                start: state.session.schedule.start,
+                attendeeId: state.attendee.id
             }
-            dispatch(sessionCheckin(checkin))
+            dispatchReducer(attendeeCheckedIn())
+            await dispatch(sessionCheckin(checkin))
         } else {
             const checkout = {
-                sessionId: session.id || "",
-                attendeeId: attendee.id,
+                sessionId: state.session.id || "",
+                attendeeId: state.attendee.id,
             }
             dispatch(sessionCheckout(checkout))
         }
@@ -104,12 +135,12 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                             alignItems: 'center'
                         }}>
                             <Typography variant="body1">
-                                {attendee.firstname.concat(" ").concat(attendee.lastname)}
+                                {state.attendee.firstname.concat(" ").concat(state.attendee.lastname)}
                             </Typography>
                         </Box>
                     </Grid>
                     <Grid item xs={4} md={4}>
-                        <CreditBox credit={attendee.credits?.amount || 0}/>
+                        <CreditBox credit={state.attendee.credits?.amount || 0}/>
                     </Grid>
                 </Grid>
             </Grid>
@@ -121,8 +152,8 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                         alignItems: 'center'
                     }}>
                         <ThemeProvider theme={theme}>
-                            <Switch size="small" defaultChecked={attendee.attendance === "CHECKED_IN"}
-                                    color={attendeeLabelColor} onChange={onSessionCheckin}/>
+                            <Switch size="small" defaultChecked={state.attendee.attendance === "CHECKED_IN"}
+                                    color={state.attendeeLabelColor} onChange={onSessionCheckin}/>
                         </ThemeProvider>
                     </Grid>
                     <Grid item xs={3} md={3} sx={{
@@ -131,7 +162,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                         alignItems: 'center'
                     }}>
                         <ThemeProvider theme={theme}>
-                            <Chip size="small" label={attendeeLabelStatus} color={attendeeLabelColor}/>
+                            <Chip size="small" label={state.attendeeLabelStatus} color={state.attendeeLabelColor}/>
                         </ThemeProvider>
                     </Grid>
                     <Grid item xs={3} md={3} sx={{
@@ -166,7 +197,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                         >
                             {options.map((option) => (
                                 <MenuItem key={option} onClick={(event) => handleAction(event)}
-                                          disabled={attendee.attendance === "CHECKED_IN"}>
+                                          disabled={state.attendee.attendance === "CHECKED_IN"}>
                                     {option}
                                 </MenuItem>
                             ))}

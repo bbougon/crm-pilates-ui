@@ -189,6 +189,11 @@ const sessionsSlice = createSlice({
             })
         }
 
+        function findSession(state: SessionState, apiSession: ApiSession) {
+            return state.sessions.find(session => session.id === apiSession.id
+                || (session.classroomId === apiSession.classroom_id && isEqual(parseISO(`${session.schedule.start}`), parseISO(`${apiSession.schedule.start}`))));
+        }
+
         builder
             .addCase(fetchSessions.pending, (state, action) => {
                 state.status = SessionStatus.LOADING
@@ -220,11 +225,10 @@ const sessionsSlice = createSlice({
             })
             .addCase(sessionCheckin.fulfilled, (state, action) => {
                 state.status = SessionStatus.CHECKIN_IN_SUCCEEDED
-                const sessionCheckedin = action.payload
-                const session = state.sessions.find(session => session.id === sessionCheckedin.id
-                    || (session.classroomId === sessionCheckedin.classroom_id && isEqual(parseISO(`${session.schedule.start}`), parseISO(`${sessionCheckedin.schedule.start}`))));
-                mapAttendees(session, sessionCheckedin)
-                mapCredits(state.sessions, sessionCheckedin);
+                const sessionCheckedIn = action.payload
+                const session = findSession(state, sessionCheckedIn)
+                mapAttendees(session, sessionCheckedIn)
+                mapCredits(state.sessions, sessionCheckedIn);
             })
             .addCase(sessionCheckout.pending, (state, action) => {
                 state.status = SessionStatus.CHECKOUT_IN_PROGRESS
@@ -243,8 +247,7 @@ const sessionsSlice = createSlice({
             .addCase(sessionCancel.fulfilled, (state, action) => {
                 state.status = SessionStatus.CANCEL_SUCCEEDED
                 const sessionCancelled = action.payload
-                const session = state.sessions.find(session => session.id === sessionCancelled.id
-                    || (session.classroomId === sessionCancelled.classroom_id && isEqual(parseISO(`${session.schedule.start}`), parseISO(`${sessionCancelled.schedule.start}`))));
+                const session = findSession(state, sessionCancelled);
                 if(session) {
                     session.attendees = sessionCancelled.attendees?.map(attendee => mapAttendee(attendee))
                     session.id = sessionCancelled.id

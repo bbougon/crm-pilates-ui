@@ -9,7 +9,7 @@ import {
     SessionsBuilder
 } from "../../test-utils/classroom/session";
 import {addHours, addWeeks, format, formatISO, subDays, subHours} from "date-fns";
-import {Attendance} from "../domain/session";
+import {Attendance, Session} from "../domain/session";
 import {Subjects} from "../domain/subjects";
 
 describe("SessionsSlice", () =>{
@@ -104,7 +104,7 @@ describe("SessionsSlice", () =>{
                         .build()
                 )
                 .build()
-            const previousState = new LoadingState().withState(sessions).build()
+            const previousState = new LoadingState().withState(sessions as Session[]).build()
             const action = new FulFilledAction(sessionCheckin)
                 .withPayload(new ApiSessionsBuilder().withId("2").withClassroom("1").withName('Pilates Trio')
                     .withMachineTrio().withScheduleAsString(formatISO(addWeeks(currentDate, 1))).withPosition(3)
@@ -193,7 +193,7 @@ describe("SessionsSlice", () =>{
                         .build()
                 )
                 .build()
-            const previousState = new LoadingState().withState(sessions).build()
+            const previousState = new LoadingState().withState(sessions as Session[]).build()
             const action = new FulFilledAction(sessionCheckout)
                 .withPayload(new ApiSessionsBuilder().withId("1").withClassroom("1").withName('Pilates avancé')
                     .withMachineTrio().withScheduleAsString(formatISO(addWeeks(currentDate, 1))).withPosition(3)
