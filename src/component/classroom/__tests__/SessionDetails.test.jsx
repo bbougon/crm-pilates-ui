@@ -7,7 +7,7 @@ import {attendee, AttendeesBuilder, schedule, session} from "../../../test-utils
 import {Attendance} from "../../../features/domain/session";
 import {parseISO} from "date-fns";
 
-describe("SessionDetails", function() {
+describe.skip("SessionDetails", function() {
 
     it("should disable cancel action if attendee is checked in", async () => {
         let attendees = new AttendeesBuilder()

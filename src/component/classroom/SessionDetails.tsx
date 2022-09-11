@@ -1,7 +1,7 @@
 import * as React from "react";
-import {BaseSyntheticEvent, useReducer} from "react";
-import {useDispatch} from "react-redux";
-import {sessionCancel, sessionCheckin, sessionCheckout} from "../../features/sessionsSlice";
+import {BaseSyntheticEvent} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {getSelectedSession, sessionCancel, sessionCheckin, sessionCheckout} from "../../features/sessionsSlice";
 import {
     Box,
     Card,
@@ -20,6 +20,7 @@ import {formatFullDate, formatHours} from "../../utils/date";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {Attendance, Attendee, Session} from "../../features/domain/session";
 import {CreditBox} from "../CreditBox";
+import {RootState} from "../../app/store";
 
 const theme = createTheme({
     components: {
@@ -37,45 +38,15 @@ interface SessionAttendeeProps {
     attendee: Attendee
     session: Session
 }
-
-enum ActionType {
-    CHECKED_IN = "CHECKED_IN"
-
-}
-
-type State = {
-    attendee: Attendee
-    session: Session
-    attendeeLabelStatus: 'R' | 'C'
-    attendeeLabelColor: 'primary' | 'success'
-}
-
-type Action =
-    | {
-    type: ActionType.CHECKED_IN
-}
-
-function reducer(state: State, action:Action): State {
-    switch (action.type) {
-        case ActionType.CHECKED_IN:
-            return {...state, attendeeLabelStatus: "C", attendeeLabelColor: "success"}
-    }
-}
-
-const attendeeCheckedIn = (): Action => {
-    return {type: ActionType.CHECKED_IN}
-}
-
 const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const [state, dispatchReducer] = useReducer(reducer, {
-        attendee: sessionAttendeeProps.attendee,
-        attendeeLabelColor: sessionAttendeeProps.attendee.attendance === Attendance.REGISTERED ? 'primary' : 'success',
-        attendeeLabelStatus: sessionAttendeeProps.attendee.attendance === Attendance.REGISTERED ? 'R' : 'C',
-        session: sessionAttendeeProps.session
-    })
+
+    const session: Session = sessionAttendeeProps.session
+    const attendee: Attendee = sessionAttendeeProps.attendee
+    const attendeeLabelColor: 'primary' | 'success' = attendee.attendance === Attendance.CHECKED_IN ? 'success' : 'primary'
+    const attendeeLabelStatus: 'C' | 'R' = attendee.attendance === Attendance.CHECKED_IN ? 'C' : 'R'
 
     const options = [
         'Cancel',
@@ -93,9 +64,9 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
 
     const handleAction = (_: React.MouseEvent<HTMLElement>) => {
         const cancel = {
-            classroomId: state.session.classroomId,
-            start: state.session.schedule.start,
-            attendeeId: state.attendee.id
+            classroomId: session.classroomId,
+            start: session.schedule.start,
+            attendeeId: attendee.id
         }
         dispatch(sessionCancel(cancel))
         setAnchorEl(null);
@@ -104,16 +75,15 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     const onSessionCheckin = async (e: BaseSyntheticEvent) => {
         if (e.target.checked) {
             const checkin = {
-                classroomId: state.session.classroomId,
-                start: state.session.schedule.start,
-                attendeeId: state.attendee.id
+                classroomId: session.classroomId,
+                start: session.schedule.start,
+                attendeeId: attendee.id
             }
             await dispatch(sessionCheckin(checkin))
-            dispatchReducer(attendeeCheckedIn())
         } else {
             const checkout = {
-                sessionId: state.session.id || "",
-                attendeeId: state.attendee.id,
+                sessionId: session.id || "",
+                attendeeId: attendee.id,
             }
             dispatch(sessionCheckout(checkout))
         }
@@ -135,12 +105,12 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                             alignItems: 'center'
                         }}>
                             <Typography variant="body1">
-                                {state.attendee.firstname.concat(" ").concat(state.attendee.lastname)}
+                                {attendee.firstname.concat(" ").concat(attendee.lastname)}
                             </Typography>
                         </Box>
                     </Grid>
                     <Grid item xs={4} md={4}>
-                        <CreditBox credit={state.attendee.credits?.amount || 0}/>
+                        <CreditBox credit={attendee.credits?.amount || 0}/>
                     </Grid>
                 </Grid>
             </Grid>
@@ -152,8 +122,8 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                         alignItems: 'center'
                     }}>
                         <ThemeProvider theme={theme}>
-                            <Switch size="small" defaultChecked={state.attendee.attendance === "CHECKED_IN"}
-                                    color={state.attendeeLabelColor} onChange={onSessionCheckin}/>
+                            <Switch size="small" checked={attendee.attendance === "CHECKED_IN"}
+                                    color={attendeeLabelColor} onChange={onSessionCheckin}/>
                         </ThemeProvider>
                     </Grid>
                     <Grid item xs={3} md={3} sx={{
@@ -162,7 +132,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                         alignItems: 'center'
                     }}>
                         <ThemeProvider theme={theme}>
-                            <Chip size="small" label={state.attendeeLabelStatus} color={state.attendeeLabelColor}/>
+                            <Chip size="small" label={attendeeLabelStatus} color={attendeeLabelColor}/>
                         </ThemeProvider>
                     </Grid>
                     <Grid item xs={3} md={3} sx={{
@@ -197,7 +167,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
                         >
                             {options.map((option) => (
                                 <MenuItem key={option} onClick={(event) => handleAction(event)}
-                                          disabled={state.attendee.attendance === "CHECKED_IN"}>
+                                          disabled={attendee.attendance === "CHECKED_IN"}>
                                     {option}
                                 </MenuItem>
                             ))}
@@ -221,23 +191,35 @@ const SessionAttendees = (session: Session) => {
     )
 }
 
-export const SessionDetails = ({session}: { session: Session }) => {
+export const SessionDetails = () => {
 
-    const sessionStart = session.schedule.start;
-    const sessionEnd = session.schedule.stop;
-    const dateSubheader = formatFullDate(sessionStart)
-        .concat(` ${formatHours(sessionStart)}`)
-        .concat(" to ")
-        .concat(formatFullDate(sessionEnd))
-        .concat(` ${formatHours(sessionEnd)}`);
+    const currentSession = useSelector<RootState, Session | undefined>(getSelectedSession)
+
+    let element = <div>Nothing</div>
+
+    if (currentSession) {
+        const sessionStart = currentSession.schedule.start
+        const sessionEnd = currentSession.schedule.stop
+        const dateSubheader = formatFullDate(sessionStart)
+            .concat(` ${formatHours(sessionStart)}`)
+            .concat(" to ")
+            .concat(formatFullDate(sessionEnd))
+            .concat(` ${formatHours(sessionEnd)}`);
+        element =
+            <>
+                <CardHeader title={currentSession.name}
+                            subheader={dateSubheader}
+                            component="div"/>
+                <CardContent>
+                    <SessionAttendees {...currentSession}/>
+                </CardContent>
+            </>
+    }
+
     return (
+
         <Card sx={{width: 1}}>
-            <CardHeader title={session.name}
-                        subheader={dateSubheader}
-                        component="div"/>
-            <CardContent>
-                <SessionAttendees {...session}/>
-            </CardContent>
+            {element}
         </Card>
     )
 }

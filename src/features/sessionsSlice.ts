@@ -1,4 +1,4 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {api, ApiAttendee, ApiSession} from "../api";
 import map_action_thunk_error, {ApiError, ErrorMessage} from "./errors";
 import {isEqual, parseISO} from "date-fns";
@@ -23,6 +23,7 @@ export enum SessionStatus {
 
 export interface SessionState {
     sessions: Session[],
+    selectedSession: Session | undefined,
     status: SessionStatus.IDLE | SessionStatus.CHECKIN_IN_PROGRESS | SessionStatus.CHECKIN_IN_FAILED | SessionStatus.CHECKIN_IN_SUCCEEDED
         | SessionStatus.SUCCEEDED | SessionStatus.LOADING | SessionStatus.FAILED | SessionStatus.CHECKOUT_SUCCEEDED | SessionStatus.CHECKOUT_FAILED
         | SessionStatus.CHECKOUT_IN_PROGRESS | SessionStatus.CANCEL_SUCCEEDED,
@@ -32,6 +33,7 @@ export interface SessionState {
 
 const initialState: SessionState = {
     sessions: [],
+    selectedSession: undefined,
     status: SessionStatus.IDLE,
     error: [],
     link: undefined
@@ -140,10 +142,14 @@ export const sessionCancel = createAsyncThunk<ApiSession, Cancel, { rejectValue:
     }
 )
 
-const sessionsSlice = createSlice({
+export const sessionsSlice = createSlice({
     name: 'sessions',
     initialState,
-    reducers: {},
+    reducers: {
+        selectedSession(state: SessionState, action: PayloadAction<Session | undefined>) {
+            state.selectedSession = action.payload
+        }
+    },
     extraReducers(builder) {
         const mapAttendee = (attendee: ApiAttendee): Attendee => {
             return {
@@ -257,5 +263,8 @@ const sessionsSlice = createSlice({
 })
 
 export const selectMonthlySessions = (state: RootState) => state.sessions.sessions
+export const getSelectedSession = (state: RootState): Session | undefined => state.sessions.selectedSession
+
+export const {selectedSession} = sessionsSlice.actions
 
 export default sessionsSlice.reducer

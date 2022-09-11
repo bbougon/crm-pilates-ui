@@ -42,9 +42,9 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
         dispatch(fetchSessions(link?.current.url))
     }
 
-    const MonthlyDay = (props: MonthlyDayProps<Session[]>) => {
+    const MonthlyDay = (props: MonthlyDayProps<{ session: Session, date: Date }[]>) => {
         const {locale} = useMonthlyCalendar()
-        const {day, events} = useMonthlyBody<Session>()
+        const {day, events} = useMonthlyBody<{ session: Session, date: Date }>()
         const dayNumber = format(day, 'd', {locale});
 
         const backgroundColor = isSameDay(day, new Date()) ? blueGrey[50] : "white"
@@ -114,9 +114,9 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
     };
 
 
-    function mapToCalendarEvent(session: Session) {
+    function mapToCalendarEvent(session: Session): { session: Session, date: Date } {
         return {
-            ...session,
+            session: {...session},
             date: parseISO(`${session.schedule.start}`)
         }
     }
@@ -135,10 +135,11 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
             <MonthlyBody events={sessions.map(session => mapToCalendarEvent(session))} omitDays={[0]}>
                 <MonthlyDay
                     {...{
-                        render: (data) => {
-                            const events = data.map((item: Session, index: number) => (
-                                <ClassroomEventItem key={index} session={item}/>
-                            ));
+                        render: (data: { session: Session, date: Date }[]) => {
+                            const events = data.map((item: { session: Session, date: Date }, index: number) => {
+                                    return <ClassroomEventItem key={index} session={item.session} date={item.date}/>
+                                }
+                            );
                             events.push(<AddClassroomItem key={Math.random()} onClassroomAdded={handleClassroomAdded}/>)
                             return events
                         }
