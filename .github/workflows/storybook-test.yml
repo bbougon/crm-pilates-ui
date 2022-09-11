@@ -1,5 +1,8 @@
 name: 'Storybook Tests'
 on: push
+
+env:
+  NODE_ENV: test
 jobs:
   test:
     timeout-minutes: 60
