@@ -39,3 +39,7 @@ export const cancellationRequest = (classroomId: string, sessionDate: Date) => {
         session_date: formatISO(sessionDate)
     }
 }
+
+export const cancellationResponse = (session_id: string, classroom_id: string, session: ApiSession) => {
+    return checkinResponse(session_id, classroom_id, session)
+}

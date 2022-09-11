@@ -179,7 +179,7 @@ export const session = (id: string | undefined, classroomId = "1", name = "Pilat
 
 export const apiSession = (id: string | undefined, classroomId = "1", name = "Pilates avancé",
                            subject = "MAT", schedule_ = schedule(), position = 1,
-                           attendees: [ApiAttendee] | undefined): ApiSession => {
+                           attendees: [ApiAttendee] | undefined = undefined): ApiSession => {
     return {
         id: id,
         classroom_id: classroomId,

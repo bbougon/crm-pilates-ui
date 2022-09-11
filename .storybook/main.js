@@ -20,7 +20,7 @@ module.exports = {
     },
     async viteFinal(config) {
         config.plugins.push(istanbul({
-            exclude: [...constants.defaultExclude, '**/src/test-utils/**'],
+            exclude: [...constants.defaultExclude, '**/src/test-utils/**', '**src/features/**'],
             extension: constants.defaultExtensions
         }));
         // customize the Vite config here

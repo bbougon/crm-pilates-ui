@@ -12,11 +12,11 @@ import {addHours, parseISO} from "date-fns";
 import {Attendance, Attendee, Session} from "../../features/domain/session";
 import {Provider} from 'react-redux';
 import {configureStore, createSlice} from '@reduxjs/toolkit';
-import {sessionCheckin, SessionStatus} from "../../features/sessionsSlice";
+import {sessionCancel, sessionCheckin, sessionCheckout, SessionStatus} from "../../features/sessionsSlice";
 import {store} from "../../app/store";
 import {compose, context, rest} from "msw";
-import {checkinResponse} from "../../test-utils/classroom/checkin";
-import {fireEvent, screen, userEvent, waitFor, within} from "@storybook/testing-library";
+import {cancellationResponse, checkinResponse} from "../../test-utils/classroom/checkin";
+import {fireEvent, screen, userEvent, waitFor, within, waitForElementToBeRemoved} from "@storybook/testing-library";
 import {expect} from '@storybook/jest';
 import {ComponentStory} from "@storybook/react";
 import {AuthStatus} from "../../features/auth";
@@ -38,10 +38,25 @@ const defaultSession: Session =
             .withAttendee(attendee("1", "Bruno", "Germain", Attendance.REGISTERED, {amount: 5}))
             .build())
 
+const sessionWithOneCheckedInAttendee: Session =
+    session("2", "2", "Cours duo machine", "MACHINE_DUO",
+        schedule(parseISO("2021-09-05T11:00:00"), parseISO("2021-09-05T12:00:00")), 2,
+        new AttendeesBuilder()
+            .withAttendee(attendee("1", "Bruno", "Germain", Attendance.CHECKED_IN, {amount: 4}))
+            .build())
 
-const MockedState: State = {
+
+const SessionWithOneRegisteredAttendee: State = {
     sessions: [defaultSession],
     selectedSession: defaultSession,
+    status: SessionStatus.IDLE,
+    error: [],
+    link: undefined
+}
+
+const SessionWithOneCheckedInAttendee: State = {
+    sessions: [sessionWithOneCheckedInAttendee],
+    selectedSession: sessionWithOneCheckedInAttendee,
     status: SessionStatus.IDLE,
     error: [],
     link: undefined
@@ -93,6 +108,16 @@ const Mockstore = ({sessionState, children}: MockStoreProps) => {
                                     const sessionCheckedIn = action.payload
                                     state.selectedSession = mapSession(sessionCheckedIn)
                                 })
+                                .addCase(sessionCheckout.fulfilled, (state, action) => {
+                                    state.status = SessionStatus.CHECKOUT_SUCCEEDED
+                                    const sessionCheckedOut = action.payload
+                                    state.selectedSession = mapSession(sessionCheckedOut)
+                                })
+                                .addCase(sessionCancel.fulfilled, (state, action) => {
+                                    state.status = SessionStatus.CANCEL_SUCCEEDED
+                                    const sessionCheckedOut = action.payload
+                                    state.selectedSession = mapSession(sessionCheckedOut)
+                                })
                         }
                     }).reducer,
                     login: createSlice({
@@ -124,13 +149,15 @@ const Template: ComponentStory<typeof SessionDetails> = (args) => <SessionDetail
 
 export const DisplaySessionDetails = Template.bind({});
 export const SessionCheckin = Template.bind({});
+export const SessionCheckout = Template.bind({});
+export const CancelSession = Template.bind({});
 
 function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 DisplaySessionDetails.decorators = [
-    (story: any) => <Mockstore sessionState={MockedState}>{story()}</Mockstore>,
+    (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
 ]
 DisplaySessionDetails.args = {
     ...defaultSession
@@ -151,7 +178,7 @@ DisplaySessionDetails.play = async ({canvasElement}) => {
 };
 
 SessionCheckin.decorators = [
-    (story: any) => <Mockstore sessionState={MockedState}>{story()}</Mockstore>,
+    (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
 ]
 SessionCheckin.args = {
     ...defaultSession
@@ -191,4 +218,92 @@ SessionCheckin.play = async ({canvasElement}) => {
 
     const presentation = within(screen.getByRole('presentation'))
     await expect(presentation.getByRole('menuitem', {name: /cancel/i})).toHaveAttribute("aria-disabled")
+};
+
+SessionCheckout.decorators = [
+    (story: any) => <Mockstore sessionState={SessionWithOneCheckedInAttendee}>{story()}</Mockstore>,
+]
+SessionCheckout.args = {
+    ...sessionWithOneCheckedInAttendee
+};
+
+
+SessionCheckout.parameters = {
+    msw: {
+        handlers: [
+            rest.post("http://localhost:8081/sessions/2/checkout", (req, res, _) => {
+                const response = checkinResponse(sessionWithOneCheckedInAttendee.id ?? "1", sessionWithOneCheckedInAttendee.classroomId,
+                    apiSession(sessionWithOneCheckedInAttendee.id, sessionWithOneCheckedInAttendee.classroomId, sessionWithOneCheckedInAttendee.name, sessionWithOneCheckedInAttendee.subject.toString(),
+                        schedule(parseISO(sessionWithOneCheckedInAttendee.schedule.start),
+                            addHours(parseISO(sessionWithOneCheckedInAttendee.schedule.start), 1)),
+                        sessionWithOneCheckedInAttendee.position,
+                        [apiAttendee("1", "Bruno", "Germain", Attendance.REGISTERED, {amount: 5})]));
+                return res(compose(
+                    context.status(201),
+                    context.json(response)
+                ))
+            })
+        ],
+    },
+};
+
+SessionCheckout.play = async ({canvasElement}) => {
+    const canvas = await waitFor(() => within(canvasElement));
+    await expect(canvas.getByText('4')).toBeInTheDocument()
+    await expect(canvas.getByText('C')).toBeInTheDocument()
+
+    await userEvent.click(canvas.getByRole('checkbox'));
+    await sleep(200);
+
+    await expect(canvas.getByText('5')).toBeInTheDocument()
+    await expect(canvas.getByText('R')).toBeInTheDocument()
+
+    await waitFor(async () => {
+        await fireEvent.click(canvas.getByRole('button', {name: /more/i}))
+    })
+
+    const presentation = within(screen.getByRole('presentation'))
+    await expect(presentation.getByRole('menuitem', {name: /cancel/i})).not.toHaveAttribute("aria-disabled")
+};
+
+CancelSession.decorators = [
+    (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
+]
+CancelSession.args = {
+    ...defaultSession
+};
+
+CancelSession.parameters = {
+    msw: {
+        handlers: [
+            rest.post("http://localhost:8081/sessions/cancellation/1", (req, res, _) => {
+                const response = cancellationResponse(defaultSession.id ?? "1", defaultSession.classroomId,
+                    apiSession(defaultSession.id, defaultSession.classroomId, defaultSession.name, defaultSession.subject.toString(),
+                        schedule(parseISO(defaultSession.schedule.start),
+                            addHours(parseISO(defaultSession.schedule.start), 1)),
+                        defaultSession.position));
+                return res(compose(
+                    context.status(201),
+                    context.json(response)
+                ))
+            })
+        ],
+    },
+};
+
+CancelSession.play = async ({canvasElement}) => {
+    const canvas = await waitFor(() => within(canvasElement));
+
+    await expect(canvas.getByText('Bruno Germain')).toBeInTheDocument()
+
+    await waitFor(async () => {
+        await fireEvent.click(canvas.getByRole('button', {name: /more/i}))
+    })
+
+    const presentation = within(screen.getByRole('presentation'))
+    await waitFor(async () => {
+        await fireEvent.click(presentation.getByRole('menuitem', {name: /cancel/i}))
+    })
+
+    expect(canvas.queryByText('the mummy')).not.toBeInTheDocument()
 };

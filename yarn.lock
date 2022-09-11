@@ -5992,6 +5992,17 @@
     "shebang-command" "^1.2.0"
     "which" "^1.2.9"
 
+"cross-spawn@^6.0.5":
+  "integrity" "sha512-eTVLrBSt7fjbDygz805pMnstIs2VTBNkRm0qxZd+M7A5XDdxVRWO5MxGBXZhjY4cqLYLdtrGqRf8mBPmzwSpWQ=="
+  "resolved" "https://registry.npmjs.org/cross-spawn/-/cross-spawn-6.0.5.tgz"
+  "version" "6.0.5"
+  dependencies:
+    "nice-try" "^1.0.4"
+    "path-key" "^2.0.1"
+    "semver" "^5.5.0"
+    "shebang-command" "^1.2.0"
+    "which" "^1.2.9"
+
 "cross-spawn@^7.0.0", "cross-spawn@^7.0.2", "cross-spawn@^7.0.3":
   "integrity" "sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w=="
   "resolved" "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.3.tgz"
@@ -10258,7 +10269,7 @@
   "resolved" "https://registry.npmjs.org/jsesc/-/jsesc-0.5.0.tgz"
   "version" "0.5.0"
 
-"json-parse-better-errors@^1.0.2":
+"json-parse-better-errors@^1.0.1", "json-parse-better-errors@^1.0.2":
   "integrity" "sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw=="
   "resolved" "https://registry.npmjs.org/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz"
   "version" "1.0.2"
@@ -10532,6 +10543,16 @@
     "pify" "^2.0.0"
     "pinkie-promise" "^2.0.0"
     "strip-bom" "^2.0.0"
+
+"load-json-file@^4.0.0":
+  "integrity" "sha512-Kx8hMakjX03tiGTLAIdJ+lL0htKnXjEZN6hk/tozf/WOuYGdZBJrZ+rCJRbVCugsjB3jMLn9746NsQIf5VjBMw=="
+  "resolved" "https://registry.npmjs.org/load-json-file/-/load-json-file-4.0.0.tgz"
+  "version" "4.0.0"
+  dependencies:
+    "graceful-fs" "^4.1.2"
+    "parse-json" "^4.0.0"
+    "pify" "^3.0.0"
+    "strip-bom" "^3.0.0"
 
 "loader-runner@^2.4.0":
   "integrity" "sha512-Jsmr89RcXGIwivFY21FcRrisYZfvLMTWx5kOLc+JTxtpBOG6xML0vzbc6SEQG2FO9/4Fc3wW4LVcB5DmGflaRw=="
@@ -10832,6 +10853,11 @@
   dependencies:
     "errno" "^0.1.3"
     "readable-stream" "^2.0.1"
+
+"memorystream@^0.3.1":
+  "integrity" "sha512-S3UwM3yj5mtUSEfP41UZmt/0SCoVYUcU1rkXv+BQ5Ig8ndL4sPoJNBUJERafdPb5jjHJGuMgytgKvKIf58XNBw=="
+  "resolved" "https://registry.npmjs.org/memorystream/-/memorystream-0.3.1.tgz"
+  "version" "0.3.1"
 
 "meow@^3.1.0":
   "integrity" "sha512-TNdwZs0skRlpPpCUK25StC4VH+tP5GgeY1HQOOGP+lQ2xtdkN2VtT/5tiX9k3IWpkBPV9b3LsAWXn4GGi/PrSA=="
@@ -11274,6 +11300,21 @@
   "integrity" "sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA=="
   "resolved" "https://registry.npmjs.org/normalize-range/-/normalize-range-0.1.2.tgz"
   "version" "0.1.2"
+
+"npm-run-all@^4.1.5":
+  "integrity" "sha512-Oo82gJDAVcaMdi3nuoKFavkIHBRVqQ1qvMb+9LHk/cF4P6B2m8aP04hGf7oL6wZ9BuGwX1onlLhpuoofSyoQDQ=="
+  "resolved" "https://registry.npmjs.org/npm-run-all/-/npm-run-all-4.1.5.tgz"
+  "version" "4.1.5"
+  dependencies:
+    "ansi-styles" "^3.2.1"
+    "chalk" "^2.4.1"
+    "cross-spawn" "^6.0.5"
+    "memorystream" "^0.3.1"
+    "minimatch" "^3.0.4"
+    "pidtree" "^0.3.0"
+    "read-pkg" "^3.0.0"
+    "shell-quote" "^1.6.1"
+    "string.prototype.padend" "^3.0.0"
 
 "npm-run-path@^2.0.0":
   "integrity" "sha512-lJxZYlT4DW/bRUtFh1MQIWqmLwQfAxnqWG4HhEdjMlkrJYnJn0Jrr2u3mgxqaWsdiBc76TYkTG/mhrnYTuzfHw=="
@@ -11755,6 +11796,14 @@
   dependencies:
     "error-ex" "^1.2.0"
 
+"parse-json@^4.0.0":
+  "integrity" "sha512-aOIos8bujGN93/8Ox/jPLh7RwVnPEysynVFE+fQZyg6jKELEHwzgKdLRFHUgXJL6kylijVSBC4BvN9OmsB48Rw=="
+  "resolved" "https://registry.npmjs.org/parse-json/-/parse-json-4.0.0.tgz"
+  "version" "4.0.0"
+  dependencies:
+    "error-ex" "^1.3.1"
+    "json-parse-better-errors" "^1.0.1"
+
 "parse-json@^5.0.0", "parse-json@^5.2.0":
   "integrity" "sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg=="
   "resolved" "https://registry.npmjs.org/parse-json/-/parse-json-5.2.0.tgz"
@@ -11925,6 +11974,11 @@
   "integrity" "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA=="
   "resolved" "https://registry.npmjs.org/picomatch/-/picomatch-2.3.1.tgz"
   "version" "2.3.1"
+
+"pidtree@^0.3.0":
+  "integrity" "sha512-qQbW94hLHEqCg7nhby4yRC7G2+jYHY4Rguc2bjw7Uug4GIJuu1tvf2uHaZv5Q8zdt+WKJ6qK1FOI6amaWUo5FA=="
+  "resolved" "https://registry.npmjs.org/pidtree/-/pidtree-0.3.1.tgz"
+  "version" "0.3.1"
 
 "pidtree@^0.6.0":
   "integrity" "sha512-eG2dWTVw5bzqGRztnHExczNxt5VGsE6OwTeCG3fdUf9KBsZzO3R5OIIIzWR+iZA0NtZ+RDVdaoE2dK1cn6jH4g=="
@@ -12676,6 +12730,15 @@
     "load-json-file" "^1.0.0"
     "normalize-package-data" "^2.3.2"
     "path-type" "^1.0.0"
+
+"read-pkg@^3.0.0":
+  "integrity" "sha512-BLq/cCO9two+lBgiTYNqD6GdtK8s4NpaWrl6/rCO9w0TUS8oJl7cmToOZfRYllKTISY6nt1U7jQ53brmKqY6BA=="
+  "resolved" "https://registry.npmjs.org/read-pkg/-/read-pkg-3.0.0.tgz"
+  "version" "3.0.0"
+  dependencies:
+    "load-json-file" "^4.0.0"
+    "normalize-package-data" "^2.3.2"
+    "path-type" "^3.0.0"
 
 "read-pkg@^5.2.0":
   "integrity" "sha512-Ug69mNOpfvKDAc2Q8DRpMjjzdtrnv9HcSMX+4VsZxD1aZ6ZzrIE7rlzXBtWTyhULSMKg076AW6WR5iZpD0JiOg=="
@@ -13560,6 +13623,11 @@
   "integrity" "sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A=="
   "resolved" "https://registry.npmjs.org/shebang-regex/-/shebang-regex-3.0.0.tgz"
   "version" "3.0.0"
+
+"shell-quote@^1.6.1":
+  "integrity" "sha512-Vpfqwm4EnqGdlsBFNmHhxhElJYrdfcxPThu+ryKS5J8L/fhAwLazFZtq+S+TWZ9ANj2piSQLGj6NQg+lKPmxrw=="
+  "resolved" "https://registry.npmjs.org/shell-quote/-/shell-quote-1.7.3.tgz"
+  "version" "1.7.3"
 
 "side-channel@^1.0.4":
   "integrity" "sha512-q5XPytqFEIKHkGdiMIrY10mvLRvnQh42/+GoBlFW3b2LXLE2xxJpZFdm94we0BaoV3RwJyGqg5wS7epxTv0Zvw=="
