@@ -16,7 +16,7 @@ import {sessionCancel, sessionCheckin, sessionCheckout, SessionStatus} from "../
 import {store} from "../../app/store";
 import {compose, context, rest} from "msw";
 import {cancellationResponse, checkinResponse} from "../../test-utils/classroom/checkin";
-import {fireEvent, screen, userEvent, waitFor, within, waitForElementToBeRemoved} from "@storybook/testing-library";
+import {fireEvent, screen, userEvent, waitFor, within} from "@storybook/testing-library";
 import {expect} from '@storybook/jest';
 import {ComponentStory} from "@storybook/react";
 import {AuthStatus} from "../../features/auth";

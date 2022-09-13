@@ -137,7 +137,7 @@ function updateClassroomEndDate(endDate: Date): Action {
 
 const FORMAT = "MM/dd/yyyy HH:mm"
 
-export const AddClassroomForm:React.FC<AddClassroomFormProps> = ({date, onClassroomAdded}: AddClassroomFormProps) => {
+export const AddClassroomForm: React.FC<AddClassroomFormProps> = ({date, onClassroomAdded}: AddClassroomFormProps) => {
 
     const dispatch = useDispatch();
 
@@ -241,7 +241,7 @@ export const AddClassroomForm:React.FC<AddClassroomFormProps> = ({date, onClassr
                                     size="small"
                                 >
                                     {state.availablePositions.map(position => <MenuItem key={position}
-                                                                                   value={position}>{position}</MenuItem>)}
+                                                                                        value={position}>{position}</MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -256,7 +256,9 @@ export const AddClassroomForm:React.FC<AddClassroomFormProps> = ({date, onClassr
                                             if (newValue !== null && isValid(newValue))
                                                 dispatchReducer(updateClassroomStartDate(newValue as Date))
                                         }}
-                                        renderInput={(params) => <TextField {...params} label="Choose start date"
+                                        renderInput={(params) => <TextField {...params}
+                                                                            aria-labelledby="Choose start date"
+                                                                            aria-label="Choose start date"
                                                                             helperText="Choose start date"
                                                                             variant="standard"/>}
                                         value={state.classroomStartDateTime}
@@ -278,7 +280,9 @@ export const AddClassroomForm:React.FC<AddClassroomFormProps> = ({date, onClassr
                                         }}
                                         minDateTime={dayStart}
                                         value={state.classroomEndDateTime}
-                                        renderInput={(props) => <TextField  {...props} variant="standard"/>}
+                                        renderInput={(props) => <TextField  {...props} variant="standard"
+                                                                            aria-labelledby="Recurrence"
+                                                                            aria-label="Recurrence"/>}
                                         inputFormat={FORMAT}
                                     />
                                 </LocalizationProvider>
@@ -299,7 +303,7 @@ export const AddClassroomForm:React.FC<AddClassroomFormProps> = ({date, onClassr
                                     aria-labelledby="duration-select-label"
                                 >
                                     {state.availableDurations.map(duration => <MenuItem key={duration.duration}
-                                                                                   value={duration.duration}>{duration.human}</MenuItem>)}
+                                                                                        value={duration.duration}>{duration.human}</MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Grid>
