@@ -2,7 +2,10 @@ const istanbul = require('vite-plugin-istanbul');
 const constants = require('@storybook/addon-coverage/dist/cjs/constants');
 
 module.exports = {
-    "stories": ['../src/component/**/*.stories.@(js|jsx|ts|tsx)'],
+    "stories": [
+        '../src/stories/**/*.stories.mdx',
+        '../src/stories/**/*.stories.@(js|jsx|ts|tsx)'
+    ],
     "addons": [
         "@storybook/addon-links",
         "@storybook/addon-essentials",

@@ -1,5 +1,4 @@
 import React, {ReactElement} from 'react';
-import {SessionDetails} from "./SessionDetails";
 import {
     apiAttendee,
     apiSession,
@@ -22,6 +21,7 @@ import {ComponentStory} from "@storybook/react";
 import {AuthStatus} from "../../features/auth";
 import {ApiAttendee, ApiSession} from "../../api";
 import {Subjects} from "../../features/domain/subjects";
+import {SessionDetails} from "../../component/classroom/SessionDetails";
 
 type State = {
     sessions: Session[]
@@ -145,7 +145,7 @@ export default {
     excludeStories: /.*MockedState$/,
 };
 
-const Template: ComponentStory<typeof SessionDetails> = (args) => <SessionDetails {...args} />;
+const Template: ComponentStory<typeof SessionDetails> = (args) => <SessionDetails />;
 
 export const DisplaySessionDetails = Template.bind({});
 export const SessionCheckin = Template.bind({});

@@ -1,0 +1,19 @@
+import {ArgsTable, Canvas, Meta, PRIMARY_STORY, Source, Story} from '@storybook/addon-docs'
+import {store} from "../../app/store";
+import {Provider} from "react-redux";
+
+<Meta title="AddClassroomForm"/>
+
+# AddClassroomForm ↕️
+
+<Canvas withSource="none">
+    <div>
+        <Provider store={store}>
+            <Story id="add-classroom-form--add-classroom-details"/>
+        </Provider>
+    </div>
+</Canvas>
+
+<ArgsTable story={PRIMARY_STORY}/>
+
+<Source dark/>

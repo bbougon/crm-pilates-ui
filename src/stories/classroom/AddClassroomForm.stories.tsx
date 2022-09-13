@@ -5,14 +5,15 @@ import {configureStore, createSlice} from '@reduxjs/toolkit';
 import {store} from "../../app/store";
 import {within} from "@storybook/testing-library";
 import {expect} from "@storybook/jest";
-import {ComponentStory} from "@storybook/react";
+import {ComponentMeta, ComponentStory} from "@storybook/react";
 import {AuthStatus} from "../../features/auth";
 import {Classroom} from "../../features/domain/classroom";
 import {ErrorMessage} from "../../features/errors";
 import {addClassroom, ClassroomStatus} from "../../features/classroomSlice";
-import {AddClassroomForm} from "./AddClassroomForm";
 import {Client} from "../../features/domain/client";
 import {ClientStatus} from "../../features/clientsSlice";
+import {AddClassroomForm} from "../../component/classroom/AddClassroomForm";
+import AddClassroomFormDoc from "./AddClassroomForm.docs.mdx"
 
 type ClassroomState = {
     classrooms: Classroom[],
@@ -96,15 +97,16 @@ export default {
     title: 'Add classroom form',
     decorators: [(story: any) => <Provider store={store}>{story()}</Provider>],
     excludeStories: /.*MockedState$/,
-};
+    parameters: {
+        docs: {
+            page: AddClassroomFormDoc
+        }
+    }
+} as ComponentMeta<typeof AddClassroomForm>;
 
 const Template: ComponentStory<typeof AddClassroomForm> = (args) => <AddClassroomForm {...args} />;
 
 export const AddClassroomDetails = Template.bind({});
-
-function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 AddClassroomDetails.decorators = [
     (story: any) => <Mockstore classroomState={initialClassroomState}
