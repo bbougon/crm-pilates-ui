@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 import {fireEvent, screen, waitForElementToBeRemoved, within} from "@testing-library/react";
 import {RequestHandlerBuilders, ServerBuilder} from "../../../test-utils/server/server";
 import {apiClient, ClientsBuilder} from "../../../test-utils/clients/clients";
-import {ClassroomBuilder} from "../../../test-utils/classroom/classroom";
+import {APIClassroomBuilder} from "../../../test-utils/classroom/classroom";
 import {useDispatch} from "react-redux";
 import {fetchClients} from "../../../features/clientsSlice";
 import * as PropTypes from "prop-types";
@@ -60,7 +60,7 @@ describe("AddClassroomItem", () => {
                 .build(),
             new RequestHandlerBuilders().post("/classrooms")
                 .created()
-                .body(new ClassroomBuilder()
+                .body(new APIClassroomBuilder()
                     .name('Cours duo')
                     .mat()
                     .startDate("2021-10-01T00:00:00")

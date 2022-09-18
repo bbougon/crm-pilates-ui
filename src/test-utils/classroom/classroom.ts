@@ -1,7 +1,7 @@
 import {ApiClassroom} from "../../api";
 import {addHours, formatISO} from "date-fns";
 
-export class ClassroomBuilder {
+export class APIClassroomBuilder {
 
     private id = "1";
     private _name = "Cours tapis";
@@ -29,37 +29,37 @@ export class ClassroomBuilder {
         }
     }
 
-    startDate = (startDate: string):ClassroomBuilder => {
+    startDate = (startDate: string):APIClassroomBuilder => {
         this._startDate = startDate
         return this
     }
 
-    endDate = (endDate: string): ClassroomBuilder => {
+    endDate = (endDate: string): APIClassroomBuilder => {
         this._endDate = endDate
         return this
     }
 
-    attendees = (attendees: string[]): ClassroomBuilder => {
+    attendees = (attendees: string[]): APIClassroomBuilder => {
         this._attendees = attendees.map(attendee => ({id: attendee}))
         return this;
     }
 
-    position = (position: number): ClassroomBuilder => {
+    position = (position: number): APIClassroomBuilder => {
         this._position = position
         return this
     }
 
-    duration = (duration: number): ClassroomBuilder => {
+    duration = (duration: number): APIClassroomBuilder => {
         this._duration = duration
         return this
     }
 
-    name = (name:string): ClassroomBuilder => {
+    name = (name:string): APIClassroomBuilder => {
         this._name = name
         return this
     }
 
-    mat = (): ClassroomBuilder => {
+    mat = (): APIClassroomBuilder => {
         this.subject = "MAT"
         return this
     }

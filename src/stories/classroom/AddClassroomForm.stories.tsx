@@ -3,7 +3,7 @@ import {parseISO} from "date-fns";
 import {Provider} from 'react-redux';
 import {configureStore, createSlice} from '@reduxjs/toolkit';
 import {store} from "../../app/store";
-import {within} from "@storybook/testing-library";
+import {userEvent, within} from "@storybook/testing-library";
 import {expect} from "@storybook/jest";
 import {ComponentMeta, ComponentStory} from "@storybook/react";
 import {AuthStatus} from "../../features/auth";
@@ -14,6 +14,10 @@ import {Client} from "../../features/domain/client";
 import {ClientStatus} from "../../features/clientsSlice";
 import {AddClassroomForm} from "../../component/classroom/AddClassroomForm";
 import AddClassroomFormDoc from "./AddClassroomForm.docs.mdx"
+import {client} from "../../test-utils/clients/clients";
+import {fireEvent, screen} from "@testing-library/react";
+import {compose, context, rest} from "msw";
+import {APIClassroomBuilder} from "../../test-utils/classroom/classroom";
 
 type ClassroomState = {
     classrooms: Classroom[],
@@ -35,6 +39,15 @@ const initialClassroomState: ClassroomState = {
 
 const initialClientsState: ClientState = {
     clients: [],
+    status: ClientStatus.SUCCEEDED,
+    error: []
+}
+
+const withClientsState: ClientState = {
+    clients: [
+        client(),
+        client("Charles", "Martin", "2")
+    ],
     status: ClientStatus.SUCCEEDED,
     error: []
 }
@@ -107,6 +120,7 @@ export default {
 const Template: ComponentStory<typeof AddClassroomForm> = (args) => <AddClassroomForm {...args} />;
 
 export const AddClassroomDetails = Template.bind({});
+export const AddClassroomWithAttendees = Template.bind({});
 
 AddClassroomDetails.decorators = [
     (story: any) => <Mockstore classroomState={initialClassroomState}
@@ -136,3 +150,59 @@ AddClassroomDetails.play = async ({canvasElement}) => {
     await expect(canvas.getByRole('button', {name: /submit/i})).toBeDisabled()
 };
 
+AddClassroomWithAttendees.decorators = [
+    (story: any) => <Mockstore classroomState={initialClassroomState}
+                               clientsState={withClientsState}>{story()}</Mockstore>,
+]
+AddClassroomWithAttendees.args = {
+    ...initialProps
+};
+
+AddClassroomWithAttendees.parameters = {
+    msw: {
+        handlers: [
+            rest.post('http://localhost:8081/classrooms', (req, res, _) => {
+                const response = new APIClassroomBuilder()
+                    .mat()
+                    .position(2)
+                    .startDate("2021-05-07T10:00")
+                    .endDate("2021-07-07T12:00")
+                    .duration(120)
+                    .attendees(['2'])
+                    .build();
+                return res(
+                    compose(
+                        context.status(201),
+                        context.json(response)
+                    )
+                )
+            })
+        ],
+    },
+};
+
+AddClassroomWithAttendees.play = async ({canvasElement}) => {
+    const canvas = within(canvasElement);
+
+    userEvent.type(canvas.getByRole("textbox", {name: /classroom's name/i}), "Cours tapis duo")
+    fireEvent.mouseDown(canvas.getByRole("button", {name: /subject/i}))
+    const subject = within(screen.getByRole('listbox'));
+    userEvent.click(subject.getByText(/mat/i));
+    fireEvent.mouseDown(canvas.getByRole("button", {name: /position 1/i}))
+    const position = within(screen.getByRole('listbox'));
+    userEvent.click(position.getByText(/2/i));
+    const startDateElement = canvas.getByLabelText(/choose start date/i);
+    userEvent.clear(within(startDateElement).getByRole('textbox'))
+    userEvent.type(within(startDateElement).getByRole('textbox'), '05/07/2021 10:00')
+    const recurrenceElement = canvas.getByLabelText(/recurrence/i);
+    userEvent.clear(within(recurrenceElement).getByRole('textbox'))
+    userEvent.type(within(recurrenceElement).getByRole('textbox'), '07/07/2021 12:00')
+    fireEvent.mouseDown(canvas.getByRole("button", {name: /duration 1h00/i}))
+    const duration = within(screen.getByRole('listbox'));
+    userEvent.click(duration.getByText(/2h00/i));
+    userEvent.click(within(canvas.getByRole("combobox")).getByRole('textbox'))
+    const attendees = within(screen.getByRole('presentation')).getByRole('listbox');
+    userEvent.click(within(attendees).getByText(/martin charles/i))
+
+    await expect(canvas.getByRole('button', {name: /submit/i})).toBeEnabled()
+};
