@@ -3,7 +3,7 @@ import {parseISO} from "date-fns";
 import {Provider} from 'react-redux';
 import {configureStore, createSlice} from '@reduxjs/toolkit';
 import {store} from "../../app/store";
-import {userEvent, within} from "@storybook/testing-library";
+import {fireEvent, userEvent, within, screen} from "@storybook/testing-library";
 import {expect} from "@storybook/jest";
 import {ComponentMeta, ComponentStory} from "@storybook/react";
 import {AuthStatus} from "../../features/auth";
@@ -15,7 +15,6 @@ import {ClientStatus} from "../../features/clientsSlice";
 import {AddClassroomForm} from "../../component/classroom/AddClassroomForm";
 import AddClassroomFormDoc from "./AddClassroomForm.docs.mdx"
 import {client} from "../../test-utils/clients/clients";
-import {fireEvent, screen} from "@testing-library/react";
 import {compose, context, rest} from "msw";
 import {APIClassroomBuilder} from "../../test-utils/classroom/classroom";
 
