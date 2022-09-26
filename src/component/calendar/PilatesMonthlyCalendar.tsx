@@ -137,7 +137,7 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
                     {...{
                         render: (data: { session: Session, date: Date }[]) => {
                             const events = data.map((item: { session: Session, date: Date }, index: number) => {
-                                    return <ClassroomEventItem key={index} session={item.session} date={item.date}/>
+                                    return <ClassroomEventItem key={index} session={item.session}/>
                                 }
                             );
                             events.push(<AddClassroomItem key={Math.random()} onClassroomAdded={handleClassroomAdded}/>)
