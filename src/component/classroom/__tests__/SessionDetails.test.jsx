@@ -12,7 +12,7 @@ describe("SessionDetails", function() {
     it("should disable cancel action if attendee is checked in", async () => {
         let attendees = new AttendeesBuilder()
             .withAttendee(attendee(1, "Bruno", "Germain", Attendance.CHECKED_IN)).build();
-        render(<SessionDetails {...session("1", "1", "Cours privé", "MAT",
+        render(<SessionDetails session={session("1", "1", "Cours privé", "MAT",
             schedule(parseISO("2021-10-09T10:00:00"), parseISO("2021-10-09T11:00:00")), 1,
             attendees)} />)
 
@@ -25,7 +25,7 @@ describe("SessionDetails", function() {
     it("should display attendees credits", async () => {
         let attendees = new AttendeesBuilder()
             .withAttendee(attendee(1, "Bruno", "Germain", Attendance.CHECKED_IN, {amount: 5})).build();
-        render(<SessionDetails {...session("1", "1", "Cours privé", "MAT",
+        render(<SessionDetails session={session("1", "1", "Cours privé", "MAT",
             schedule(parseISO("2021-10-09T10:00:00"), parseISO("2021-10-09T11:00:00")), 1,
             attendees)} />)
 
