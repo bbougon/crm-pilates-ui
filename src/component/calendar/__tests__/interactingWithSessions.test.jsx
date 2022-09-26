@@ -28,7 +28,7 @@ import {addHours, formatISO} from "date-fns";
 import {Attendance} from "../../../features/domain/session";
 
 
-describe("Calendar", () => {
+describe.skip("Calendar", () => {
     describe("Interacting with session", () => {
 
         const classroomDate = new Date("2021-11-01T10:00:00");

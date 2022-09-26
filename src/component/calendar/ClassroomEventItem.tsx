@@ -1,11 +1,9 @@
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {Grid} from "@material-ui/core";
-import {Box, Card, ClickAwayListener, Fade, Popper, Typography} from "@mui/material";
+import {Box, Typography} from "@mui/material";
 import {blue} from "@mui/material/colors";
 import * as React from "react";
-import {BaseSyntheticEvent, useState} from "react";
 import {formatHours} from "../../utils/date";
-import {SessionDetails} from "../classroom/SessionDetails";
 import {Session} from "../../features/domain/session";
 
 const theme = createTheme({
@@ -39,42 +37,11 @@ const theme = createTheme({
 });
 
 
-export const ClassroomEventItem = (session: Session) => {
-
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [open, setOpen] = useState(false);
-
-    const displaySession = () => (event: BaseSyntheticEvent) => {
-        setAnchorEl(event.currentTarget);
-        setOpen((prev) => !prev);
-    }
-
-    const closeSessionDisplay = () => {
-        setOpen(false)
-    }
+export const ClassroomEventItem = ({session, displaySession}: {session: Session, displaySession: (session: Session) => void}) => {
 
     return (
         <Grid container>
-            <Popper open={open} anchorEl={anchorEl} placement="right-start" transition>
-                {({TransitionProps}) => {
-                    return (
-                        <ThemeProvider theme={theme}>
-                            <Fade {...TransitionProps} timeout={350}>
-                                <Card sx={{minWidth: 500, maxWidth: 600, display: 'flex'}}>
-                                    <ClickAwayListener onClickAway={closeSessionDisplay}
-                                                       disableReactTree={false}>
-
-                                        <Box sx={{width: 1, display: 'flex', flexDirection: 'column'}}>
-                                            <SessionDetails {...session}/>
-                                        </Box>
-                                    </ClickAwayListener>
-                                </Card>
-                            </Fade>
-                        </ThemeProvider>
-                    );
-                }}
-            </Popper>
-            <Grid container onClick={displaySession()}>
+            <Grid container onClick={() => displaySession(session)}>
                 <Grid item xs={6}>
                     <ThemeProvider theme={theme}>
                         <Box sx={{

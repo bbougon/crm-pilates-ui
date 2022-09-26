@@ -1,22 +1,31 @@
 import '@zach.codes/react-calendar/dist/calendar-tailwind.css';
 import * as React from "react";
+import {useRef, useState} from "react";
 import {MainContainer} from "../../const/containers";
 import {Grid} from "@material-ui/core";
 import {PilatesMonthlyCalendar} from "./PilatesMonthlyCalendar";
+import {Session} from "../../features/domain/session";
+import {MyPopper} from "./Popper";
+import {createPortal} from "react-dom";
 
-export class Calendar extends React.Component<{ date: Date }> {
-
-    render() {
-        return (
-            <MainContainer>
-                <Grid container>
-                    <Grid item xs={11}>
-                        <PilatesMonthlyCalendar date={this.props.date || new Date()}/>
-                    </Grid>
+export const Calendar = ({date}: { date: Date }) => {
+    const [session, setSession] = useState<null | Session>(null);
+    return (
+        <MainContainer>
+            <Grid container>
+                <div id="portal"></div>
+                <div>
+                {
+                    session ? createPortal(<MyPopper closeSessionDisplay={() => setSession(null)} session={session}/>, document.getElementById("portal")!) :null
+                }
+                </div>
+                <Grid item xs={11}>
+                    <PilatesMonthlyCalendar date={date || new Date()} displaySession={setSession}/>
                 </Grid>
-            </MainContainer>
-        )
-    }
+            </Grid>
+        </MainContainer>
+    )
 }
+
 
 export default Calendar;

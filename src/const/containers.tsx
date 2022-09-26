@@ -1,6 +1,6 @@
 import * as React from "react";
-import styled from "styled-components";
 import {ReactElement} from "react";
+import styled from "styled-components";
 
 interface Props {
     className?: string

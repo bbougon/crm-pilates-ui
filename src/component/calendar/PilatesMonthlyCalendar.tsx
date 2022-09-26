@@ -22,9 +22,10 @@ interface MonthlyDayProps<TEvent> {
 
 export interface PilatesMonthlyCalendarProps {
     date: Date
+    displaySession: (session: Session) => void
 }
 
-export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
+export const PilatesMonthlyCalendar = ({date, displaySession}: PilatesMonthlyCalendarProps) => {
 
     const dispatch = useDispatch();
     const [currentMonth, setCurrentMonth] = useState(startOfMonth(date))
@@ -137,7 +138,7 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
                     {...{
                         render: (data) => {
                             const events = data.map((item: Session, index: number) => (
-                                <ClassroomEventItem key={index} {...item} />
+                                <ClassroomEventItem key={index} displaySession={displaySession} session={item}/>
                             ));
                             events.push(<AddClassroomItem key={Math.random()} onClassroomAdded={handleClassroomAdded}/>)
                             return events
