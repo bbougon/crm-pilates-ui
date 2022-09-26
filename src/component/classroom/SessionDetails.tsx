@@ -221,7 +221,7 @@ const SessionAttendees = (session: Session) => {
     )
 }
 
-export const SessionDetails = (session: Session) => {
+export const SessionDetails = ({session}: { session: Session }) => {
 
     const sessionStart = session.schedule.start;
     const sessionEnd = session.schedule.stop;

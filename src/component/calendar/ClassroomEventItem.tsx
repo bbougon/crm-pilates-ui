@@ -5,6 +5,8 @@ import {blue} from "@mui/material/colors";
 import * as React from "react";
 import {formatHours} from "../../utils/date";
 import {Session} from "../../features/domain/session";
+import {useDrawer} from "../../hooks/useDrawer";
+import {SessionDetails} from "../classroom/SessionDetails";
 
 const theme = createTheme({
     typography: {
@@ -37,11 +39,12 @@ const theme = createTheme({
 });
 
 
-export const ClassroomEventItem = ({session, displaySession}: {session: Session, displaySession: (session: Session) => void}) => {
+export const ClassroomEventItem = ({session}: {session: Session}) => {
 
+    const {display} = useDrawer();
     return (
         <Grid container>
-            <Grid container onClick={() => displaySession(session)}>
+            <Grid container onClick={() => display(<SessionDetails session={session} />)}>
                 <Grid item xs={6}>
                     <ThemeProvider theme={theme}>
                         <Box sx={{

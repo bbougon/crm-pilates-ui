@@ -1,16 +1,20 @@
 import * as React from "react";
 import {ReactElement} from "react";
 import styled from "styled-components";
+import {DrawProvider} from "../context/DrawerProvider";
 
 interface Props {
     className?: string
     children: Element | ReactElement
 }
 
-export const Container:React.FC <Props> = ({className, children}: Props) => (
-    <div className={className}>
-        {children}
-    </div>
+export const Container: React.FC<Props> = ({className, children}: Props) => (
+    <DrawProvider>
+        <div className={className}>
+            <div id="portal"></div>
+            {children}
+        </div>
+    </DrawProvider>
 );
 
 
