@@ -7,10 +7,12 @@ services:
     build:
       context: .
       target: production
-    volumes:
-      - "./src:/app/src"
+    #volumes:
+      #- "./volumes/app:/usr/share/nginx"
+      #- "./volumes/nginx:/etc/nginx"
     ports:
       - 3000:3000
+      - 80:80
 
 networks:
   default:

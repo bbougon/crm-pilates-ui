@@ -3,26 +3,25 @@ ENV NODE_ENV development
 
 WORKDIR /app
 
-COPY package.json .
-COPY yarn.lock .
-RUN yarn install --network-timeout 600000
+COPY package*.json .
+RUN npm ci --prefer-offline --no-audit
 
 COPY . .
 
 EXPOSE 3000
 
-CMD [ "yarn", "start" ]
+CMD [ "npm", "run", "dev" ]
 
 FROM node:16-alpine AS builder
 ENV NODE_ENV production
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 WORKDIR /app
 
-COPY package.json .
-COPY yarn.lock .
-RUN yarn install --production --network-timeout 600000
+COPY package*.json .
+RUN npm ci --prefer-offline --no-audit
 COPY . .
-RUN yarn build
+RUN npm run build
 
 # Bundle static assets with nginx
 FROM nginx:1.21.0-alpine AS production
