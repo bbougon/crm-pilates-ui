@@ -25,7 +25,6 @@ import {SessionDetails} from "../../component/classroom/SessionDetails";
 
 type State = {
     sessions: Session[]
-    selectedSession: Session | undefined
     status: SessionStatus
     error: []
     link: string | undefined
@@ -48,7 +47,6 @@ const sessionWithOneCheckedInAttendee: Session =
 
 const SessionWithOneRegisteredAttendee: State = {
     sessions: [defaultSession],
-    selectedSession: defaultSession,
     status: SessionStatus.IDLE,
     error: [],
     link: undefined
@@ -56,7 +54,6 @@ const SessionWithOneRegisteredAttendee: State = {
 
 const SessionWithOneCheckedInAttendee: State = {
     sessions: [sessionWithOneCheckedInAttendee],
-    selectedSession: sessionWithOneCheckedInAttendee,
     status: SessionStatus.IDLE,
     error: [],
     link: undefined
@@ -106,17 +103,14 @@ const Mockstore = ({sessionState, children}: MockStoreProps) => {
                                 .addCase(sessionCheckin.fulfilled, (state, action) => {
                                     state.status = SessionStatus.CHECKIN_IN_SUCCEEDED
                                     const sessionCheckedIn = action.payload
-                                    state.selectedSession = mapSession(sessionCheckedIn)
                                 })
                                 .addCase(sessionCheckout.fulfilled, (state, action) => {
                                     state.status = SessionStatus.CHECKOUT_SUCCEEDED
                                     const sessionCheckedOut = action.payload
-                                    state.selectedSession = mapSession(sessionCheckedOut)
                                 })
                                 .addCase(sessionCancel.fulfilled, (state, action) => {
                                     state.status = SessionStatus.CANCEL_SUCCEEDED
                                     const sessionCheckedOut = action.payload
-                                    state.selectedSession = mapSession(sessionCheckedOut)
                                 })
                         }
                     }).reducer,

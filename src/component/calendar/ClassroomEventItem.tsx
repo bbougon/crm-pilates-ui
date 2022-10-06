@@ -5,8 +5,6 @@ import {blue} from "@mui/material/colors";
 import * as React from "react";
 import {formatHours} from "../../utils/date";
 import {Session} from "../../features/domain/session";
-import {useDispatch} from "react-redux";
-import {selectedSession} from "../../features/sessionsSlice";
 import {useDrawer} from "../../hooks/useDrawer";
 import {SessionDetails} from "../classroom/SessionDetails";
 

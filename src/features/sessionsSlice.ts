@@ -145,11 +145,7 @@ export const sessionCancel = createAsyncThunk<ApiSession, Cancel, { rejectValue:
 export const sessionsSlice = createSlice({
     name: 'sessions',
     initialState,
-    reducers: {
-        selectedSession(state: SessionState, action: PayloadAction<Session | undefined>) {
-            state.selectedSession = action.payload
-        }
-    },
+    reducers: {},
     extraReducers(builder) {
         const mapAttendee = (attendee: ApiAttendee): Attendee => {
             return {
@@ -263,8 +259,4 @@ export const sessionsSlice = createSlice({
 })
 
 export const selectMonthlySessions = (state: RootState) => state.sessions.sessions
-export const getSelectedSession = (state: RootState): Session | undefined => state.sessions.selectedSession
-
-export const {selectedSession} = sessionsSlice.actions
-
 export default sessionsSlice.reducer
