@@ -145,11 +145,11 @@ export default {
     excludeStories: /.*MockedState$/,
 };
 
-const Template: ComponentStory<typeof SessionDetails> = (args) => <SessionDetails />;
+const Template: ComponentStory<typeof SessionDetails> = (args) => <SessionDetails {...args} />;
 
 export const DisplaySessionDetails = Template.bind({});
 export const SessionCheckin = Template.bind({});
-export const SessionCheckout = Template.bind({});
+export const SessionCheckout = Template.bind({session: sessionWithOneCheckedInAttendee});
 export const CancelSession = Template.bind({});
 
 function sleep(ms: number) {
@@ -160,7 +160,7 @@ DisplaySessionDetails.decorators = [
     (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
 ]
 DisplaySessionDetails.args = {
-    ...defaultSession
+    session: defaultSession
 };
 
 DisplaySessionDetails.parameters = {
@@ -181,7 +181,7 @@ SessionCheckin.decorators = [
     (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
 ]
 SessionCheckin.args = {
-    ...defaultSession
+    session: defaultSession
 };
 
 SessionCheckin.parameters = {
@@ -224,7 +224,7 @@ SessionCheckout.decorators = [
     (story: any) => <Mockstore sessionState={SessionWithOneCheckedInAttendee}>{story()}</Mockstore>,
 ]
 SessionCheckout.args = {
-    ...sessionWithOneCheckedInAttendee
+    session: sessionWithOneCheckedInAttendee
 };
 
 
@@ -270,7 +270,7 @@ CancelSession.decorators = [
     (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
 ]
 CancelSession.args = {
-    ...defaultSession
+    session: defaultSession
 };
 
 CancelSession.parameters = {
@@ -304,6 +304,7 @@ CancelSession.play = async ({canvasElement}) => {
     await waitFor(async () => {
         await fireEvent.click(presentation.getByRole('menuitem', {name: /cancel/i}))
     })
+    await sleep(200);
 
-    expect(canvas.queryByText('the mummy')).not.toBeInTheDocument()
+    expect(canvas.queryByText('Bruno Germain')).not.toBeInTheDocument()
 };

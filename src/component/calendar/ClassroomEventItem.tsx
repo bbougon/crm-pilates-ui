@@ -46,7 +46,7 @@ export const ClassroomEventItem = ({session}: {session: Session}) => {
     const {display} = useDrawer();
     return (
         <Grid container>
-            <Grid container onClick={() => display(<SessionDetails />)}>
+            <Grid container onClick={() => display(<SessionDetails session={session}/>)}>
                 <Grid item xs={6}>
                     <ThemeProvider theme={theme}>
                         <Box sx={{
