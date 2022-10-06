@@ -1,6 +1,12 @@
 import * as React from "react";
 import {BaseSyntheticEvent, useCallback, useEffect, useReducer, useState} from "react";
-import {sessionCancel, sessionCheckin, sessionCheckout} from "../../features/sessionsSlice";
+import {
+    findAttendeeById,
+    mapSession,
+    sessionCancel,
+    sessionCheckin,
+    sessionCheckout
+} from "../../features/sessionsSlice";
 import {
     Box,
     Card,
@@ -20,8 +26,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {Attendance, Attendee, Session} from "../../features/domain/session";
 import {CreditBox} from "../CreditBox";
 import {useAppDispatch} from "../../hooks/redux";
-import {ApiAttendee, ApiSession} from "../../api";
-import {Subjects} from "../../features/domain/subjects";
+import {ApiSession} from "../../api";
+import {PayloadAction} from "@reduxjs/toolkit";
 
 const theme = createTheme({
     components: {
@@ -94,16 +100,6 @@ const attendeeCheckedOut = (attendee: Attendee): Action => {
     }
 }
 
-const mapAttendee = (apiAttendee: ApiAttendee): Attendee => {
-    return {
-        id: apiAttendee.id,
-        firstname: apiAttendee.firstname,
-        lastname: apiAttendee.lastname,
-        attendance: apiAttendee.attendance as Attendance,
-        credits: {amount: apiAttendee.credits?.amount}
-    }
-}
-
 const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -134,20 +130,18 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     useEffect(() => {
         if (checkin) {
             dispatch(sessionCheckin(checkin)).then((result) => {
-                const apiSession = result.payload as ApiSession;
-                const apiAttendee = apiSession.attendees?.find(attendee => attendee.id === state.attendee.id)
-                if (apiAttendee) {
-                    dispatchReducer(attendeeCheckedIn(mapAttendee(apiAttendee)))
+                const attendee = findAttendeeById(result as PayloadAction<ApiSession>, state.attendee.id);
+                if (attendee) {
+                    dispatchReducer(attendeeCheckedIn(attendee))
                 }
             })
             setCheckin(null)
         }
         if (checkout) {
             dispatch(sessionCheckout(checkout)).then((result) => {
-                const apiSession = result.payload as ApiSession;
-                const apiAttendee = apiSession.attendees?.find(attendee => attendee.id === state.attendee.id)
-                if (apiAttendee) {
-                    dispatchReducer(attendeeCheckedOut(mapAttendee(apiAttendee)))
+                const attendee = findAttendeeById(result as PayloadAction<ApiSession>, state.attendee.id)
+                if (attendee) {
+                    dispatchReducer(attendeeCheckedOut(attendee))
                 }
             })
             setCheckOut(null)
@@ -290,28 +284,13 @@ const SessionAttendees = ({session, onCancel}: { session: Session, onCancel: (ca
     )
 }
 
-const mapSession = (apiSession: ApiSession): Session => {
-    return {
-        id: apiSession.id,
-        classroomId: apiSession.classroom_id,
-        name: apiSession.name,
-        subject: apiSession.subject as Subjects,
-        schedule: {
-            start: apiSession.schedule.start,
-            stop: apiSession.schedule.stop
-        },
-        position: apiSession.position,
-        attendees: apiSession.attendees?.map(attendee => mapAttendee(attendee))
-    }
-}
-
 export const SessionDetails = ({session}: { session: Session }) => {
 
-    const [mySession, setSession] = useState<Session>(session)
+    const [currentSession, setCurrentSession] = useState<Session>(session)
     const dispatch = useAppDispatch();
 
-    const sessionStart = mySession.schedule.start;
-    const sessionEnd = mySession.schedule.stop;
+    const sessionStart = currentSession.schedule.start;
+    const sessionEnd = currentSession.schedule.stop;
     const dateSubheader = formatFullDate(sessionStart)
         .concat(` ${formatHours(sessionStart)}`)
         .concat(" to ")
@@ -320,17 +299,17 @@ export const SessionDetails = ({session}: { session: Session }) => {
 
     const cancelSession = useCallback((cancel: CancelAttendee) => {
         dispatch(sessionCancel(cancel)).then((result) => {
-            setSession(mapSession((result.payload as ApiSession)))
+            setCurrentSession(mapSession(result as PayloadAction<ApiSession>))
         })
     }, [dispatch])
 
     return (
         <Card sx={{width: 1}}>
-            <CardHeader title={mySession.name}
+            <CardHeader title={currentSession.name}
                         subheader={dateSubheader}
                         component="div"/>
             <CardContent>
-                <SessionAttendees session={mySession} onCancel={cancelSession}/>
+                <SessionAttendees session={currentSession} onCancel={cancelSession}/>
             </CardContent>
         </Card>
     )

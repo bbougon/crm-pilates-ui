@@ -260,3 +260,37 @@ export const sessionsSlice = createSlice({
 
 export const selectMonthlySessions = (state: RootState) => state.sessions.sessions
 export default sessionsSlice.reducer
+
+const mapAttendee = (apiAttendee: ApiAttendee): Attendee => {
+    return {
+        id: apiAttendee.id,
+        firstname: apiAttendee.firstname,
+        lastname: apiAttendee.lastname,
+        attendance: apiAttendee.attendance as Attendance,
+        credits: {amount: apiAttendee.credits?.amount}
+    }
+}
+
+export function findAttendeeById(result: PayloadAction<ApiSession>, attendeeId: string): Attendee | undefined {
+    const attendee = result.payload.attendees?.find(attendee => attendee.id === attendeeId);
+    if (attendee) {
+        return mapAttendee(attendee)
+    }
+    return attendee;
+}
+
+export const mapSession = (result: PayloadAction<ApiSession>): Session => {
+    const apiSession = result.payload
+    return {
+        id: apiSession.id,
+        classroomId: apiSession.classroom_id,
+        name: apiSession.name,
+        subject: apiSession.subject as Subjects,
+        schedule: {
+            start: apiSession.schedule.start,
+            stop: apiSession.schedule.stop
+        },
+        position: apiSession.position,
+        attendees: apiSession.attendees?.map(attendee => mapAttendee(attendee))
+    }
+}
