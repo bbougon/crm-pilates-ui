@@ -23,12 +23,7 @@ export default defineConfig({
             }
         }
     },
-    plugins: [react(), splitVendorChunkPlugin(), istanbul({
-        include: 'src/*',
-        exclude: ['node_modules', '**/src/test-utils/**', '**/__tests__/**', '**/*.stories.@(js|jsx|ts|tsx)'],
-        extension: [ '.js', '.jsx', '.ts', '.tsx' ],
-        requireEnv: true,
-    })],
+    plugins: [react(), splitVendorChunkPlugin()],
     define: {
         'process.env': {}
     },
@@ -38,14 +33,5 @@ export default defineConfig({
     server: {
         host: true,
         port: 3000
-    },
-    test: {
-        environment: "jsdom",
-        globals: true,
-        setupFiles: './setupTests.js',
-        env: "test",
-        coverage: {
-            exclude: ['**/src/test-utils/**', '**/__tests__/**']
-        }
     }
 })
