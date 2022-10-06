@@ -1,6 +1,5 @@
 import {defineConfig, splitVendorChunkPlugin} from 'vite'
 import react from '@vitejs/plugin-react'
-import istanbul from 'vite-plugin-istanbul';
 //import visualizer from "rollup-plugin-visualizer";
 
 export default defineConfig({
