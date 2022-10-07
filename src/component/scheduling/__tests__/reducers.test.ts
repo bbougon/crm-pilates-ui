@@ -1,4 +1,4 @@
-import {describe, it} from "vitest";
+import {describe, expect, it} from "vitest";
 import {ActionType, schedulingReducer, SchedulingState} from "../reducers";
 import {formatISO, parseISO} from "date-fns";
 import {faker} from "@faker-js/faker";
@@ -13,12 +13,14 @@ describe("Reducers", () => {
                     .endsAt("2022-09-09T11:00")
                     .build()
 
-                const {duration} = schedulingReducer(state, {
+                const {duration, classroomStartDateTime, classroomEndDateTime} = schedulingReducer(state, {
                     type: ActionType.END_DATE_UPDATED,
                     endDate: parseISO("2022-09-09T12:00")
                 })
 
                 expect(duration).toEqual(120)
+                expect(classroomStartDateTime).toEqual(formatISO(parseISO("2022-09-09T10:00")))
+                expect(classroomEndDateTime).toEqual(formatISO(parseISO("2022-09-09T12:00")))
             })
 
             it("should calculate closest 5 minutes duration", () => {
@@ -27,28 +29,81 @@ describe("Reducers", () => {
                     .endsAt("2022-09-09T11:10")
                     .build()
 
-                const {duration, classroomEndDateTime} = schedulingReducer(state, {
+                const {duration, classroomStartDateTime, classroomEndDateTime} = schedulingReducer(state, {
                     type: ActionType.END_DATE_UPDATED,
                     endDate: parseISO("2022-09-09T11:23")
                 })
 
                 expect(duration).toEqual(75)
+                expect(classroomStartDateTime).toEqual(formatISO(parseISO("2022-09-09T10:10")))
                 expect(classroomEndDateTime).toEqual(formatISO(parseISO("2022-09-09T11:25")))
             })
 
-            it("should not calculate closest 5 minutes duration if not in available duration", () => {
+            it("should not calculate duration if not in available duration", () => {
                 const state: SchedulingState = new SchedulingStateBuilder()
                     .startAt("2022-09-09T10:10")
                     .endsAt("2022-09-09T11:10")
                     .build()
 
-                const {duration, classroomEndDateTime} = schedulingReducer(state, {
+                const {duration, classroomStartDateTime, classroomEndDateTime} = schedulingReducer(state, {
                     type: ActionType.END_DATE_UPDATED,
                     endDate: parseISO("2022-09-09T11:18")
                 })
 
                 expect(duration).toEqual(60)
+                expect(classroomStartDateTime).toEqual(formatISO(parseISO("2022-09-09T10:10")))
                 expect(classroomEndDateTime).toEqual(formatISO(parseISO("2022-09-09T11:20")))
+            })
+        })
+
+        describe("When start date updated", () => {
+
+            it("should calculate duration in minutes", () => {
+                const state: SchedulingState = new SchedulingStateBuilder()
+                    .startAt("2022-09-09T10:00")
+                    .endsAt("2022-09-09T11:00")
+                    .build()
+
+                const {duration, classroomStartDateTime, classroomEndDateTime} = schedulingReducer(state, {
+                    type: ActionType.START_DATE_UPDATED,
+                    startDate: parseISO("2022-09-09T09:00")
+                })
+
+                expect(duration).toEqual(120)
+                expect(classroomStartDateTime).toEqual(formatISO(parseISO("2022-09-09T09:00")))
+                expect(classroomEndDateTime).toEqual(formatISO(parseISO("2022-09-09T11:00")))
+            })
+
+            it("should calculate closest 5 minutes duration", () => {
+                const state: SchedulingState = new SchedulingStateBuilder()
+                    .startAt("2022-09-09T10:10")
+                    .endsAt("2022-09-09T11:10")
+                    .build()
+
+                const {duration, classroomStartDateTime, classroomEndDateTime} = schedulingReducer(state, {
+                    type: ActionType.START_DATE_UPDATED,
+                    startDate: parseISO("2022-09-09T09:53")
+                })
+
+                expect(duration).toEqual(75)
+                expect(classroomStartDateTime).toEqual(formatISO(parseISO("2022-09-09T09:55")))
+                expect(classroomEndDateTime).toEqual(formatISO(parseISO("2022-09-09T11:10")))
+            })
+
+            it("should not calculate duration if not in available duration", () => {
+                const state: SchedulingState = new SchedulingStateBuilder()
+                    .startAt("2022-09-09T10:10")
+                    .endsAt("2022-09-09T11:10")
+                    .build()
+
+                const {duration, classroomStartDateTime, classroomEndDateTime} = schedulingReducer(state, {
+                    type: ActionType.START_DATE_UPDATED,
+                    startDate: parseISO("2022-09-09T09:18")
+                })
+
+                expect(duration).toEqual(60)
+                expect(classroomStartDateTime).toEqual(formatISO(parseISO("2022-09-09T09:20")))
+                expect(classroomEndDateTime).toEqual(formatISO(parseISO("2022-09-09T11:10")))
             })
         })
     })
@@ -75,12 +130,12 @@ class SchedulingStateBuilder {
     private subject = undefined;
 
     startAt(dateAsstring: string): SchedulingStateBuilder {
-        this.classroomStartDateTime = dateAsstring
+        this.classroomStartDateTime = formatISO(parseISO(dateAsstring))
         return this
     }
 
     endsAt(dateAsString: string): SchedulingStateBuilder {
-        this.classroomEndDateTime = dateAsString
+        this.classroomEndDateTime = formatISO(parseISO(dateAsString))
         return this
     }
 

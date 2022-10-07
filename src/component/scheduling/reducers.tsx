@@ -55,7 +55,36 @@ type SchedulingAction =
     endDate: Date
 }
 
+type ScheduleInformation = {
+    hours: number | undefined,
+    minutes: number | undefined,
+    key: string,
+    date: Date
+};
+
 export function schedulingReducer(state: SchedulingState, action: SchedulingAction): SchedulingState {
+    const durationAndStartDate = ({hours, minutes, key, date}: ScheduleInformation): SchedulingState => {
+        return determineClassroomTimeAndDuration({hours, minutes, key, date})
+    }
+    const durationAndEndDate = ({hours, minutes, key, date}: ScheduleInformation): SchedulingState => {
+        return determineClassroomTimeAndDuration({hours, minutes, key, date})
+    }
+    const determineClassroomTimeAndDuration = ({hours, minutes, key, date}: ScheduleInformation): SchedulingState => {
+        if (hours) {
+            const duration = hours * 60 + (minutes || 0);
+            const foundAvailableDuration = state.availableDurations.find(availableDuration => availableDuration.duration === duration);
+            return !foundAvailableDuration ? {
+                ...state,
+                [key]: formatISO(roundToNearestMinutes(date, {nearestTo: 5}))
+            } : {
+                ...state,
+                duration,
+                [key]: formatISO(roundToNearestMinutes(date, {nearestTo: 5}))
+            };
+        }
+        return {...state, [key]: formatISO(date)}
+    }
+
     switch (action.type) {
         case ActionType.CLASSROOM_NAME_CHANGED:
             return {...state, classroomName: action.classroomName}
@@ -71,21 +100,20 @@ export function schedulingReducer(state: SchedulingState, action: SchedulingActi
                 attendees: action.attendees.map(attendee => ({id: attendee.id})),
                 position: action.attendees.length > state.position ? action.attendees.length : state.position
             }
-        case ActionType.START_DATE_UPDATED:
-            return {...state, classroomStartDateTime: formatISO(action.startDate)}
-        case ActionType.END_DATE_UPDATED:
+        case ActionType.START_DATE_UPDATED: {
             const {hours, minutes} = intervalToDuration({
-                start: parseISO(state.classroomStartDateTime), end: roundToNearestMinutes(action.endDate, {nearestTo: 5})
+                start: roundToNearestMinutes(action.startDate, {nearestTo: 5}),
+                end: parseISO(state.classroomEndDateTime)
             });
-            if (hours) {
-                const duration = hours * 60 + (minutes || 0);
-                const foundAvailableDuration = state.availableDurations.find(availableDuration => availableDuration.duration === duration);
-                if(!foundAvailableDuration) {
-                    return {...state, classroomEndDateTime: formatISO(roundToNearestMinutes(action.endDate, {nearestTo: 5}))}
-                }
-                return {...state, duration, classroomEndDateTime: formatISO(roundToNearestMinutes(action.endDate, {nearestTo: 5}))}
-            }
-            return {...state, classroomEndDateTime: formatISO(action.endDate)}
+            return durationAndStartDate({hours, minutes, key: "classroomStartDateTime", date: action.startDate});
+        }
+        case ActionType.END_DATE_UPDATED: {
+            const {hours, minutes} = intervalToDuration({
+                start: parseISO(state.classroomStartDateTime),
+                end: roundToNearestMinutes(action.endDate, {nearestTo: 5})
+            });
+            return durationAndEndDate({hours, minutes, key: "classroomEndDateTime", date: action.endDate})
+        }
     }
 }
 
