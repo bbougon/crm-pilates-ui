@@ -22,6 +22,7 @@ import {AuthStatus} from "../../features/auth";
 import {ApiAttendee, ApiSession} from "../../api";
 import {Subjects} from "../../features/domain/subjects";
 import {SessionDetails} from "../../component/classroom/SessionDetails";
+import SessionDetailsDoc from "./SessionDetails.docs.mdx";
 
 type State = {
     sessions: Session[]
@@ -137,6 +138,11 @@ export default {
     title: 'Session Details',
     decorators: [(story: any) => <Provider store={store}>{story()}</Provider>],
     excludeStories: /.*MockedState$/,
+    parameters: {
+        docs: {
+            page: SessionDetailsDoc
+        }
+    }
 };
 
 const Template: ComponentStory<typeof SessionDetails> = (args) => <SessionDetails {...args} />;
