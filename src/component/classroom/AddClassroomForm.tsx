@@ -19,7 +19,7 @@ import set from "date-fns/set";
 import {useDispatch, useSelector} from "react-redux";
 import {selectAllClients} from "../../features/clientsSlice";
 import {addClassroom} from "../../features/classroomSlice";
-import {format, formatISO, isValid} from "date-fns";
+import {format, formatISO, intervalToDuration, isValid, parseISO} from "date-fns";
 import {Subjects} from "../../features/domain/subjects";
 import {Attendee, Classroom} from "../../features/domain/classroom";
 import {Client} from "../../features/domain/client";
@@ -103,6 +103,13 @@ function reducer(state: State, action: Action): State {
         case ActionType.START_DATE_UPDATED:
             return {...state, classroomStartDateTime: formatISO(action.startDate)}
         case ActionType.END_DATE_UPDATED:
+            const {hours, minutes} = intervalToDuration({
+                start: parseISO(state.classroomStartDateTime), end: action.endDate
+            });
+            if (hours) {
+                const duration = hours * 60 + (minutes || 0);
+                return {...state, duration, classroomEndDateTime: formatISO(action.endDate)}
+            }
             return {...state, classroomEndDateTime: formatISO(action.endDate)}
     }
 }

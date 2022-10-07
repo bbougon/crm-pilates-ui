@@ -119,8 +119,14 @@ export default {
 const Template: ComponentStory<typeof AddClassroomForm> = (args) => <AddClassroomForm {...args} />;
 
 export const AddClassroomDetails = Template.bind({});
+export const CalculateClassroomDuration = Template.bind({});
 export const AddClassroomWithAttendees = Template.bind({});
 
+/*
+    #########################################################
+    # Display classroom form                                #
+    #########################################################
+ */
 AddClassroomDetails.decorators = [
     (story: any) => <Mockstore classroomState={initialClassroomState}
                                clientsState={initialClientsState}>{story()}</Mockstore>,
@@ -149,6 +155,48 @@ AddClassroomDetails.play = async ({canvasElement}) => {
     await expect(canvas.getByRole('button', {name: /submit/i})).toBeDisabled()
 };
 
+
+/*
+    #########################################################
+    # Calculate classroom duration                          #
+    #########################################################
+ */
+
+CalculateClassroomDuration.decorators = [
+    (story: any) => <Mockstore classroomState={initialClassroomState}
+                               clientsState={initialClientsState}>{story()}</Mockstore>,
+]
+CalculateClassroomDuration.storyName = "Classroom duration may be determined from filled start and end time"
+CalculateClassroomDuration.args = {
+    ...initialProps
+};
+CalculateClassroomDuration.parameters = {
+    msw: {
+        handlers: [],
+    },
+};
+
+CalculateClassroomDuration.play = async ({canvasElement}) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText('Add a classroom on 2021-05-07')).toBeInTheDocument()
+    await expect(canvas.getByLabelText(/position/i)).toHaveTextContent('1')
+    const startDateElement = canvas.getByLabelText(/choose start date/i);
+    userEvent.clear(within(startDateElement).getByRole('textbox'))
+    userEvent.type(within(startDateElement).getByRole('textbox'), '05/07/2021 09:00')
+    const recurrenceElement = canvas.getByLabelText(/recurrence/i);
+    userEvent.clear(within(recurrenceElement).getByRole('textbox'))
+    userEvent.type(within(recurrenceElement).getByRole('textbox'), '05/07/2021 10:30')
+    userEvent.type(canvas.getByRole("textbox", {name: /classroom's name/i}), "Cours tapis duo")
+    const durationElement = canvas.getAllByLabelText("Duration")[0];
+    await expect(within(durationElement).getByRole('button')).toHaveTextContent('1h30')
+    await expect(canvas.getByRole('button', {name: /submit/i})).toBeDisabled()
+};
+/*
+    #########################################################
+    # Fill classroom form with attendees                    #
+    #########################################################
+ */
 AddClassroomWithAttendees.decorators = [
     (story: any) => <Mockstore classroomState={initialClassroomState}
                                clientsState={withClientsState}>{story()}</Mockstore>,

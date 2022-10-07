@@ -156,18 +156,23 @@ function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/*
+    #########################################################
+    # Display default session details                       #
+    #########################################################
+ */
 DisplaySessionDetails.decorators = [
     (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
 ]
 DisplaySessionDetails.args = {
     session: defaultSession
 };
-
 DisplaySessionDetails.parameters = {
     msw: {
         handlers: [],
     },
 };
+
 
 DisplaySessionDetails.play = async ({canvasElement}) => {
     const canvas = within(canvasElement);
@@ -177,13 +182,18 @@ DisplaySessionDetails.play = async ({canvasElement}) => {
     await expect(canvas.getByText('R')).toBeInTheDocument()
 };
 
+/*
+    #########################################################
+    # Perform checkin                                       #
+    #########################################################
+ */
 SessionCheckin.decorators = [
     (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
 ]
+SessionCheckin.storyName = "Bruno Germain performs checkin"
 SessionCheckin.args = {
     session: defaultSession
 };
-
 SessionCheckin.parameters = {
     msw: {
         handlers: [
@@ -220,14 +230,18 @@ SessionCheckin.play = async ({canvasElement}) => {
     await expect(presentation.getByRole('menuitem', {name: /cancel/i})).toHaveAttribute("aria-disabled")
 };
 
+/*
+    #########################################################
+    # Perform Checkout                                      #
+    #########################################################
+ */
 SessionCheckout.decorators = [
     (story: any) => <Mockstore sessionState={SessionWithOneCheckedInAttendee}>{story()}</Mockstore>,
 ]
+SessionCheckout.storyName = "Bruno Germain performs checkout"
 SessionCheckout.args = {
     session: sessionWithOneCheckedInAttendee
 };
-
-
 SessionCheckout.parameters = {
     msw: {
         handlers: [
@@ -266,13 +280,18 @@ SessionCheckout.play = async ({canvasElement}) => {
     await expect(presentation.getByRole('menuitem', {name: /cancel/i})).not.toHaveAttribute("aria-disabled")
 };
 
+/*
+    #########################################################
+    # Cancel session                                        #
+    #########################################################
+ */
 CancelSession.decorators = [
     (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
 ]
+CancelSession.storyName = "Bruno Germain cancel his session"
 CancelSession.args = {
     session: defaultSession
 };
-
 CancelSession.parameters = {
     msw: {
         handlers: [
