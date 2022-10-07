@@ -12,8 +12,8 @@ import {ErrorMessage} from "../../features/errors";
 import {addClassroom, ClassroomStatus} from "../../features/classroomSlice";
 import {Client} from "../../features/domain/client";
 import {ClientStatus} from "../../features/clientsSlice";
-import {AddClassroomForm} from "../../component/classroom/AddClassroomForm";
-import AddClassroomFormDoc from "./AddClassroomForm.docs.mdx"
+import {ClassroomScheduling} from "../../component/scheduling/ClassroomScheduling";
+import ClassroomSchedulingDoc from "./ClassroomScheduling.docs.mdx"
 import {client} from "../../test-utils/clients/clients";
 import {compose, context, rest} from "msw";
 import {APIClassroomBuilder} from "../../test-utils/classroom/classroom";
@@ -54,7 +54,7 @@ const withClientsState: ClientState = {
 const initialProps = {
     date: parseISO('2021-05-07T09:00:00'),
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onClassroomAdded: () => {
+    onClassroomScheduled: () => {
     }
 }
 
@@ -105,43 +105,43 @@ const Mockstore = ({classroomState, clientsState, children}: MockStoreProps) => 
 };
 
 export default {
-    component: AddClassroomForm,
+    component: ClassroomScheduling,
     title: 'Add classroom form',
     decorators: [(story: any) => <Provider store={store}>{story()}</Provider>],
     excludeStories: /.*MockedState$/,
     parameters: {
         docs: {
-            page: AddClassroomFormDoc
+            page: ClassroomSchedulingDoc
         }
     }
-} as ComponentMeta<typeof AddClassroomForm>;
+} as ComponentMeta<typeof ClassroomScheduling>;
 
-const Template: ComponentStory<typeof AddClassroomForm> = (args) => <AddClassroomForm {...args} />;
+const Template: ComponentStory<typeof ClassroomScheduling> = (args) => <ClassroomScheduling {...args} />;
 
-export const AddClassroomDetails = Template.bind({});
+export const ClassroomSchedulingDetails = Template.bind({});
 export const CalculateClassroomDuration = Template.bind({});
-export const AddClassroomWithAttendees = Template.bind({});
+export const ClassroomSchedulingWithAttendees = Template.bind({});
 
 /*
     #########################################################
     # Display classroom form                                #
     #########################################################
  */
-AddClassroomDetails.decorators = [
+ClassroomSchedulingDetails.decorators = [
     (story: any) => <Mockstore classroomState={initialClassroomState}
                                clientsState={initialClientsState}>{story()}</Mockstore>,
 ]
-AddClassroomDetails.args = {
+ClassroomSchedulingDetails.args = {
     ...initialProps
 };
 
-AddClassroomDetails.parameters = {
+ClassroomSchedulingDetails.parameters = {
     msw: {
         handlers: [],
     },
 };
 
-AddClassroomDetails.play = async ({canvasElement}) => {
+ClassroomSchedulingDetails.play = async ({canvasElement}) => {
     const canvas = within(canvasElement);
 
     await expect(canvas.getByText('Add a classroom on 2021-05-07')).toBeInTheDocument()
@@ -197,15 +197,15 @@ CalculateClassroomDuration.play = async ({canvasElement}) => {
     # Fill classroom form with attendees                    #
     #########################################################
  */
-AddClassroomWithAttendees.decorators = [
+ClassroomSchedulingWithAttendees.decorators = [
     (story: any) => <Mockstore classroomState={initialClassroomState}
                                clientsState={withClientsState}>{story()}</Mockstore>,
 ]
-AddClassroomWithAttendees.args = {
+ClassroomSchedulingWithAttendees.args = {
     ...initialProps
 };
 
-AddClassroomWithAttendees.parameters = {
+ClassroomSchedulingWithAttendees.parameters = {
     msw: {
         handlers: [
             rest.post('http://localhost:8081/classrooms', (req, res, _) => {
@@ -228,7 +228,7 @@ AddClassroomWithAttendees.parameters = {
     },
 };
 
-AddClassroomWithAttendees.play = async ({canvasElement}) => {
+ClassroomSchedulingWithAttendees.play = async ({canvasElement}) => {
     const canvas = within(canvasElement);
 
     userEvent.type(canvas.getByRole("textbox", {name: /classroom's name/i}), "Cours tapis duo")
@@ -239,9 +239,6 @@ AddClassroomWithAttendees.play = async ({canvasElement}) => {
     const startDateElement = canvas.getByLabelText(/choose start date/i);
     userEvent.clear(within(startDateElement).getByRole('textbox'))
     userEvent.type(within(startDateElement).getByRole('textbox'), '05/07/2021 10:00')
-    const recurrenceElement = canvas.getByLabelText(/recurrence/i);
-    userEvent.clear(within(recurrenceElement).getByRole('textbox'))
-    userEvent.type(within(recurrenceElement).getByRole('textbox'), '07/07/2021 12:00')
     fireEvent.mouseDown(canvas.getByRole("button", {name: /duration 1h00/i}))
     userEvent.click(canvas.getByText(/2h00/i));
     userEvent.click(within(canvas.getByRole("combobox")).getByRole('textbox'))

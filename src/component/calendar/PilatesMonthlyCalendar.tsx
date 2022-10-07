@@ -10,7 +10,7 @@ import {Grid, List} from "@mui/material";
 import {blueGrey} from "@mui/material/colors";
 import {RootState} from "../../app/store";
 import {ClassroomEventItem} from "./ClassroomEventItem";
-import {AddClassroomItem} from "./AddClassroomItem";
+import {ClassroomSchedulingItem} from "../scheduling/ClassroomSchedulingItem";
 import {ErrorMessage} from "../../features/errors";
 import {DisplayError} from "../errors/DisplayError";
 import {Session, SessionsLink} from "../../features/domain/session";
@@ -140,7 +140,7 @@ export const PilatesMonthlyCalendar = ({date}: PilatesMonthlyCalendarProps) => {
                                     return <ClassroomEventItem key={index} session={item.session}/>
                                 }
                             );
-                            events.push(<AddClassroomItem key={Math.random()} onClassroomAdded={handleClassroomAdded}/>)
+                            events.push(<ClassroomSchedulingItem key={Math.random()} onClassroomScheduled={handleClassroomAdded}/>)
                             return events
                         }
                     }}

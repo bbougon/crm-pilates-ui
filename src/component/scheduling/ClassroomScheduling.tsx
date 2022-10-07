@@ -26,11 +26,6 @@ import {Client} from "../../features/domain/client";
 import {subjects} from "../../utils/translation";
 import {DateTimePicker, LocalizationProvider} from "@mui/lab";
 
-export type AddClassroomFormProps = {
-    date: Date
-    onClassroomAdded: () => void
-}
-
 enum ActionType {
     CLASSROOM_NAME_CHANGED = "CLASSROOM_NAME_CHANGED",
     SUBJECT_CHANGED = "SUBJECT_CHANGED",
@@ -144,7 +139,10 @@ function updateClassroomEndDate(endDate: Date): Action {
 
 const FORMAT = "MM/dd/yyyy HH:mm"
 
-export const AddClassroomForm: React.FC<AddClassroomFormProps> = ({date, onClassroomAdded}: AddClassroomFormProps) => {
+export const ClassroomScheduling = ({date, onClassroomScheduled}: {
+    date: Date
+    onClassroomScheduled: () => void
+}) => {
 
     const dispatch = useDispatch();
 
@@ -194,7 +192,7 @@ export const AddClassroomForm: React.FC<AddClassroomFormProps> = ({date, onClass
             attendees: state.attendees
         }
         await dispatch(addClassroom(classroom))
-        onClassroomAdded()
+        onClassroomScheduled()
     }
 
     return (
