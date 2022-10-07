@@ -19,123 +19,23 @@ import set from "date-fns/set";
 import {useDispatch, useSelector} from "react-redux";
 import {selectAllClients} from "../../features/clientsSlice";
 import {addClassroom} from "../../features/classroomSlice";
-import {format, formatISO, intervalToDuration, isValid, parseISO} from "date-fns";
+import {format, formatISO, isValid} from "date-fns";
 import {Subjects} from "../../features/domain/subjects";
-import {Attendee, Classroom} from "../../features/domain/classroom";
+import {Classroom} from "../../features/domain/classroom";
 import {Client} from "../../features/domain/client";
 import {subjects} from "../../utils/translation";
 import {DateTimePicker, LocalizationProvider} from "@mui/lab";
-
-enum ActionType {
-    CLASSROOM_NAME_CHANGED = "CLASSROOM_NAME_CHANGED",
-    SUBJECT_CHANGED = "SUBJECT_CHANGED",
-    POSITION_CHANGED = "POSITION_CHANGED",
-    DURATION_UPDATED = "DURATION_UPDATED",
-    ATTENDEES_UPDATED = "ATTENDEES_UPDATED",
-    START_DATE_UPDATED = "START_DATE_UPDATED",
-    END_DATE_UPDATED = "END_DATE_UPDATED",
-}
-
-type State = {
-    currentDate: Date
-    classroomName: string
-    position: number
-    subject?: Subjects | unknown
-    duration: number
-    classroomStartDateTime: string
-    classroomEndDateTime: string
-    attendees: Attendee[]
-    availableDurations: { duration: number, human: string }[]
-    availablePositions: number[]
-    fieldsAreFilled: (state: State) => boolean
-}
-
-type Action =
-    | {
-    type: ActionType.CLASSROOM_NAME_CHANGED
-    classroomName: string
-}
-    | {
-    type: ActionType.SUBJECT_CHANGED
-    subject: Subjects
-} | {
-    type: ActionType.POSITION_CHANGED
-    position: number
-}
-    | {
-    type: ActionType.DURATION_UPDATED
-    duration: number
-}
-    | {
-    type: ActionType.ATTENDEES_UPDATED
-    attendees: Client[]
-}
-    | {
-    type: ActionType.START_DATE_UPDATED
-    startDate: Date
-}
-    | {
-    type: ActionType.END_DATE_UPDATED
-    endDate: Date
-}
-
-function reducer(state: State, action: Action): State {
-    switch (action.type) {
-        case ActionType.CLASSROOM_NAME_CHANGED:
-            return {...state, classroomName: action.classroomName}
-        case ActionType.SUBJECT_CHANGED:
-            return {...state, subject: action.subject}
-        case ActionType.POSITION_CHANGED:
-            return {...state, position: action.position}
-        case ActionType.DURATION_UPDATED:
-            return {...state, duration: action.duration}
-        case ActionType.ATTENDEES_UPDATED:
-            return {
-                ...state,
-                attendees: action.attendees.map(attendee => ({id: attendee.id})),
-                position: action.attendees.length > state.position ? action.attendees.length : state.position
-            }
-        case ActionType.START_DATE_UPDATED:
-            return {...state, classroomStartDateTime: formatISO(action.startDate)}
-        case ActionType.END_DATE_UPDATED:
-            const {hours, minutes} = intervalToDuration({
-                start: parseISO(state.classroomStartDateTime), end: action.endDate
-            });
-            if (hours) {
-                const duration = hours * 60 + (minutes || 0);
-                return {...state, duration, classroomEndDateTime: formatISO(action.endDate)}
-            }
-            return {...state, classroomEndDateTime: formatISO(action.endDate)}
-    }
-}
-
-function updateClasrroomName(classroomName: string): Action {
-    return {classroomName, type: ActionType.CLASSROOM_NAME_CHANGED}
-}
-
-function updateSubject(subject: Subjects): Action {
-    return {subject, type: ActionType.SUBJECT_CHANGED}
-}
-
-function updatePosition(position: number): Action {
-    return {position, type: ActionType.POSITION_CHANGED}
-}
-
-function updateDuration(duration: number): Action {
-    return {duration, type: ActionType.DURATION_UPDATED}
-}
-
-function updateAttendees(attendees: Client[]): Action {
-    return {attendees, type: ActionType.ATTENDEES_UPDATED}
-}
-
-function updateClassroomStartDate(startDate: Date): Action {
-    return {startDate, type: ActionType.START_DATE_UPDATED}
-}
-
-function updateClassroomEndDate(endDate: Date): Action {
-    return {endDate, type: ActionType.END_DATE_UPDATED}
-}
+import {
+    schedulingReducer,
+    SchedulingState,
+    updateAttendees,
+    updateClassroomName,
+    updateClassroomEndDate,
+    updateClassroomStartDate,
+    updateDuration,
+    updatePosition,
+    updateSubject
+} from "./reducers";
 
 const FORMAT = "MM/dd/yyyy HH:mm"
 
@@ -146,7 +46,7 @@ export const ClassroomScheduling = ({date, onClassroomScheduled}: {
 
     const dispatch = useDispatch();
 
-    const [state, dispatchReducer] = useReducer(reducer, {
+    const [state, dispatchReducer] = useReducer(schedulingReducer, {
         classroomName: "",
         currentDate: new Date(),
         classroomStartDateTime: formatISO(set(date, {hours: date.getHours(), minutes: date.getMinutes()})),
@@ -165,7 +65,7 @@ export const ClassroomScheduling = ({date, onClassroomScheduled}: {
             {duration: 120, human: "2h00"}
         ],
         availablePositions: [1, 2, 3, 4, 5, 6],
-        fieldsAreFilled: (state: State) => {
+        fieldsAreFilled: (state: SchedulingState) => {
             return state.classroomName !== ""
                 && state.subject !== undefined
                 && state.availableDurations.map(duration => duration.duration).includes(state.duration)
@@ -174,7 +74,7 @@ export const ClassroomScheduling = ({date, onClassroomScheduled}: {
 
     const clients: Client[] = useSelector(selectAllClients)
 
-    const onClassroomNameChanged = (e: BaseSyntheticEvent) => dispatchReducer(updateClasrroomName(e.target.value))
+    const onClassroomNameChanged = (e: BaseSyntheticEvent) => dispatchReducer(updateClassroomName(e.target.value))
     const onSubjectChanged = (e: SelectChangeEvent<Subjects | unknown>) => dispatchReducer(updateSubject(e.target.value as Subjects))
     const onPositionChanged = (e: SelectChangeEvent<number>) => dispatchReducer(updatePosition(e.target.value as number))
     const onDurationChanged = (e: SelectChangeEvent<number>) => dispatchReducer(updateDuration(e.target.value as number))
@@ -259,6 +159,7 @@ export const ClassroomScheduling = ({date, onClassroomScheduled}: {
                                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                                     <DateTimePicker
                                         label="Choose start date"
+                                        minutesStep={5}
                                         onChange={(newValue) => {
                                             if (newValue !== null && isValid(newValue))
                                                 dispatchReducer(updateClassroomStartDate(newValue as Date))
@@ -281,6 +182,7 @@ export const ClassroomScheduling = ({date, onClassroomScheduled}: {
                                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                                     <DateTimePicker
                                         label="Recurrence"
+                                        minutesStep={5}
                                         onChange={(newValue) => {
                                             if (newValue !== null && isValid(newValue))
                                                 dispatchReducer(updateClassroomEndDate(newValue as Date));

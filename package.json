@@ -65,6 +65,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.18.13",
+    "@faker-js/faker": "^7.5.0",
     "@storybook/addon-a11y": "^6.5.10",
     "@storybook/addon-actions": "^6.5.10",
     "@storybook/addon-coverage": "^0.0.4",
