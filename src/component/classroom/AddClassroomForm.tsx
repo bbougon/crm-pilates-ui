@@ -213,6 +213,7 @@ export const AddClassroomForm: React.FC<AddClassroomFormProps> = ({date, onClass
                             <FormControl fullWidth>
                                 <InputLabel id="subject-select-label">Subject</InputLabel>
                                 <Select
+                                    MenuProps={{disablePortal: true}}
                                     labelId="subject-select-label"
                                     id="subject-select"
                                     value={state.subject || ""}
@@ -232,6 +233,7 @@ export const AddClassroomForm: React.FC<AddClassroomFormProps> = ({date, onClass
                             <FormControl fullWidth>
                                 <InputLabel id="position-select-label">Position</InputLabel>
                                 <Select
+                                    MenuProps={{disablePortal: true}}
                                     labelId="position-select-label"
                                     id="position-select"
                                     value={state.position}
@@ -292,6 +294,7 @@ export const AddClassroomForm: React.FC<AddClassroomFormProps> = ({date, onClass
                             <FormControl fullWidth>
                                 <InputLabel id="duration-select-label" htmlFor="duration-form">Duration</InputLabel>
                                 <Select
+                                    MenuProps={{disablePortal: true}}
                                     labelId="duration-select-label"
                                     id="duration-select"
                                     name="duration-form"

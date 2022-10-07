@@ -3,7 +3,7 @@ import {parseISO} from "date-fns";
 import {Provider} from 'react-redux';
 import {configureStore, createSlice} from '@reduxjs/toolkit';
 import {store} from "../../app/store";
-import {fireEvent, userEvent, within, screen} from "@storybook/testing-library";
+import {fireEvent, screen, userEvent, within} from "@storybook/testing-library";
 import {expect} from "@storybook/jest";
 import {ComponentMeta, ComponentStory} from "@storybook/react";
 import {AuthStatus} from "../../features/auth";
@@ -185,11 +185,9 @@ AddClassroomWithAttendees.play = async ({canvasElement}) => {
 
     userEvent.type(canvas.getByRole("textbox", {name: /classroom's name/i}), "Cours tapis duo")
     fireEvent.mouseDown(canvas.getByRole("button", {name: /subject/i}))
-    const subject = within(screen.getByRole('listbox'));
-    userEvent.click(subject.getByText(/mat/i));
+    userEvent.click(canvas.getByText(/mat/i));
     fireEvent.mouseDown(canvas.getByRole("button", {name: /position 1/i}))
-    const position = within(screen.getByRole('listbox'));
-    userEvent.click(position.getByText(/2/i));
+    userEvent.click(canvas.getByText(/3/i));
     const startDateElement = canvas.getByLabelText(/choose start date/i);
     userEvent.clear(within(startDateElement).getByRole('textbox'))
     userEvent.type(within(startDateElement).getByRole('textbox'), '05/07/2021 10:00')
@@ -197,8 +195,7 @@ AddClassroomWithAttendees.play = async ({canvasElement}) => {
     userEvent.clear(within(recurrenceElement).getByRole('textbox'))
     userEvent.type(within(recurrenceElement).getByRole('textbox'), '07/07/2021 12:00')
     fireEvent.mouseDown(canvas.getByRole("button", {name: /duration 1h00/i}))
-    const duration = within(screen.getByRole('listbox'));
-    userEvent.click(duration.getByText(/2h00/i));
+    userEvent.click(canvas.getByText(/2h00/i));
     userEvent.click(within(canvas.getByRole("combobox")).getByRole('textbox'))
     const attendees = within(screen.getByRole('presentation')).getByRole('listbox');
     userEvent.click(within(attendees).getByText(/martin charles/i))
