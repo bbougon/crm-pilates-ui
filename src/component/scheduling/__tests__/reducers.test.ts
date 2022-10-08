@@ -177,7 +177,6 @@ class SchedulingStateBuilder {
 
     build(): SchedulingState {
         return {
-            currentDate: new Date(),
             classroomName: this.classroomName,
             position: this.position,
             duration: this.duration,

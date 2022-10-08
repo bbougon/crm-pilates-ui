@@ -19,7 +19,7 @@ import set from "date-fns/set";
 import {useDispatch, useSelector} from "react-redux";
 import {selectAllClients} from "../../features/clientsSlice";
 import {addClassroom} from "../../features/classroomSlice";
-import {format, formatISO, isValid} from "date-fns";
+import {formatISO, intlFormat, isValid} from "date-fns";
 import {Subjects} from "../../features/domain/subjects";
 import {Classroom} from "../../features/domain/classroom";
 import {Client} from "../../features/domain/client";
@@ -29,8 +29,8 @@ import {
     schedulingReducer,
     SchedulingState,
     updateAttendees,
-    updateClassroomName,
     updateClassroomEndDate,
+    updateClassroomName,
     updateClassroomStartDate,
     updateDuration,
     updatePosition,
@@ -48,7 +48,6 @@ export const ClassroomScheduling = ({date, onClassroomScheduled}: {
 
     const [state, dispatchReducer] = useReducer(schedulingReducer, {
         classroomName: "",
-        currentDate: new Date(),
         classroomStartDateTime: formatISO(set(date, {hours: date.getHours(), minutes: date.getMinutes()})),
         classroomEndDateTime: formatISO(set(date, {hours: date.getHours() + 1, minutes: date.getMinutes()})),
         duration: 60,
@@ -97,7 +96,12 @@ export const ClassroomScheduling = ({date, onClassroomScheduled}: {
 
     return (
         <Card sx={{width: 1}}>
-            <CardHeader title={`Add a classroom on ${format(date, "yyyy-MM-dd")}`} component="div"/>
+            <CardHeader title={`Scheduling classroom on ${intlFormat(date, {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}`} component="div"/>
             <CardContent>
                 <Grid container rowSpacing={2}>
                     <Grid container spacing={1} direction="row">

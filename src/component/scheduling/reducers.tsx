@@ -15,7 +15,6 @@ export enum ActionType {
 }
 
 export type SchedulingState = {
-    currentDate: Date
     classroomName: string
     position: number
     subject?: Subjects | unknown

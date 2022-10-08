@@ -1,5 +1,5 @@
 import React, {ReactElement} from 'react';
-import {parseISO} from "date-fns";
+import {intlFormat, parseISO} from "date-fns";
 import {Provider} from 'react-redux';
 import {configureStore, createSlice} from '@reduxjs/toolkit';
 import {store} from "../../app/store";
@@ -144,7 +144,14 @@ ClassroomSchedulingDetails.parameters = {
 ClassroomSchedulingDetails.play = async ({canvasElement}) => {
     const canvas = within(canvasElement);
 
-    await expect(canvas.getByText('Add a classroom on 2021-05-07')).toBeInTheDocument()
+    await expect(canvas.getByText(`Scheduling classroom on ${intlFormat(parseISO("2021-05-07T09:00"), {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+    })}`)).toBeInTheDocument()
     await expect(canvas.getByLabelText(/position/i)).toHaveTextContent('1')
     const startDateElement = canvas.getByLabelText(/choose start date/i);
     await expect(within(startDateElement).getByRole('textbox')).toHaveValue('05/07/2021 09:00')
@@ -179,7 +186,12 @@ CalculateClassroomDuration.parameters = {
 CalculateClassroomDuration.play = async ({canvasElement}) => {
     const canvas = within(canvasElement);
 
-    await expect(canvas.getByText('Add a classroom on 2021-05-07')).toBeInTheDocument()
+    await expect(canvas.getByText(`Scheduling classroom on ${intlFormat(parseISO("2021-05-07T09:00"), {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    })}`)).toBeInTheDocument()
     await expect(canvas.getByLabelText(/position/i)).toHaveTextContent('1')
     const startDateElement = canvas.getByLabelText(/choose start date/i);
     userEvent.clear(within(startDateElement).getByRole('textbox'))
