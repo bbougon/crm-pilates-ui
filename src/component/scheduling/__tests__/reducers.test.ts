@@ -106,6 +106,42 @@ describe("Reducers", () => {
                 expect(classroomEndDateTime).toEqual(formatISO(parseISO("2022-09-09T11:10")))
             })
         })
+
+        describe("When duration is updated", () => {
+
+            it("should calculate end date", () => {
+                const state: SchedulingState = new SchedulingStateBuilder()
+                    .startAt("2022-09-09T10:00")
+                    .endsAt("2022-09-09T11:00")
+                    .build()
+
+                const {duration, classroomStartDateTime, classroomEndDateTime} = schedulingReducer(state, {
+                    type: ActionType.DURATION_UPDATED,
+                    duration: 75
+                })
+
+                expect(duration).toEqual(75)
+                expect(classroomStartDateTime).toEqual(formatISO(parseISO("2022-09-09T10:00")))
+                expect(classroomEndDateTime).toEqual(formatISO(parseISO("2022-09-09T11:15")))
+            })
+
+            it("should calculate end date when recurring", () => {
+                const state: SchedulingState = new SchedulingStateBuilder()
+                    .startAt("2022-09-09T10:00")
+                    .endsAt("2022-09-30T11:00")
+                    .build()
+
+                const {duration, classroomStartDateTime, classroomEndDateTime} = schedulingReducer(state, {
+                    type: ActionType.DURATION_UPDATED,
+                    duration: 90
+                })
+
+                expect(duration).toEqual(90)
+                expect(classroomStartDateTime).toEqual(formatISO(parseISO("2022-09-09T10:00")))
+                expect(classroomEndDateTime).toEqual(formatISO(parseISO("2022-09-30T11:30")))
+            })
+
+        })
     })
 })
 

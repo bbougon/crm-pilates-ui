@@ -1,11 +1,11 @@
 import * as React from "react";
-import {BaseSyntheticEvent, useEffect, useState} from "react";
+import {BaseSyntheticEvent, KeyboardEvent, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {MainContainer} from "../../const/containers";
 import {FormControl} from "@material-ui/core";
 import {Button, Card, CardContent, CardHeader, Grid, TextField} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import {login, AuthStatus} from "../../features/auth";
+import {AuthStatus, login} from "../../features/auth";
 import {RootState} from "../../app/store";
 import {DisplayError} from "../errors/DisplayError";
 import {ErrorMessage} from "../../features/errors";
@@ -34,12 +34,18 @@ const Login = () => {
         await dispatch(login({username, password}))
     }
 
+    const onKeyDown = async (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === "Enter") {
+            await dispatch(login({username, password}))
+        }
+    }
+
+
     useEffect(() => {
         if (status === AuthStatus.SUCCEEDED) {
             navigate("/")
         }
     })
-
 
     if (status === AuthStatus.FAILED) {
         errorContent = (
@@ -82,6 +88,7 @@ const Login = () => {
                                                    required
                                                    variant="standard"
                                                    onChange={onPasswordChanged}
+                                                   onKeyDown={onKeyDown}
                                                    aria-describedby="password-help"
                                         />
                                     </FormControl>

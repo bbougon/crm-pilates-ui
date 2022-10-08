@@ -1,7 +1,8 @@
 import {Subjects} from "../../features/domain/subjects";
 import {Attendee} from "../../features/domain/classroom";
 import {Client} from "../../features/domain/client";
-import {formatISO, intervalToDuration, parseISO, roundToNearestMinutes} from "date-fns";
+import {addMinutes, formatISO, intervalToDuration, parseISO, roundToNearestMinutes} from "date-fns";
+import set from "date-fns/set";
 
 export enum ActionType {
     CLASSROOM_NAME_CHANGED = "CLASSROOM_NAME_CHANGED",
@@ -92,8 +93,15 @@ export function schedulingReducer(state: SchedulingState, action: SchedulingActi
             return {...state, subject: action.subject}
         case ActionType.POSITION_CHANGED:
             return {...state, position: action.position}
-        case ActionType.DURATION_UPDATED:
-            return {...state, duration: action.duration}
+        case ActionType.DURATION_UPDATED: {
+            const startDate = parseISO(state.classroomStartDateTime)
+            const endDateTimeAtSameTimeThanStartDateTime = set(parseISO(state.classroomEndDateTime), {
+                hours: startDate.getHours(),
+                minutes: startDate.getMinutes()
+            });
+            const classroomEndDateTime = formatISO(addMinutes(endDateTimeAtSameTimeThanStartDateTime, action.duration))
+            return {...state, duration: action.duration, classroomEndDateTime}
+        }
         case ActionType.ATTENDEES_UPDATED:
             return {
                 ...state,
