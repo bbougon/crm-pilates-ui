@@ -148,9 +148,7 @@ ClassroomSchedulingDetails.play = async ({canvasElement}) => {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric'
+        day: 'numeric'
     })}`)).toBeInTheDocument()
     await expect(canvas.getByLabelText(/position/i)).toHaveTextContent('1')
     const startDateElement = canvas.getByLabelText(/choose start date/i);
