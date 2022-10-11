@@ -9,13 +9,18 @@ type CreditItemProps = {
 }
 export const CreditItem = ({credits}: CreditItemProps) => {
     return <>
-        <Grid item xs={2} sx={{
+        <Grid item sm={3} xs={6} sx={{
+            spacing: '0',
             display: 'flex',
             justifyContent: 'flex-start',
         }}>
             <Typography>{translate(credits?.subject)}</Typography>
         </Grid>
-        <Grid item xs={1}>
+        <Grid item sm={9} xs={6} sx={{
+            spacing: '0',
+            display: 'flex',
+            justifyContent: 'flex-start',
+        }}>
             <CreditBox credit={credits?.value || 0}/>
         </Grid>
     </>;
