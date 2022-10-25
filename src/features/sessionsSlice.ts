@@ -57,7 +57,7 @@ export interface Checkout {
     attendeeId: string
 }
 
-export const fetchSessions = createAsyncThunk<{ sessions: ApiSession[], link: string | null }, string | undefined, { rejectValue: ApiError }>(
+export const fetchSessions = createAsyncThunk<{ sessions: Session[], link: string | null }, string | undefined, { rejectValue: ApiError }>(
     'sessions/fetch',
     async (link = "/sessions", thunkAPI) => {
         try {
@@ -68,7 +68,7 @@ export const fetchSessions = createAsyncThunk<{ sessions: ApiSession[], link: st
                     headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
                 }
             })
-            return {sessions: response.data as ApiSession[], link: response.headers.get("X-Link")}
+            return {sessions: (response.data as ApiSession[]).map(session => mapSession(session)), link: response.headers.get("X-Link")}
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)
         }
@@ -76,7 +76,7 @@ export const fetchSessions = createAsyncThunk<{ sessions: ApiSession[], link: st
     }
 )
 
-export const sessionCheckin = createAsyncThunk<ApiSession, Checkin, { rejectValue: ApiError }>(
+export const sessionCheckin = createAsyncThunk<Session, Checkin, { rejectValue: ApiError }>(
     'sessions/checkin',
     async (checkin, thunkAPI) => {
         try {
@@ -92,14 +92,14 @@ export const sessionCheckin = createAsyncThunk<ApiSession, Checkin, { rejectValu
                 headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
             }
             const response = await api("/sessions/checkin", {customConfig})
-            return response.data as ApiSession
+            return mapSession(response.data as ApiSession)
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)
         }
     }
 )
 
-export const sessionCheckout = createAsyncThunk<ApiSession, Checkout, { rejectValue: ApiError }>(
+export const sessionCheckout = createAsyncThunk<Session, Checkout, { rejectValue: ApiError }>(
     'sessions/checkout',
     async (checkout, thunkAPI) => {
         try {
@@ -113,14 +113,14 @@ export const sessionCheckout = createAsyncThunk<ApiSession, Checkout, { rejectVa
                 headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
             }
             const response = await api(`/sessions/${checkout.sessionId}/checkout`, {customConfig})
-            return response.data as ApiSession
+            return mapSession(response.data as ApiSession)
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)
         }
     }
 )
 
-export const sessionCancel = createAsyncThunk<ApiSession, Cancel, { rejectValue: ApiError }>(
+export const sessionCancel = createAsyncThunk<Session, Cancel, { rejectValue: ApiError }>(
     'sessions/revoke',
     async (cancel, thunkAPI) => {
         try {
@@ -135,7 +135,7 @@ export const sessionCancel = createAsyncThunk<ApiSession, Cancel, { rejectValue:
                 headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${login.token.token}`}
             }
             const response = await api(`/sessions/cancellation/${cancel.attendeeId}`, {customConfig})
-            return response.data as ApiSession
+            return mapSession(response.data as ApiSession)
         } catch (e) {
             return thunkAPI.rejectWithValue(e as ApiError)
         }
@@ -147,41 +147,17 @@ export const sessionsSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers(builder) {
-        const mapAttendee = (attendee: ApiAttendee): Attendee => {
-            return {
-                id: attendee.id,
-                firstname: attendee.firstname,
-                lastname: attendee.lastname,
-                attendance: attendee.attendance as Attendance,
-                credits: {amount: attendee.credits?.amount}
-            }
-        }
-        const mapSession = (apiSession: ApiSession): Session => {
 
-            return {
-                id: apiSession.id,
-                classroomId: apiSession.classroom_id,
-                name: apiSession.name,
-                subject: apiSession.subject as Subjects,
-                schedule: {
-                    start: apiSession.schedule.start,
-                    stop: apiSession.schedule.stop
-                },
-                position: apiSession.position,
-                attendees: apiSession.attendees?.map(attendee => mapAttendee(attendee))
-            }
-        }
-
-        function mapAttendees(session: Session | undefined, apiSession: ApiSession) {
+        function updateAttendees(session: Session | undefined, updatedSession: Session) {
             if (session) {
-                session.attendees = apiSession.attendees?.map(attendee => mapAttendee(attendee))
-                session.id = apiSession.id
+                session.attendees = updatedSession.attendees?.map(attendee => mapAttendee(attendee))
+                session.id = updatedSession.id
             }
         }
 
-        function mapCredits(sessions: Session[], apiSession: ApiSession) {
-            sessions.filter(session => session.subject as Subjects === apiSession.subject as Subjects).forEach(session => {
-                apiSession.attendees?.forEach(attendee => {
+        function updateCredits(sessions: Session[], updatedSession: Session) {
+            sessions.filter(session => session.subject as Subjects === updatedSession.subject as Subjects).forEach(session => {
+                updatedSession.attendees?.forEach(attendee => {
                     session.attendees?.forEach(sessionAttendee => {
                         if (sessionAttendee.id === attendee.id) {
                             sessionAttendee.credits = attendee.credits
@@ -191,9 +167,9 @@ export const sessionsSlice = createSlice({
             })
         }
 
-        function findSession(state: SessionState, apiSession: ApiSession) {
-            return state.sessions.find(session => session.id === apiSession.id
-                || (session.classroomId === apiSession.classroom_id && isEqual(parseISO(`${session.schedule.start}`), parseISO(`${apiSession.schedule.start}`))));
+        function findSession(state: SessionState, expectedSession: Session) {
+            return state.sessions.find(session => session.id === expectedSession.id
+                || (session.classroomId === expectedSession.classroomId && isEqual(parseISO(`${session.schedule.start}`), parseISO(`${expectedSession.schedule.start}`))));
         }
 
         builder
@@ -203,7 +179,7 @@ export const sessionsSlice = createSlice({
             .addCase(fetchSessions.fulfilled, (state, action) => {
                 state.status = SessionStatus.SUCCEEDED
 
-                state.sessions = action.payload.sessions.map(apiSession => mapSession(apiSession))
+                state.sessions = action.payload.sessions
                 const links = (): SessionsLink => {
                     const links = parseLinkHeader(action.payload.link)
                     return {
@@ -229,8 +205,8 @@ export const sessionsSlice = createSlice({
                 state.status = SessionStatus.CHECKIN_IN_SUCCEEDED
                 const sessionCheckedIn = action.payload
                 const session = findSession(state, sessionCheckedIn)
-                mapAttendees(session, sessionCheckedIn)
-                mapCredits(state.sessions, sessionCheckedIn);
+                updateAttendees(session, sessionCheckedIn)
+                updateCredits(state.sessions, sessionCheckedIn);
             })
             .addCase(sessionCheckout.pending, (state, action) => {
                 state.status = SessionStatus.CHECKOUT_IN_PROGRESS
@@ -243,8 +219,8 @@ export const sessionsSlice = createSlice({
                 state.status = SessionStatus.CHECKOUT_SUCCEEDED
                 const sessionCheckedOut = action.payload
                 const session = state.sessions.find(session => session.id === sessionCheckedOut.id);
-                mapAttendees(session, sessionCheckedOut);
-                mapCredits(state.sessions, sessionCheckedOut)
+                updateAttendees(session, sessionCheckedOut);
+                updateCredits(state.sessions, sessionCheckedOut)
             })
             .addCase(sessionCancel.fulfilled, (state, action) => {
                 state.status = SessionStatus.CANCEL_SUCCEEDED
@@ -258,10 +234,7 @@ export const sessionsSlice = createSlice({
     }
 })
 
-export const selectMonthlySessions = (state: RootState) => state.sessions.sessions
-export default sessionsSlice.reducer
-
-const mapAttendee = (apiAttendee: ApiAttendee): Attendee => {
+const mapAttendee = (apiAttendee: ApiAttendee | Attendee): Attendee => {
     return {
         id: apiAttendee.id,
         firstname: apiAttendee.firstname,
@@ -271,16 +244,7 @@ const mapAttendee = (apiAttendee: ApiAttendee): Attendee => {
     }
 }
 
-export function findAttendeeById(result: PayloadAction<ApiSession>, attendeeId: string): Attendee | undefined {
-    const attendee = result.payload.attendees?.find(attendee => attendee.id === attendeeId);
-    if (attendee) {
-        return mapAttendee(attendee)
-    }
-    return attendee;
-}
-
-export const mapSession = (result: PayloadAction<ApiSession>): Session => {
-    const apiSession = result.payload
+const mapSession = (apiSession: ApiSession): Session => {
     return {
         id: apiSession.id,
         classroomId: apiSession.classroom_id,
@@ -294,3 +258,9 @@ export const mapSession = (result: PayloadAction<ApiSession>): Session => {
         attendees: apiSession.attendees?.map(attendee => mapAttendee(attendee))
     }
 }
+
+export const selectMonthlySessions = (state: RootState) => state.sessions.sessions
+export function findAttendeeById(result: PayloadAction<Session>, attendeeId: string): Attendee | undefined {
+    return result.payload.attendees?.find(attendee => attendee.id === attendeeId);
+}
+export default sessionsSlice.reducer

@@ -1,12 +1,6 @@
 import * as React from "react";
 import {BaseSyntheticEvent, useCallback, useEffect, useReducer, useState} from "react";
-import {
-    findAttendeeById,
-    mapSession,
-    sessionCancel,
-    sessionCheckin,
-    sessionCheckout
-} from "../../features/sessionsSlice";
+import {findAttendeeById, sessionCancel, sessionCheckin, sessionCheckout} from "../../features/sessionsSlice";
 import {
     Box,
     Card,
@@ -26,7 +20,6 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {Attendance, Attendee, Session} from "../../features/domain/session";
 import {CreditBox} from "../CreditBox";
 import {useAppDispatch} from "../../hooks/redux";
-import {ApiSession} from "../../api";
 import {PayloadAction} from "@reduxjs/toolkit";
 
 const theme = createTheme({
@@ -130,7 +123,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     useEffect(() => {
         if (checkin) {
             dispatch(sessionCheckin(checkin)).then((result) => {
-                const attendee = findAttendeeById(result as PayloadAction<ApiSession>, state.attendee.id);
+                const attendee = findAttendeeById(result as PayloadAction<Session>, state.attendee.id);
                 if (attendee) {
                     dispatchReducer(attendeeCheckedIn(attendee))
                 }
@@ -139,7 +132,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
         }
         if (checkout) {
             dispatch(sessionCheckout(checkout)).then((result) => {
-                const attendee = findAttendeeById(result as PayloadAction<ApiSession>, state.attendee.id)
+                const attendee = findAttendeeById(result as PayloadAction<Session>, state.attendee.id)
                 if (attendee) {
                     dispatchReducer(attendeeCheckedOut(attendee))
                 }
@@ -298,8 +291,8 @@ export const SessionDetails = ({session}: { session: Session }) => {
         .concat(` ${formatHours(sessionEnd)}`);
 
     const cancelSession = useCallback((cancel: CancelAttendee) => {
-        dispatch(sessionCancel(cancel)).then((result) => {
-            setCurrentSession(mapSession(result as PayloadAction<ApiSession>))
+        dispatch(sessionCancel(cancel)).then((session) => {
+            setCurrentSession(session.payload as Session)
         })
     }, [dispatch])
 

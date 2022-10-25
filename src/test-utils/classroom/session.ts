@@ -2,18 +2,71 @@ import {addHours, formatISO, parseISO} from "date-fns";
 import {ApiAttendee, ApiCredits, ApiSession} from "../../api";
 import {Attendance, Attendee, Credits, Session} from "../../features/domain/session";
 import {Subjects} from "../../features/domain/subjects";
+import {faker} from "@faker-js/faker";
 
-export class AttendeesBuilder {
+interface Builder<T> {
+    build(): T
+}
+export class AttendeesBuilder implements Builder<Attendee[]>{
 
     private attendees: Attendee[] = []
 
-    withAttendee = (attendee: Attendee) => {
+    withAttendee = (attendee: Attendee): AttendeesBuilder => {
         this.attendees.push(attendee)
         return this
     }
 
-    build = () => {
+    build = (): Attendee[] => {
         return this.attendees
+    }
+}
+
+export class AttendeeBuilder implements Builder<Attendee> {
+
+    private attendance: Attendance = Attendance.REGISTERED;
+    private _id = "1";
+    private _firstname: string = faker.name.firstName();
+    private _lastname: string = faker.name.lastName();
+    private _credits: Credits = {amount: faker.datatype.number({min: 0, max: 10})};
+
+    id = (id: string): AttendeeBuilder => {
+        this._id = id;
+        return this;
+    }
+
+    firstname = (firstname: string): AttendeeBuilder => {
+        this._firstname = firstname
+        return this;
+    }
+
+    lastname = (lastname: string): AttendeeBuilder => {
+        this._lastname = lastname
+        return this;
+    }
+
+    checkedIn = (): AttendeeBuilder => {
+        this.attendance = Attendance.CHECKED_IN
+        return this;
+    }
+
+    credits = (amount: number): AttendeeBuilder => {
+        this._credits = {amount}
+        return this;
+    }
+
+    noCredits = (): AttendeeBuilder => {
+        this._credits = {amount: undefined};
+        return this;
+    }
+
+    build(): Attendee {
+        return {
+            id: this._id,
+            firstname: this._firstname,
+            lastname: this._lastname,
+            attendance: this.attendance,
+            credits: this._credits,
+        };
     }
 }
 

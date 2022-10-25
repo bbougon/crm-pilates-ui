@@ -76,42 +76,15 @@ const Mockstore = ({sessionState, children}: MockStoreProps) => {
                         initialState: sessionState,
                         reducers: {},
                         extraReducers(builder) {
-                            const mapSession = (apiSession: ApiSession): Session => {
-
-                                return {
-                                    id: apiSession.id,
-                                    classroomId: apiSession.classroom_id,
-                                    name: apiSession.name,
-                                    subject: apiSession.subject as Subjects,
-                                    schedule: {
-                                        start: apiSession.schedule.start,
-                                        stop: apiSession.schedule.stop
-                                    },
-                                    position: apiSession.position,
-                                    attendees: apiSession.attendees?.map(attendee => mapAttendee(attendee))
-                                }
-                            }
-                            const mapAttendee = (attendee: ApiAttendee): Attendee => {
-                                return {
-                                    id: attendee.id,
-                                    firstname: attendee.firstname,
-                                    lastname: attendee.lastname,
-                                    attendance: attendee.attendance as Attendance,
-                                    credits: {amount: attendee.credits?.amount}
-                                }
-                            }
                             builder
                                 .addCase(sessionCheckin.fulfilled, (state, action) => {
                                     state.status = SessionStatus.CHECKIN_IN_SUCCEEDED
-                                    const sessionCheckedIn = action.payload
                                 })
                                 .addCase(sessionCheckout.fulfilled, (state, action) => {
                                     state.status = SessionStatus.CHECKOUT_SUCCEEDED
-                                    const sessionCheckedOut = action.payload
                                 })
                                 .addCase(sessionCancel.fulfilled, (state, action) => {
                                     state.status = SessionStatus.CANCEL_SUCCEEDED
-                                    const sessionCheckedOut = action.payload
                                 })
                         }
                     }).reducer,
