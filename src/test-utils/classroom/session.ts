@@ -201,9 +201,6 @@ export class SessionBuilder {
     }
 }
 
-export const attendee = (id = "1", firstname = "Laurent", lastname = "Gas", attendance: Attendance = Attendance.REGISTERED, credits: Credits | undefined = undefined): Attendee => {
-    return {id: id, firstname: firstname, lastname: lastname, attendance: attendance, credits}
-}
 
 export class ApiAttendeeBuilder implements Builder<ApiAttendee>{
     private id: string = faker.datatype.string();

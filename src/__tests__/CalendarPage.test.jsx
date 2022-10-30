@@ -5,7 +5,7 @@ import {
     SessionXLinkValueHeaderBuilder,
     XLinkHeaderBuilder
 } from "../test-utils/server/server";
-import {ApiSessionsBuilder, attendee, SessionsBuilder} from "../test-utils/classroom/session";
+import {ApiAttendeeBuilder, ApiSessionsBuilder, attendee, SessionsBuilder} from "../test-utils/classroom/session";
 import {formatISO} from "date-fns";
 import {Attendance} from "../features/domain/session";
 import {render} from "../test-utils/test-utils";
@@ -25,7 +25,13 @@ describe.skip("Calendar page", () => {
                 .withSession(
                     new ApiSessionsBuilder().withClassroom("1").withName('Cours Duo')
                         .withSchedule(formatISO(classroomDate), 1).withPosition(2)
-                        .withAttendee(attendee("3", "Bertrand", "Bougon", Attendance.REGISTERED))
+                        .withAttendee(
+                            new ApiAttendeeBuilder()
+                                .withId("3")
+                                .withFirstname("Bertrand")
+                                .withLastname("Bougon")
+                                .build()
+                        )
                         .build()
                 )
                 .build())

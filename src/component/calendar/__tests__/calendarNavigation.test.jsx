@@ -5,7 +5,7 @@ import {
     XLinkHeaderBuilder
 } from "../../../test-utils/server/server";
 import {afterAll, afterEach, beforeEach} from 'vitest'
-import {ApiSessionsBuilder, attendee, SessionsBuilder} from "../../../test-utils/classroom/session";
+import {ApiAttendeeBuilder, ApiSessionsBuilder, attendee, SessionsBuilder} from "../../../test-utils/classroom/session";
 import {screen, waitFor} from "@testing-library/react";
 import {render} from "../../../test-utils/test-utils";
 import userEvent from "@testing-library/user-event";
@@ -37,7 +37,14 @@ describe("Calendar", () => {
                     .withSession(
                         new ApiSessionsBuilder().withId("4").withClassroom(1).withName('Stage 2')
                             .withSchedule("2021-11-01T13:20:00Z", 1).withPosition(1)
-                            .withAttendee(attendee(3, "Bertrand", "Bougon", Attendance.CHECKED_IN))
+                            .withAttendee(
+                                new ApiAttendeeBuilder()
+                                    .withId("3")
+                                    .withFirstname("Bertrand")
+                                    .withLastname("Bougon")
+                                    .checkedIn()
+                                    .build()
+                            )
                             .build()
                     )
                     .build())

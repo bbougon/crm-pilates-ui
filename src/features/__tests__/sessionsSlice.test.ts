@@ -1,9 +1,9 @@
 import {FulFilledAction} from "../../test-utils/features/actionFixtures";
 import reducer, {fetchSessions, sessionCheckin, sessionCheckout} from "../sessionsSlice";
 import {LoadingState} from "../../test-utils/features/sessions/sessionsStateFixtures";
-import {attendee, AttendeeBuilder, SessionBuilder, SessionsBuilder} from "../../test-utils/classroom/session";
+import {AttendeeBuilder, SessionBuilder, SessionsBuilder} from "../../test-utils/classroom/session";
 import {addHours, addWeeks, format, formatISO, subDays, subHours} from "date-fns";
-import {Attendance, Session} from "../domain/session";
+import {Session} from "../domain/session";
 import {Subjects} from "../domain/subjects";
 
 describe("SessionsSlice", () => {
@@ -229,21 +229,48 @@ describe("SessionsSlice", () => {
                 .withSession(
                     new SessionBuilder().withId("1").withClassroom("1").withName('Pilates avancé')
                         .withMachineTrio().withScheduleAsString(formatISO(currentDate)).withPosition(3)
-                        .withAttendee(attendee("1", "Laurent", "Gas", Attendance.CHECKED_IN, {amount: 5}))
-                        .withAttendee(attendee("2", "Pierre", "Bernard", Attendance.REGISTERED))
+                        .withAttendee(new AttendeeBuilder()
+                            .id("1")
+                            .firstname("Laurent")
+                            .lastname("Gas")
+                            .checkedIn()
+                            .credits(5)
+                            .build())
+                        .withAttendee(new AttendeeBuilder()
+                            .id("2")
+                            .firstname("Pierre")
+                            .lastname("Bernard")
+                            .noCredits()
+                            .build())
                         .build()
                 )
                 .withSession(
                     new SessionBuilder().withId("2").withClassroom("1").withName('Pilates avancé')
                         .withMachineTrio().withScheduleAsString(formatISO(addWeeks(currentDate, 1))).withPosition(3)
-                        .withAttendee(attendee("1", "Laurent", "Gas", Attendance.REGISTERED, {amount: 5}))
-                        .withAttendee(attendee("2", "Pierre", "Bernard", Attendance.REGISTERED))
+                        .withAttendee(new AttendeeBuilder()
+                            .id("1")
+                            .firstname("Laurent")
+                            .lastname("Gas")
+                            .credits(5)
+                            .build())
+                        .withAttendee(new AttendeeBuilder()
+                            .id("2")
+                            .firstname("Pierre")
+                            .lastname("Bernard")
+                            .noCredits()
+                            .build())
                         .build()
                 )
                 .withSession(
                     new SessionBuilder().withId("3").withClassroom("2").withName('Pilates machine')
                         .withMachineTrio().withScheduleAsString(formatISO(subDays(currentDate, 2))).withPosition(3)
-                        .withAttendee(attendee("1", "Laurent", "Gas", Attendance.CHECKED_IN, {amount: 5}))
+                        .withAttendee(new AttendeeBuilder()
+                            .id("1")
+                            .firstname("Laurent")
+                            .lastname("Gas")
+                            .checkedIn()
+                            .credits(5)
+                            .build())
                         .build()
                 )
                 .build()

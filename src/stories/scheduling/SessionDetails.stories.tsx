@@ -2,13 +2,13 @@ import React, {ReactElement} from 'react';
 import {
     ApiAttendeeBuilder,
     apiSession,
-    attendee,
+    AttendeeBuilder,
     AttendeesBuilder,
     schedule,
     session
 } from "../../test-utils/classroom/session";
 import {addHours, parseISO} from "date-fns";
-import {Attendance, Session} from "../../features/domain/session";
+import {Session} from "../../features/domain/session";
 import {Provider} from 'react-redux';
 import {configureStore, createSlice} from '@reduxjs/toolkit';
 import {sessionCancel, sessionCheckin, sessionCheckout, SessionStatus} from "../../features/sessionsSlice";
@@ -33,14 +33,25 @@ const defaultSession: Session =
     session("1", "1", "Cours privé", "MAT",
         schedule(parseISO("2021-10-09T10:00:00"), parseISO("2021-10-09T11:00:00")), 1,
         new AttendeesBuilder()
-            .withAttendee(attendee("1", "Bruno", "Germain", Attendance.REGISTERED, {amount: 5}))
+            .withAttendee(new AttendeeBuilder()
+                .id("1")
+                .firstname("Bruno")
+                .lastname("Germain")
+                .credits(5)
+                .build())
             .build())
 
 const sessionWithOneCheckedInAttendee: Session =
     session("2", "2", "Cours duo machine", "MACHINE_DUO",
         schedule(parseISO("2021-09-05T11:00:00"), parseISO("2021-09-05T12:00:00")), 2,
         new AttendeesBuilder()
-            .withAttendee(attendee("1", "Bruno", "Germain", Attendance.CHECKED_IN, {amount: 4}))
+            .withAttendee(new AttendeeBuilder()
+                .id("1")
+                .firstname("Bruno")
+                .lastname("Germain")
+                .checkedIn()
+                .credits(4)
+                .build())
             .build())
 
 
