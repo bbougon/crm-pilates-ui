@@ -1,8 +1,7 @@
 import {render} from "../../../test-utils/test-utils";
 import {screen} from "@testing-library/react";
 import React from "react";
-import {AttendeeBuilder, AttendeesBuilder, schedule, session} from "../../../test-utils/classroom/session";
-import {addHours} from "date-fns";
+import {AttendeeBuilder, AttendeesBuilder, ScheduleBuilder, session} from "../../../test-utils/classroom/session";
 import userEvent from "@testing-library/user-event";
 import {ClassroomEventItem} from "../ClassroomEventItem";
 import {formatFullDate, formatHours} from "../../../utils/date";
@@ -22,7 +21,8 @@ describe.skip('Classroom Event', function () {
             .noCredits()
             .build()).build();
         const session_date = new Date();
-        const classroomSession = session("1", "2", "Cours tapis", "MAT", schedule(session_date, addHours(session_date, 1)), 3, attendees);
+        const classroomSession = session("1", "2", "Cours tapis", "MAT", new ScheduleBuilder(session_date)
+            .build(), 3, attendees);
         render(<ClassroomEventItem session={classroomSession} displaySession={() => ({classroomSession})}/>)
 
         userEvent.click(screen.getByText("Cours tapis"))
@@ -54,7 +54,8 @@ describe.skip('Classroom Event', function () {
             .lastname("Bougon")
             .noCredits()
             .build()).build();
-        const classroomSession = session(undefined, undefined, undefined, undefined, schedule(), undefined, attendees);
+        const classroomSession = session(undefined, undefined, undefined, undefined, new ScheduleBuilder(new Date())
+            .build(), undefined, attendees);
         render(<ClassroomEventItem {...classroomSession}/>)
 
         userEvent.click(screen.getByText(classroomSession.name))

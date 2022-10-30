@@ -1,14 +1,16 @@
 import {Subjects} from "./subjects";
 
+export type Schedule = {
+    start: string;
+    stop: string;
+}
+
 export interface Session {
     id?: string | undefined
     classroomId: string
     name: string
     subject: Subjects
-    schedule: {
-        start: string
-        stop: string
-    }
+    schedule: Schedule
     position: number
     attendees?: Attendee[]
 }

@@ -1,6 +1,6 @@
 import {addHours, formatISO, parseISO} from "date-fns";
 import {ApiAttendee, ApiCredits, ApiSession} from "../../api";
-import {Attendance, Attendee, Credits, Session} from "../../features/domain/session";
+import {Attendance, Attendee, Credits, Schedule, Session} from "../../features/domain/session";
 import {Subjects} from "../../features/domain/subjects";
 import {faker} from "@faker-js/faker";
 
@@ -250,15 +250,27 @@ export class ApiAttendeeBuilder implements Builder<ApiAttendee>{
     }
 }
 
-export const schedule = (start = new Date(), stop = addHours(new Date(), 1)) => {
-    return {
-        start: formatISO(start),
-        stop: formatISO(stop)
+export class ScheduleBuilder implements Builder<Schedule>{
+    private readonly start: Date;
+    private readonly stop: Date;
+
+    constructor(start: Date | string) {
+        this.start = typeof start === 'string' ? parseISO(start) : start;
+        this.stop = addHours(this.start, 1)
     }
+
+    build(): Schedule {
+        return {
+            start: formatISO(this.start),
+            stop: formatISO(this.stop)
+        }
+    }
+
 }
 
 export const session = (id: string | undefined, classroomId = "1", name = "Pilates avancé",
-                        subject = "MAT", schedule_ = schedule(), position = 1,
+                        subject = "MAT", schedule_ = new ScheduleBuilder(new Date())
+        .build(), position = 1,
                         attendees: Attendee[] = []): Session => {
     return {
         id: id,
@@ -272,7 +284,8 @@ export const session = (id: string | undefined, classroomId = "1", name = "Pilat
 }
 
 export const apiSession = (id: string | undefined, classroomId = "1", name = "Pilates avancé",
-                           subject = "MAT", schedule_ = schedule(), position = 1,
+                           subject = "MAT", schedule_ = new ScheduleBuilder(new Date())
+        .build(), position = 1,
                            attendees: [ApiAttendee] | undefined = undefined): ApiSession => {
     return {
         id: id,

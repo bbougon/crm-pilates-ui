@@ -4,10 +4,10 @@ import {
     apiSession,
     AttendeeBuilder,
     AttendeesBuilder,
-    schedule,
+    ScheduleBuilder,
     session
 } from "../../test-utils/classroom/session";
-import {addHours, parseISO} from "date-fns";
+import {parseISO} from "date-fns";
 import {Session} from "../../features/domain/session";
 import {Provider} from 'react-redux';
 import {configureStore, createSlice} from '@reduxjs/toolkit';
@@ -31,7 +31,8 @@ type State = {
 
 const defaultSession: Session =
     session("1", "1", "Cours privé", "MAT",
-        schedule(parseISO("2021-10-09T10:00:00"), parseISO("2021-10-09T11:00:00")), 1,
+        new ScheduleBuilder("2021-10-09T10:00:00")
+            .build(), 1,
         new AttendeesBuilder()
             .withAttendee(new AttendeeBuilder()
                 .id("1")
@@ -43,7 +44,8 @@ const defaultSession: Session =
 
 const sessionWithOneCheckedInAttendee: Session =
     session("2", "2", "Cours duo machine", "MACHINE_DUO",
-        schedule(parseISO("2021-09-05T11:00:00"), parseISO("2021-09-05T12:00:00")), 2,
+        new ScheduleBuilder("2021-09-05T11:00:00")
+            .build(), 2,
         new AttendeesBuilder()
             .withAttendee(new AttendeeBuilder()
                 .id("1")
@@ -182,8 +184,8 @@ SessionCheckin.parameters = {
             rest.post("http://localhost:8081/sessions/checkin", (req, res, _) => {
                 const response = checkinResponse(defaultSession.id ?? "1", defaultSession.classroomId,
                     apiSession(defaultSession.id, defaultSession.classroomId, defaultSession.name, defaultSession.subject.toString(),
-                        schedule(parseISO(defaultSession.schedule.start),
-                            addHours(parseISO(defaultSession.schedule.start), 1)),
+                        new ScheduleBuilder(defaultSession.schedule.start)
+                            .build(),
                         defaultSession.position,
                         [new ApiAttendeeBuilder()
                             .withId("1")
@@ -236,8 +238,8 @@ SessionCheckout.parameters = {
             rest.post("http://localhost:8081/sessions/2/checkout", (req, res, _) => {
                 const response = checkinResponse(sessionWithOneCheckedInAttendee.id ?? "1", sessionWithOneCheckedInAttendee.classroomId,
                     apiSession(sessionWithOneCheckedInAttendee.id, sessionWithOneCheckedInAttendee.classroomId, sessionWithOneCheckedInAttendee.name, sessionWithOneCheckedInAttendee.subject.toString(),
-                        schedule(parseISO(sessionWithOneCheckedInAttendee.schedule.start),
-                            addHours(parseISO(sessionWithOneCheckedInAttendee.schedule.start), 1)),
+                        new ScheduleBuilder(sessionWithOneCheckedInAttendee.schedule.start)
+                            .build(),
                         sessionWithOneCheckedInAttendee.position,
                         [new ApiAttendeeBuilder()
                             .withId("1")
@@ -291,8 +293,8 @@ CancelSession.parameters = {
             rest.post("http://localhost:8081/sessions/cancellation/1", (req, res, _) => {
                 const response = cancellationResponse(defaultSession.id ?? "1", defaultSession.classroomId,
                     apiSession(defaultSession.id, defaultSession.classroomId, defaultSession.name, defaultSession.subject.toString(),
-                        schedule(parseISO(defaultSession.schedule.start),
-                            addHours(parseISO(defaultSession.schedule.start), 1)),
+                        new ScheduleBuilder(defaultSession.schedule.start)
+                            .build(),
                         defaultSession.position));
                 return res(compose(
                     context.status(201),
