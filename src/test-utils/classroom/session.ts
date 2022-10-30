@@ -7,7 +7,8 @@ import {faker} from "@faker-js/faker";
 interface Builder<T> {
     build(): T
 }
-export class AttendeesBuilder implements Builder<Attendee[]>{
+
+export class AttendeesBuilder implements Builder<Attendee[]> {
 
     private attendees: Attendee[] = []
 
@@ -146,10 +147,7 @@ export class SessionBuilder {
     private id: string | undefined = undefined;
     private classroomId = "1";
     private name = "Cours tapis";
-    private schedule: { stop: string; start: string } = {
-        start: formatISO(new Date()),
-        stop: formatISO(addHours(new Date(), 1))
-    };
+    private schedule: Schedule = new ScheduleBuilder(new Date()).build()
     private position = 1;
     private subject: Subjects = Subjects.MAT
     private attendees: Attendee[] = [];
@@ -174,9 +172,8 @@ export class SessionBuilder {
         return this
     }
 
-    withSchedule = (startDate: string, amount = 1): SessionBuilder => {
-        this.schedule.start = startDate
-        this.schedule.stop = formatISO(addHours(parseISO(startDate), amount))
+    withSchedule = (schedule: Schedule): SessionBuilder => {
+        this.schedule = schedule
         return this
     }
 
@@ -196,13 +193,26 @@ export class SessionBuilder {
         return this
     }
 
+    withAttendees = (attendees: Attendee[]): SessionBuilder => {
+        this.attendees.push(...attendees)
+        return this
+    }
+
     build = (): Session => {
-        return session(this.id, this.classroomId, this.name, this.subject, this.schedule, this.position, this.attendees)
+        return {
+            id: this.id,
+            classroomId: this.classroomId,
+            subject: this.subject,
+            name: this.name,
+            schedule: this.schedule,
+            position: this.position,
+            attendees: this.attendees
+        }
     }
 }
 
 
-export class ApiAttendeeBuilder implements Builder<ApiAttendee>{
+export class ApiAttendeeBuilder implements Builder<ApiAttendee> {
     private id: string = faker.datatype.string();
     private credits: ApiCredits | undefined = undefined;
     private attendance: 'REGISTERED' | 'CHECKED_IN' = 'REGISTERED';
@@ -250,7 +260,7 @@ export class ApiAttendeeBuilder implements Builder<ApiAttendee>{
     }
 }
 
-export class ScheduleBuilder implements Builder<Schedule>{
+export class ScheduleBuilder implements Builder<Schedule> {
     private readonly start: Date;
     private readonly stop: Date;
 
@@ -268,20 +278,6 @@ export class ScheduleBuilder implements Builder<Schedule>{
 
 }
 
-export const session = (id: string | undefined, classroomId = "1", name = "Pilates avancé",
-                        subject = "MAT", schedule_ = new ScheduleBuilder(new Date())
-        .build(), position = 1,
-                        attendees: Attendee[] = []): Session => {
-    return {
-        id: id,
-        classroomId: classroomId,
-        subject: subject as Subjects,
-        name: name,
-        schedule: {...schedule_},
-        position: position,
-        attendees: attendees
-    }
-}
 
 export const apiSession = (id: string | undefined, classroomId = "1", name = "Pilates avancé",
                            subject = "MAT", schedule_ = new ScheduleBuilder(new Date())

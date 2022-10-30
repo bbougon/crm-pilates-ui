@@ -5,9 +5,8 @@ import {
     AttendeeBuilder,
     AttendeesBuilder,
     ScheduleBuilder,
-    session
+    SessionBuilder
 } from "../../test-utils/classroom/session";
-import {parseISO} from "date-fns";
 import {Session} from "../../features/domain/session";
 import {Provider} from 'react-redux';
 import {configureStore, createSlice} from '@reduxjs/toolkit';
@@ -30,10 +29,14 @@ type State = {
 }
 
 const defaultSession: Session =
-    session("1", "1", "Cours privé", "MAT",
-        new ScheduleBuilder("2021-10-09T10:00:00")
-            .build(), 1,
-        new AttendeesBuilder()
+    new SessionBuilder()
+        .withId("1")
+        .withClassroom("1")
+        .withName("Cours privé")
+        .withSchedule(new ScheduleBuilder("2021-10-09T10:00:00")
+            .build())
+        .withPosition(1)
+        .withAttendees(new AttendeesBuilder()
             .withAttendee(new AttendeeBuilder()
                 .id("1")
                 .firstname("Bruno")
@@ -41,12 +44,17 @@ const defaultSession: Session =
                 .credits(5)
                 .build())
             .build())
+        .build()
 
 const sessionWithOneCheckedInAttendee: Session =
-    session("2", "2", "Cours duo machine", "MACHINE_DUO",
-        new ScheduleBuilder("2021-09-05T11:00:00")
-            .build(), 2,
-        new AttendeesBuilder()
+    new SessionBuilder()
+        .withId("2")
+        .withClassroom("2")
+        .withName("Cours duo machine")
+        .withSchedule(new ScheduleBuilder("2021-09-05T11:00:00")
+            .build())
+        .withPosition(2)
+        .withAttendees(new AttendeesBuilder()
             .withAttendee(new AttendeeBuilder()
                 .id("1")
                 .firstname("Bruno")
@@ -55,6 +63,7 @@ const sessionWithOneCheckedInAttendee: Session =
                 .credits(4)
                 .build())
             .build())
+        .build()
 
 
 const SessionWithOneRegisteredAttendee: State = {
