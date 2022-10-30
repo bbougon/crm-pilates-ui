@@ -205,8 +205,52 @@ export const attendee = (id = "1", firstname = "Laurent", lastname = "Gas", atte
     return {id: id, firstname: firstname, lastname: lastname, attendance: attendance, credits}
 }
 
-export const apiAttendee = (id = "1", firstname = "Laurent", lastname = "Gas", attendance: Attendance = Attendance.REGISTERED, credits: ApiCredits | undefined = undefined): ApiAttendee => {
-    return {id: id, firstname: firstname, lastname: lastname, attendance: attendance, credits}
+export class ApiAttendeeBuilder implements Builder<ApiAttendee>{
+    private id: string = faker.datatype.string();
+    private credits: ApiCredits | undefined = undefined;
+    private attendance: 'REGISTERED' | 'CHECKED_IN' = 'REGISTERED';
+    private lastname: string = faker.name.lastName();
+    private firstname: string = faker.name.firstName();
+
+    build(): ApiAttendee {
+        return {
+            id: this.id,
+            credits: this.credits,
+            attendance: this.attendance,
+            lastname: this.lastname,
+            firstname: this.firstname
+        };
+    }
+
+    withId = (id: string): ApiAttendeeBuilder => {
+        this.id = id
+        return this
+    }
+
+    withFirstname = (firstname: string): ApiAttendeeBuilder => {
+        this.firstname = firstname
+        return this
+    }
+
+    withLastname = (lastname: string): ApiAttendeeBuilder => {
+        this.lastname = lastname
+        return this
+    }
+
+    noCredits = (): ApiAttendeeBuilder => {
+        this.credits = undefined
+        return this
+    }
+
+    checkedIn = (): ApiAttendeeBuilder => {
+        this.attendance = 'CHECKED_IN'
+        return this
+    }
+
+    with_credits = (credits: number): ApiAttendeeBuilder => {
+        this.credits = {amount: credits}
+        return this
+    }
 }
 
 export const schedule = (start = new Date(), stop = addHours(new Date(), 1)) => {

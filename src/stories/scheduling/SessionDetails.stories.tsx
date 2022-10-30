@@ -1,6 +1,6 @@
 import React, {ReactElement} from 'react';
 import {
-    apiAttendee,
+    ApiAttendeeBuilder,
     apiSession,
     attendee,
     AttendeesBuilder,
@@ -8,7 +8,7 @@ import {
     session
 } from "../../test-utils/classroom/session";
 import {addHours, parseISO} from "date-fns";
-import {Attendance, Attendee, Session} from "../../features/domain/session";
+import {Attendance, Session} from "../../features/domain/session";
 import {Provider} from 'react-redux';
 import {configureStore, createSlice} from '@reduxjs/toolkit';
 import {sessionCancel, sessionCheckin, sessionCheckout, SessionStatus} from "../../features/sessionsSlice";
@@ -19,8 +19,6 @@ import {fireEvent, screen, userEvent, waitFor, within} from "@storybook/testing-
 import {expect} from '@storybook/jest';
 import {ComponentStory} from "@storybook/react";
 import {AuthStatus} from "../../features/auth";
-import {ApiAttendee, ApiSession} from "../../api";
-import {Subjects} from "../../features/domain/subjects";
 import {SessionDetails} from "../../component/classroom/SessionDetails";
 import SessionDetailsDoc from "./SessionDetails.docs.mdx";
 
@@ -176,7 +174,13 @@ SessionCheckin.parameters = {
                         schedule(parseISO(defaultSession.schedule.start),
                             addHours(parseISO(defaultSession.schedule.start), 1)),
                         defaultSession.position,
-                        [apiAttendee("1", "Bruno", "Germain", Attendance.CHECKED_IN, {amount: 4})]));
+                        [new ApiAttendeeBuilder()
+                            .withId("1")
+                            .withFirstname("Bruno")
+                            .withLastname("Germain")
+                            .checkedIn()
+                            .with_credits(4)
+                            .build()]));
                 return res(compose(
                     context.status(201),
                     context.json(response)
@@ -224,7 +228,12 @@ SessionCheckout.parameters = {
                         schedule(parseISO(sessionWithOneCheckedInAttendee.schedule.start),
                             addHours(parseISO(sessionWithOneCheckedInAttendee.schedule.start), 1)),
                         sessionWithOneCheckedInAttendee.position,
-                        [apiAttendee("1", "Bruno", "Germain", Attendance.REGISTERED, {amount: 5})]));
+                        [new ApiAttendeeBuilder()
+                            .withId("1")
+                            .withFirstname("Bruno")
+                            .withLastname("Germain")
+                            .with_credits(5)
+                            .build()]));
                 return res(compose(
                     context.status(201),
                     context.json(response)

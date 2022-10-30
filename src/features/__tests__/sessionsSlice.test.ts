@@ -1,13 +1,7 @@
 import {FulFilledAction} from "../../test-utils/features/actionFixtures";
 import reducer, {fetchSessions, sessionCheckin, sessionCheckout} from "../sessionsSlice";
 import {LoadingState} from "../../test-utils/features/sessions/sessionsStateFixtures";
-import {
-    apiAttendee,
-    ApiSessionsBuilder,
-    attendee, AttendeeBuilder, AttendeesBuilder,
-    SessionBuilder,
-    SessionsBuilder
-} from "../../test-utils/classroom/session";
+import {attendee, AttendeeBuilder, SessionBuilder, SessionsBuilder} from "../../test-utils/classroom/session";
 import {addHours, addWeeks, format, formatISO, subDays, subHours} from "date-fns";
 import {Attendance, Session} from "../domain/session";
 import {Subjects} from "../domain/subjects";
@@ -255,10 +249,10 @@ describe("SessionsSlice", () => {
                 .build()
             const previousState = new LoadingState().withState(sessions as Session[]).build()
             const action = new FulFilledAction(sessionCheckout)
-                .withPayload(new ApiSessionsBuilder().withId("1").withClassroom("1").withName('Pilates avancé')
+                .withPayload(new SessionBuilder().withId("1").withClassroom("1").withName('Pilates avancé')
                     .withMachineTrio().withScheduleAsString(formatISO(addWeeks(currentDate, 1))).withPosition(3)
-                    .withAttendee(apiAttendee("1", "Laurent", "Gas", Attendance.REGISTERED, {amount: 6}))
-                    .withAttendee(apiAttendee("2", "Pierre", "Bernard", Attendance.REGISTERED, undefined))
+                    .withAttendee(new AttendeeBuilder().id("1").firstname("Laurent").lastname("Gas").credits(6).build())
+                    .withAttendee(new AttendeeBuilder().id("2").firstname( "Pierre").lastname( "Bernard").noCredits().build())
                     .build())
                 .build()
 
@@ -281,7 +275,7 @@ describe("SessionsSlice", () => {
                                 attendance: "REGISTERED",
                                 credits: {amount: 6}
                             },
-                            {id: "2", firstname: "Pierre", lastname: "Bernard", attendance: "REGISTERED"}
+                            {id: "2", firstname: "Pierre", lastname: "Bernard", attendance: "REGISTERED", credits: {amount: undefined}}
                         ],
                         subject: Subjects.MACHINE_TRIO
                     },
@@ -302,7 +296,7 @@ describe("SessionsSlice", () => {
                                 attendance: "REGISTERED",
                                 credits: {amount: 6}
                             },
-                            {id: "2", firstname: "Pierre", lastname: "Bernard", attendance: "REGISTERED"}
+                            {id: "2", firstname: "Pierre", lastname: "Bernard", attendance: "REGISTERED", credits: {amount: undefined}}
                         ],
                         subject: Subjects.MACHINE_TRIO
                     },
