@@ -88,10 +88,7 @@ export class ApiSessionsBuilder {
     private id: string | undefined = undefined
     private classroomId = "1";
     private name = "Cours tapis";
-    private schedule: { stop: string; start: string } = {
-        start: formatISO(new Date()),
-        stop: formatISO(addHours(new Date(), 1))
-    };
+    private schedule: Schedule = new ScheduleBuilder(new Date()).build()
     private subject = "MAT"
     private position = 1;
     private attendees?: [ApiAttendee];
@@ -116,9 +113,8 @@ export class ApiSessionsBuilder {
         return this
     }
 
-    public withSchedule = (date: string, amount: number): ApiSessionsBuilder => {
-        this.schedule.start = date
-        this.schedule.stop = formatISO(addHours(parseISO(date), amount))
+    public withSchedule = (schedule: Schedule): ApiSessionsBuilder => {
+        this.schedule = schedule
         return this
     }
 
@@ -138,8 +134,21 @@ export class ApiSessionsBuilder {
         return this
     }
 
+    withAttendees = (attendees: [ApiAttendee] | undefined): ApiSessionsBuilder => {
+        this.attendees === undefined ? this.attendees = attendees : attendees !== undefined ? this.attendees.push(...attendees): this.attendees = undefined
+        return this
+    }
+
     build = (): ApiSession => {
-        return apiSession(this.id, this.classroomId, this.name, this.subject, this.schedule, this.position, this.attendees)
+        return {
+            id: this.id,
+            classroom_id: this.classroomId,
+            name: this.name,
+            subject: this.subject,
+            schedule: this.schedule,
+            position: this.position,
+            attendees: this.attendees
+        }
     }
 }
 
@@ -279,18 +288,7 @@ export class ScheduleBuilder implements Builder<Schedule> {
 }
 
 
-export const apiSession = (id: string | undefined, classroomId = "1", name = "Pilates avancé",
-                           subject = "MAT", schedule_ = new ScheduleBuilder(new Date())
-        .build(), position = 1,
-                           attendees: [ApiAttendee] | undefined = undefined): ApiSession => {
-    return {
-        id: id,
-        classroom_id: classroomId,
-        name: name,
-        subject: subject,
-        schedule: {...schedule_},
-        position: position,
-        attendees: attendees
-    }
-}
+
+
+
 

@@ -1,7 +1,7 @@
 import React, {ReactElement} from 'react';
 import {
     ApiAttendeeBuilder,
-    apiSession,
+    ApiSessionsBuilder,
     AttendeeBuilder,
     AttendeesBuilder,
     ScheduleBuilder,
@@ -192,17 +192,21 @@ SessionCheckin.parameters = {
         handlers: [
             rest.post("http://localhost:8081/sessions/checkin", (req, res, _) => {
                 const response = checkinResponse(defaultSession.id ?? "1", defaultSession.classroomId,
-                    apiSession(defaultSession.id, defaultSession.classroomId, defaultSession.name, defaultSession.subject.toString(),
-                        new ScheduleBuilder(defaultSession.schedule.start)
-                            .build(),
-                        defaultSession.position,
-                        [new ApiAttendeeBuilder()
+                    new ApiSessionsBuilder()
+                        .withId((defaultSession.id)!)
+                        .withClassroom(defaultSession.classroomId)
+                        .withName(defaultSession.name)
+                        .withSchedule(new ScheduleBuilder(defaultSession.schedule.start)
+                            .build())
+                        .withPosition(defaultSession.position)
+                        .withAttendees([new ApiAttendeeBuilder()
                             .withId("1")
                             .withFirstname("Bruno")
                             .withLastname("Germain")
                             .checkedIn()
                             .with_credits(4)
-                            .build()]));
+                            .build()])
+                        .build());
                 return res(compose(
                     context.status(201),
                     context.json(response)
@@ -246,16 +250,20 @@ SessionCheckout.parameters = {
         handlers: [
             rest.post("http://localhost:8081/sessions/2/checkout", (req, res, _) => {
                 const response = checkinResponse(sessionWithOneCheckedInAttendee.id ?? "1", sessionWithOneCheckedInAttendee.classroomId,
-                    apiSession(sessionWithOneCheckedInAttendee.id, sessionWithOneCheckedInAttendee.classroomId, sessionWithOneCheckedInAttendee.name, sessionWithOneCheckedInAttendee.subject.toString(),
-                        new ScheduleBuilder(sessionWithOneCheckedInAttendee.schedule.start)
-                            .build(),
-                        sessionWithOneCheckedInAttendee.position,
-                        [new ApiAttendeeBuilder()
+                    new ApiSessionsBuilder()
+                        .withId((sessionWithOneCheckedInAttendee.id)!)
+                        .withClassroom(sessionWithOneCheckedInAttendee.classroomId)
+                        .withName(sessionWithOneCheckedInAttendee.name)
+                        .withSchedule(new ScheduleBuilder(sessionWithOneCheckedInAttendee.schedule.start)
+                            .build())
+                        .withPosition(sessionWithOneCheckedInAttendee.position)
+                        .withAttendees([new ApiAttendeeBuilder()
                             .withId("1")
                             .withFirstname("Bruno")
                             .withLastname("Germain")
                             .with_credits(5)
-                            .build()]));
+                            .build()])
+                        .build());
                 return res(compose(
                     context.status(201),
                     context.json(response)
@@ -301,10 +309,15 @@ CancelSession.parameters = {
         handlers: [
             rest.post("http://localhost:8081/sessions/cancellation/1", (req, res, _) => {
                 const response = cancellationResponse(defaultSession.id ?? "1", defaultSession.classroomId,
-                    apiSession(defaultSession.id, defaultSession.classroomId, defaultSession.name, defaultSession.subject.toString(),
-                        new ScheduleBuilder(defaultSession.schedule.start)
-                            .build(),
-                        defaultSession.position));
+                    new ApiSessionsBuilder()
+                        .withId((defaultSession.id)!)
+                        .withClassroom(defaultSession.classroomId)
+                        .withName(defaultSession.name)
+                        .withSchedule(new ScheduleBuilder(defaultSession.schedule.start)
+                            .build())
+                        .withPosition(defaultSession.position)
+                        .withAttendees(undefined)
+                        .build());
                 return res(compose(
                     context.status(201),
                     context.json(response)

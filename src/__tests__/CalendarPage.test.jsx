@@ -24,7 +24,7 @@ describe.skip("Calendar page", () => {
             .body(new SessionsBuilder()
                 .withSession(
                     new ApiSessionsBuilder().withClassroom("1").withName('Cours Duo')
-                        .withSchedule(formatISO(classroomDate), 1).withPosition(2)
+                        .withSchedule(classroomDate).withPosition(2)
                         .withAttendee(
                             new ApiAttendeeBuilder()
                                 .withId("3")

@@ -5,12 +5,16 @@ import {
     XLinkHeaderBuilder
 } from "../../../test-utils/server/server";
 import {afterAll, afterEach, beforeEach} from 'vitest'
-import {ApiAttendeeBuilder, ApiSessionsBuilder, attendee, SessionsBuilder} from "../../../test-utils/classroom/session";
+import {
+    ApiAttendeeBuilder,
+    ApiSessionsBuilder,
+    ScheduleBuilder,
+    SessionsBuilder
+} from "../../../test-utils/classroom/session";
 import {screen, waitFor} from "@testing-library/react";
 import {render} from "../../../test-utils/test-utils";
 import userEvent from "@testing-library/user-event";
 import React from "react";
-import {Attendance} from "../../../features/domain/session";
 import {PilatesMonthlyCalendar} from "../PilatesMonthlyCalendar";
 
 describe("Calendar", () => {
@@ -31,12 +35,12 @@ describe("Calendar", () => {
                 .body(new SessionsBuilder()
                     .withSession(
                         new ApiSessionsBuilder().withId("13").withClassroom(1).withName('Stage 1')
-                            .withSchedule("2021-11-01T11:20:00Z", 1).withPosition(3)
+                            .withSchedule(new ScheduleBuilder("2021-11-01T11:20:00Z").build()).withPosition(3)
                             .build()
                     )
                     .withSession(
                         new ApiSessionsBuilder().withId("4").withClassroom(1).withName('Stage 2')
-                            .withSchedule("2021-11-01T13:20:00Z", 1).withPosition(1)
+                            .withSchedule(new ScheduleBuilder("2021-11-01T13:20:00Z").build()).withPosition(1)
                             .withAttendee(
                                 new ApiAttendeeBuilder()
                                     .withId("3")
