@@ -1,6 +1,6 @@
-export type TokenType = "bearer"
+export type TokenType = "bearer";
 
 export interface Token {
-    token: string | null
-    type: TokenType
+  token: string | null;
+  type: TokenType;
 }

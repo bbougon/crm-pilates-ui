@@ -113,8 +113,8 @@
     "vitest": "^0.15.1"
   },
   "lint-staged": {
-    "*.{js,jsx}": ["eslint --fix . --ext .js,.jsx"],
-    "*.{ts,tsx}": ["eslint --fix . --ext .ts,.tsx"]
+    "*.{js,jsx}": ["eslint --fix . --ext .js,.jsx", "prettier --check src/"],
+    "*.{ts,tsx}": ["eslint --fix . --ext .ts,.tsx", "prettier --check src/"]
   },
   "msw": {
     "workerDirectory": "public"

@@ -1,19 +1,26 @@
-import {ArgsTable, Canvas, Meta, PRIMARY_STORY, Source, Story} from '@storybook/addon-docs'
-import {store} from "../../app/store";
-import {Provider} from "react-redux";
+import {
+  ArgsTable,
+  Canvas,
+  Meta,
+  PRIMARY_STORY,
+  Source,
+  Story,
+} from "@storybook/addon-docs";
+import { store } from "../../app/store";
+import { Provider } from "react-redux";
 
-<Meta title="ClassroomScheduling"/>
+<Meta title="ClassroomScheduling" />
 
 # ClassroomScheduling ↕️
 
 <Canvas withSource="none">
-    <div>
-        <Provider store={store}>
-            <Story id="add-classroom-form--classroom-scheduling-details"/>
-        </Provider>
-    </div>
+  <div>
+    <Provider store={store}>
+      <Story id="add-classroom-form--classroom-scheduling-details" />
+    </Provider>
+  </div>
 </Canvas>
 
-<ArgsTable story={PRIMARY_STORY}/>
+<ArgsTable story={PRIMARY_STORY} />
 
-<Source dark/>
+<Source dark />
