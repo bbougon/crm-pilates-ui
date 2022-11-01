@@ -6,7 +6,7 @@ import * as React from "react";
 import { formatHours } from "../../utils/date";
 import { Session } from "../../features/domain/session";
 import { useDrawer } from "../../hooks/useDrawer";
-import { SessionDetails } from "../classroom/SessionDetails";
+import { SessionDetails } from "./SessionDetails";
 
 const theme = createTheme({
   typography: {

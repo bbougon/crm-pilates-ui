@@ -32,7 +32,7 @@ import {
 import { expect } from "@storybook/jest";
 import { ComponentStory } from "@storybook/react";
 import { AuthStatus } from "../../features/auth";
-import { SessionDetails } from "../../component/classroom/SessionDetails";
+import { SessionDetails } from "../../component/calendar/SessionDetails";
 import SessionDetailsDoc from "./SessionDetails.docs.mdx";
 import { ErrorMessage } from "../../features/errors";
 import { SnackbarProvider } from "../../context/SnackbarProvider";

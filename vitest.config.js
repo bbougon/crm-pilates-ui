@@ -1,7 +1,5 @@
-import {defineConfig, splitVendorChunkPlugin} from 'vite'
-import react from '@vitejs/plugin-react'
+import {defineConfig} from 'vite'
 import istanbul from 'vite-plugin-istanbul';
-//import visualizer from "rollup-plugin-visualizer";
 
 export default defineConfig({
     build: {
@@ -18,7 +16,8 @@ export default defineConfig({
         setupFiles: './setupTests.js',
         env: "test",
         coverage: {
-            exclude: ['**/src/test-utils/**', '**/__tests__/**']
+            exclude: ['**/src/test-utils/**', '**/__tests__/**'],
+            reporter: ['html']
         }
     }
 })

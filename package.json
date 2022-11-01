@@ -40,6 +40,7 @@
     "preview": "vite preview",
     "test": "vitest --config ./vitest.config.js --ui --reporter verbose",
     "test:coverage": "run-s test:run:coverage test:storybook:coverage",
+    "test:coverage:report": "cp coverage/storybook/coverage-storybook.json coverage/coverage-storybook.json &&  nyc merge coverage coverage/coverage.json && nyc report --reporter=lcov --reporter=html -t coverage",
     "test:print-debug": "DEBUG_PRINT_LIMIT=50000 vitest --ui --reporter verbose",
     "test:run": "vitest --config ./vitest.config.js run",
     "test:run:coverage": "vitest --config ./vitest.config.js run --coverage",
