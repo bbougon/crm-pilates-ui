@@ -204,6 +204,7 @@ export const SessionCheckoutError = Template.bind({
   session: sessionWithOneCheckedInAttendee,
 });
 export const CancelSession = Template.bind({});
+export const CancelSessionError = Template.bind({});
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -504,4 +505,51 @@ CancelSession.play = async ({ canvasElement }) => {
   await sleep(200);
 
   expect(canvas.queryByText("Bruno Germain")).not.toBeInTheDocument();
+};
+
+CancelSessionError.decorators = [
+  (story: any) => (
+    <Mockstore sessionState={SessionWithOneRegisteredAttendee}>
+      {story()}
+    </Mockstore>
+  ),
+];
+CancelSessionError.storyName = "Bruno Germain cannot cancel his session";
+CancelSessionError.args = {
+  session: defaultSession,
+};
+CancelSessionError.parameters = {
+  msw: {
+    handlers: [
+      rest.post(
+        "http://localhost:8081/sessions/cancellation/1",
+        (req, res, _) => {
+          return res(compose(context.status(400), context.json(error)));
+        }
+      ),
+    ],
+  },
+};
+
+CancelSessionError.play = async ({ canvasElement }) => {
+  const canvas = await waitFor(() => within(canvasElement));
+
+  await expect(canvas.getByText("Bruno Germain")).toBeInTheDocument();
+
+  await waitFor(async () => {
+    await fireEvent.click(canvas.getByRole("button", { name: /more/i }));
+  });
+
+  const presentation = within(screen.getByRole("presentation"));
+  await waitFor(async () => {
+    await fireEvent.click(
+      presentation.getByRole("menuitem", { name: /cancel/i })
+    );
+  });
+  await sleep(200);
+
+  expect(canvas.queryByText("Bruno Germain")).toBeInTheDocument();
+  await expect(
+    canvas.getByText("Error occurred - Session could not be cancelled")
+  ).toBeInTheDocument();
 };

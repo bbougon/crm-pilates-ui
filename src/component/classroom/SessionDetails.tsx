@@ -355,6 +355,7 @@ const SessionAttendees = ({
 export const SessionDetails = ({ session }: { session: Session }) => {
   const [currentSession, setCurrentSession] = useState<Session>(session);
   const dispatch = useAppDispatch();
+  const { display } = useSnackbar();
 
   const sessionStart = currentSession.schedule.start;
   const sessionEnd = currentSession.schedule.stop;
@@ -366,11 +367,14 @@ export const SessionDetails = ({ session }: { session: Session }) => {
 
   const cancelSession = useCallback(
     (cancel: CancelAttendee) => {
-      dispatch(sessionCancel(cancel)).then((session) => {
-        setCurrentSession(session.payload as Session);
-      });
+      dispatch(sessionCancel(cancel))
+        .unwrap()
+        .then((session) => {
+          setCurrentSession(session);
+        })
+        .catch((err) => display(err));
     },
-    [dispatch]
+    [dispatch, display]
   );
 
   return (

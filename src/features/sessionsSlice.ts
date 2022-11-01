@@ -19,6 +19,7 @@ export enum SessionStatus {
   CHECKOUT_FAILED = "checkOutFailed",
   CHECKOUT_SUCCEEDED = "checkOutSucceeded",
   CANCEL_SUCCEEDED = "revokeSucceeded",
+  CANCEL_FAILED = "revokeFailed",
 }
 
 export interface SessionState {
@@ -35,7 +36,8 @@ export interface SessionState {
     | SessionStatus.CHECKOUT_SUCCEEDED
     | SessionStatus.CHECKOUT_FAILED
     | SessionStatus.CHECKOUT_IN_PROGRESS
-    | SessionStatus.CANCEL_SUCCEEDED;
+    | SessionStatus.CANCEL_SUCCEEDED
+    | SessionStatus.CANCEL_FAILED;
   error: ErrorMessage[];
   link: SessionsLink | undefined;
 }
@@ -153,7 +155,7 @@ export const sessionCheckout = createAsyncThunk<
 export const sessionCancel = createAsyncThunk<
   Session,
   Cancel,
-  { rejectValue: ApiError }
+  { rejectValue: ErrorMessage[] }
 >("sessions/revoke", async (cancel, thunkAPI) => {
   try {
     const { login } = thunkAPI.getState() as unknown as RootState;
@@ -174,7 +176,9 @@ export const sessionCancel = createAsyncThunk<
     });
     return mapSession(response.data as ApiSession);
   } catch (e) {
-    return thunkAPI.rejectWithValue(e as ApiError);
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error(`Session could not be cancelled`, e as ApiError)
+    );
   }
 });
 
@@ -290,6 +294,10 @@ export const sessionsSlice = createSlice({
           );
           session.id = sessionCancelled.id;
         }
+      })
+      .addCase(sessionCancel.rejected, (state, action) => {
+        state.status = SessionStatus.CANCEL_FAILED;
+        state.error = action.payload as ErrorMessage[];
       });
   },
 });
