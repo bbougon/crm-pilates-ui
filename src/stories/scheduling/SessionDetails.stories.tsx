@@ -44,6 +44,8 @@ type State = {
   link: string | undefined;
 };
 
+const error = { detail: [{ msg: "Error occurred", type: "Error" }] };
+
 const defaultSession: Session = new SessionBuilder()
   .withId("1")
   .withClassroom("1")
@@ -198,6 +200,9 @@ export const SessionCheckinError = Template.bind({});
 export const SessionCheckout = Template.bind({
   session: sessionWithOneCheckedInAttendee,
 });
+export const SessionCheckoutError = Template.bind({
+  session: sessionWithOneCheckedInAttendee,
+});
 export const CancelSession = Template.bind({});
 
 function sleep(ms: number) {
@@ -317,8 +322,7 @@ SessionCheckinError.parameters = {
   msw: {
     handlers: [
       rest.post("http://localhost:8081/sessions/checkin", (req, res, _) => {
-        const response = { detail: [{ msg: "Error occurred", type: "Error" }] };
-        return res(compose(context.status(400), context.json(response)));
+        return res(compose(context.status(400), context.json(error)));
       }),
     ],
   },
@@ -403,6 +407,40 @@ SessionCheckout.play = async ({ canvasElement }) => {
   await expect(
     presentation.getByRole("menuitem", { name: /cancel/i })
   ).not.toHaveAttribute("aria-disabled");
+};
+
+SessionCheckoutError.decorators = [
+  (story: any) => (
+    <Mockstore sessionState={SessionWithOneCheckedInAttendee}>
+      {story()}
+    </Mockstore>
+  ),
+];
+SessionCheckoutError.storyName = "Bruno Germain cannot checkout";
+SessionCheckoutError.args = {
+  session: sessionWithOneCheckedInAttendee,
+};
+SessionCheckoutError.parameters = {
+  msw: {
+    handlers: [
+      rest.post("http://localhost:8081/sessions/2/checkout", (req, res, _) => {
+        return res(compose(context.status(400), context.json(error)));
+      }),
+    ],
+  },
+};
+
+SessionCheckoutError.play = async ({ canvasElement }) => {
+  const canvas = await waitFor(() => within(canvasElement));
+  await expect(canvas.getByText("4")).toBeInTheDocument();
+  await expect(canvas.getByText("C")).toBeInTheDocument();
+
+  await userEvent.click(canvas.getByRole("checkbox"));
+  await sleep(200);
+
+  await expect(
+    canvas.getByText("Error occurred - Checkout could not be completed")
+  ).toBeInTheDocument();
 };
 
 /*

@@ -124,7 +124,7 @@ export const sessionCheckin = createAsyncThunk<
 export const sessionCheckout = createAsyncThunk<
   Session,
   Checkout,
-  { rejectValue: ApiError }
+  { rejectValue: ErrorMessage[] }
 >("sessions/checkout", async (checkout, thunkAPI) => {
   try {
     const { login } = thunkAPI.getState() as unknown as RootState;
@@ -144,7 +144,9 @@ export const sessionCheckout = createAsyncThunk<
     });
     return mapSession(response.data as ApiSession);
   } catch (e) {
-    return thunkAPI.rejectWithValue(e as ApiError);
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error(`Checkout could not be completed`, e as ApiError)
+    );
   }
 });
 
@@ -267,10 +269,7 @@ export const sessionsSlice = createSlice({
       })
       .addCase(sessionCheckout.rejected, (state, action) => {
         state.status = SessionStatus.CHECKOUT_FAILED;
-        state.error = map_action_thunk_error(
-          "Checkout",
-          action.payload as ApiError
-        );
+        state.error = action.payload as ErrorMessage[];
       })
       .addCase(sessionCheckout.fulfilled, (state, action) => {
         state.status = SessionStatus.CHECKOUT_SUCCEEDED;

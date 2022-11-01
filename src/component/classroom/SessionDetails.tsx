@@ -154,9 +154,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
             dispatchReducer(attendeeCheckedIn(attendee));
           }
         })
-        .catch((err) => {
-          display(err);
-        });
+        .catch((err) => display(err));
       setCheckin(null);
     }
     if (checkout) {
@@ -167,10 +165,11 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
           if (attendee) {
             dispatchReducer(attendeeCheckedOut(attendee));
           }
-        });
+        })
+        .catch((err) => display(err));
       setCheckOut(null);
     }
-  }, [dispatch, checkin, checkout, state]);
+  }, [dispatch, checkin, checkout, state, display]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
