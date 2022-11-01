@@ -20,11 +20,13 @@ import {ComponentStory} from "@storybook/react";
 import {AuthStatus} from "../../features/auth";
 import {SessionDetails} from "../../component/classroom/SessionDetails";
 import SessionDetailsDoc from "./SessionDetails.docs.mdx";
+import {ErrorMessage} from "../../features/errors";
+import {SnackbarProvider} from "../../context/SnackbarProvider";
 
 type State = {
     sessions: Session[]
     status: SessionStatus
-    error: []
+    error: ErrorMessage[]
     link: string | undefined
 }
 
@@ -46,6 +48,21 @@ const defaultSession: Session =
             .build())
         .build()
 
+const brunoGermain = new AttendeeBuilder()
+    .id("1")
+    .firstname("Bruno")
+    .lastname("Germain")
+    .checkedIn()
+    .credits(4)
+    .build();
+
+const bertrandBougon = new AttendeeBuilder()
+    .id("2")
+    .firstname("Bertrand")
+    .lastname("Bougon")
+    .credits(5)
+    .build();
+
 const sessionWithOneCheckedInAttendee: Session =
     new SessionBuilder()
         .withId("2")
@@ -55,16 +72,28 @@ const sessionWithOneCheckedInAttendee: Session =
             .build())
         .withPosition(2)
         .withAttendees(new AttendeesBuilder()
-            .withAttendee(new AttendeeBuilder()
-                .id("1")
-                .firstname("Bruno")
-                .lastname("Germain")
-                .checkedIn()
-                .credits(4)
-                .build())
+            .withAttendee(brunoGermain)
             .build())
         .build()
 
+const sessionWithTwoAttendees: Session =
+    new SessionBuilder()
+        .withClassroom("3")
+        .withName("Coours Mat duo")
+        .withPosition(2)
+        .withAttendees(new AttendeesBuilder()
+            .withAttendee(brunoGermain)
+            .withAttendee(bertrandBougon)
+            .build())
+        .build()
+
+
+const SessionWithTwoAttendees: State = {
+    sessions: [sessionWithTwoAttendees],
+    status: SessionStatus.IDLE,
+    error: [],
+    link: undefined
+}
 
 const SessionWithOneRegisteredAttendee: State = {
     sessions: [defaultSession],
@@ -100,6 +129,10 @@ const Mockstore = ({sessionState, children}: MockStoreProps) => {
                                 .addCase(sessionCheckin.fulfilled, (state, action) => {
                                     state.status = SessionStatus.CHECKIN_IN_SUCCEEDED
                                 })
+                                .addCase(sessionCheckin.rejected, (state, action) => {
+                                    state.status = SessionStatus.CHECKIN_IN_FAILED
+                                    state.error = action.payload as ErrorMessage[]
+                                })
                                 .addCase(sessionCheckout.fulfilled, (state, action) => {
                                     state.status = SessionStatus.CHECKOUT_SUCCEEDED
                                 })
@@ -129,7 +162,7 @@ const Mockstore = ({sessionState, children}: MockStoreProps) => {
 export default {
     component: SessionDetails,
     title: 'Session Details',
-    decorators: [(story: any) => <Provider store={store}>{story()}</Provider>],
+    decorators: [(story: any) => <Provider store={store}><SnackbarProvider>{story()}</SnackbarProvider></Provider>],
     excludeStories: /.*MockedState$/,
     parameters: {
         docs: {
@@ -142,6 +175,7 @@ const Template: ComponentStory<typeof SessionDetails> = (args) => <SessionDetail
 
 export const DisplaySessionDetails = Template.bind({});
 export const SessionCheckin = Template.bind({});
+export const SessionCheckinError = Template.bind({});
 export const SessionCheckout = Template.bind({session: sessionWithOneCheckedInAttendee});
 export const CancelSession = Template.bind({});
 
@@ -155,10 +189,10 @@ function sleep(ms: number) {
     #########################################################
  */
 DisplaySessionDetails.decorators = [
-    (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
+    (story: any) => <Mockstore sessionState={SessionWithTwoAttendees}>{story()}</Mockstore>,
 ]
 DisplaySessionDetails.args = {
-    session: defaultSession
+    session: sessionWithTwoAttendees
 };
 DisplaySessionDetails.parameters = {
     msw: {
@@ -171,6 +205,10 @@ DisplaySessionDetails.play = async ({canvasElement}) => {
     const canvas = within(canvasElement);
     await sleep(20);
 
+    await expect(canvas.getByText("Bruno Germain")).toBeInTheDocument()
+    await expect(canvas.getByText('4')).toBeInTheDocument()
+    await expect(canvas.getByText('C')).toBeInTheDocument()
+    await expect(canvas.getByText("Bertrand Bougon")).toBeInTheDocument()
     await expect(canvas.getByText('5')).toBeInTheDocument()
     await expect(canvas.getByText('R')).toBeInTheDocument()
 };
@@ -232,6 +270,38 @@ SessionCheckin.play = async ({canvasElement}) => {
     const presentation = within(screen.getByRole('presentation'))
     await expect(presentation.getByRole('menuitem', {name: /cancel/i})).toHaveAttribute("aria-disabled")
 };
+
+SessionCheckinError.decorators = [
+    (story: any) => <Mockstore sessionState={SessionWithOneRegisteredAttendee}>{story()}</Mockstore>,
+]
+SessionCheckinError.storyName = "Bruno Germain could not checkin"
+SessionCheckinError.args = {
+    session: defaultSession
+};
+SessionCheckinError.parameters = {
+    msw: {
+        handlers: [
+            rest.post("http://localhost:8081/sessions/checkin", (req, res, _) => {
+                const response = {"detail": [{"msg": "Error occurred", "type": "Error"}]}
+                return res(compose(
+                    context.status(400),
+                    context.json(response)
+                ))
+            })
+        ],
+    },
+};
+
+
+SessionCheckinError.play = async ({canvasElement}) => {
+    const canvas = await waitFor(() => within(canvasElement));
+
+    await userEvent.click(canvas.getByRole('checkbox'));
+    await sleep(100);
+
+    await expect(canvas.getByText('Error occurred - Checkin could not be completed')).toBeInTheDocument()
+};
+
 
 /*
     #########################################################

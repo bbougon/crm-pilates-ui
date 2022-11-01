@@ -76,7 +76,7 @@ export const fetchSessions = createAsyncThunk<{ sessions: Session[], link: strin
     }
 )
 
-export const sessionCheckin = createAsyncThunk<Session, Checkin, { rejectValue: ApiError }>(
+export const sessionCheckin = createAsyncThunk<Session, Checkin, { rejectValue: ErrorMessage[] }>(
     'sessions/checkin',
     async (checkin, thunkAPI) => {
         try {
@@ -94,7 +94,7 @@ export const sessionCheckin = createAsyncThunk<Session, Checkin, { rejectValue: 
             const response = await api("/sessions/checkin", {customConfig})
             return mapSession(response.data as ApiSession)
         } catch (e) {
-            return thunkAPI.rejectWithValue(e as ApiError)
+            return thunkAPI.rejectWithValue(map_action_thunk_error(`Checkin could not be completed`, e as ApiError))
         }
     }
 )
@@ -199,7 +199,7 @@ export const sessionsSlice = createSlice({
             })
             .addCase(sessionCheckin.rejected, (state, action) => {
                 state.status = SessionStatus.CHECKIN_IN_FAILED
-                state.error = map_action_thunk_error("Checkin", action.payload as ApiError)
+                state.error = action.payload as ErrorMessage[]
             })
             .addCase(sessionCheckin.fulfilled, (state, action) => {
                 state.status = SessionStatus.CHECKIN_IN_SUCCEEDED
@@ -260,7 +260,7 @@ const mapSession = (apiSession: ApiSession): Session => {
 }
 
 export const selectMonthlySessions = (state: RootState) => state.sessions.sessions
-export function findAttendeeById(result: PayloadAction<Session>, attendeeId: string): Attendee | undefined {
-    return result.payload.attendees?.find(attendee => attendee.id === attendeeId);
+export function findAttendeeById(result: Session, attendeeId: string): Attendee | undefined {
+    return result.attendees?.find(attendee => attendee.id === attendeeId);
 }
 export default sessionsSlice.reducer

@@ -1,0 +1,9 @@
+# Ignore artifacts:
+dist
+coverage
+public
+.github
+.prettierrc.json
+.storybook
+.eslintrc.json
+docker-compose.yml

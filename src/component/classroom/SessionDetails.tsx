@@ -20,7 +20,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {Attendance, Attendee, Session} from "../../features/domain/session";
 import {CreditBox} from "../CreditBox";
 import {useAppDispatch} from "../../hooks/redux";
-import {PayloadAction} from "@reduxjs/toolkit";
+import {useSnackbar} from "../../hooks/useSnackbar";
 
 const theme = createTheme({
     components: {
@@ -102,6 +102,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
         attendeeLabelStatus: sessionAttendeeProps.attendee.attendance === Attendance.REGISTERED ? 'R' : 'C',
         session: sessionAttendeeProps.session
     })
+    const {display} = useSnackbar();
 
     const [checkin, setCheckin] = useState<null | {
         classroomId: string,
@@ -122,21 +123,28 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
 
     useEffect(() => {
         if (checkin) {
-            dispatch(sessionCheckin(checkin)).then((result) => {
-                const attendee = findAttendeeById(result as PayloadAction<Session>, state.attendee.id);
-                if (attendee) {
-                    dispatchReducer(attendeeCheckedIn(attendee))
-                }
-            })
+            dispatch(sessionCheckin(checkin))
+                .unwrap()
+                .then((result) => {
+                    const attendee = findAttendeeById(result, state.attendee.id);
+                    if (attendee) {
+                        dispatchReducer(attendeeCheckedIn(attendee))
+                    }
+                })
+                .catch((err) => {
+                    display(err)
+                })
             setCheckin(null)
         }
         if (checkout) {
-            dispatch(sessionCheckout(checkout)).then((result) => {
-                const attendee = findAttendeeById(result as PayloadAction<Session>, state.attendee.id)
-                if (attendee) {
-                    dispatchReducer(attendeeCheckedOut(attendee))
-                }
-            })
+            dispatch(sessionCheckout(checkout))
+                .unwrap()
+                .then((result) => {
+                    const attendee = findAttendeeById(result, state.attendee.id)
+                    if (attendee) {
+                        dispatchReducer(attendeeCheckedOut(attendee))
+                    }
+                })
             setCheckOut(null)
         }
     }, [dispatch, checkin, checkout, state])
@@ -266,10 +274,13 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
     )
 }
 
-const SessionAttendees = ({session, onCancel}: { session: Session, onCancel: (cancel: CancelAttendee) => void }) => {
+const SessionAttendees = ({
+                              session,
+                              onCancel,
+                          }: { session: Session, onCancel: (cancel: CancelAttendee) => void }) => {
 
     const content = session?.attendees?.map((attendee) => (
-        <SessionAttendee key={attendee.id} attendee={attendee} session={session} onCancel={onCancel}/>))
+        <SessionAttendee key={attendee.id} attendee={attendee} session={session} onCancel={onCancel} />))
     return (
         <Grid container>
             {content}
