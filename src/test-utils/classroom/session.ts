@@ -153,7 +153,7 @@ export class ApiSessionsBuilder {
 }
 
 export class SessionBuilder {
-    private id: string | undefined = faker.datatype.uuid();
+    private id: string | undefined = undefined;
     private classroomId = "1";
     private name = "Cours tapis";
     private schedule: Schedule = new ScheduleBuilder(new Date()).build()
