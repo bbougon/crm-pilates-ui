@@ -36,6 +36,8 @@ import {
   updatePosition,
   updateSubject,
 } from "./reducers";
+import { useAppDispatch } from "../../hooks/redux";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 const FORMAT = "MM/dd/yyyy HH:mm";
 
@@ -46,7 +48,8 @@ export const ClassroomScheduling = ({
   date: Date;
   onClassroomScheduled: () => void;
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { display } = useSnackbar();
 
   const [state, dispatchReducer] = useReducer(schedulingReducer, {
     classroomName: "",
@@ -118,8 +121,10 @@ export const ClassroomScheduling = ({
       duration: state.duration,
       attendees: state.attendees,
     };
-    await dispatch(addClassroom(classroom));
-    onClassroomScheduled();
+    dispatch(addClassroom(classroom))
+      .unwrap()
+      .then(() => onClassroomScheduled())
+      .catch((err) => display(err));
   };
 
   return (

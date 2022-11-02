@@ -22,6 +22,7 @@ import ClassroomSchedulingDoc from "./ClassroomScheduling.docs.mdx";
 import { client } from "../../test-utils/clients/clients";
 import { compose, context, rest } from "msw";
 import { APIClassroomBuilder } from "../../test-utils/classroom/classroom";
+import { SnackbarProvider } from "../../context/SnackbarProvider";
 
 type ClassroomState = {
   classrooms: Classroom[];
@@ -88,10 +89,15 @@ const Mockstore = ({
             initialState: classroomState,
             reducers: {},
             extraReducers(builder) {
-              builder.addCase(addClassroom.fulfilled, (state, action) => {
-                state.status = ClassroomStatus.SUCCEEDED;
-                state.classrooms.push(action.payload as Classroom);
-              });
+              builder
+                .addCase(addClassroom.fulfilled, (state, action) => {
+                  state.status = ClassroomStatus.SUCCEEDED;
+                  state.classrooms.push(action.payload as Classroom);
+                })
+                .addCase(addClassroom.rejected, (state, action) => {
+                  state.status = ClassroomStatus.FAILED;
+                  state.error = action.payload as ErrorMessage[];
+                });
             },
           }).reducer,
           clients: createSlice({
@@ -120,7 +126,13 @@ const Mockstore = ({
 export default {
   component: ClassroomScheduling,
   title: "Add classroom form",
-  decorators: [(story: any) => <Provider store={store}>{story()}</Provider>],
+  decorators: [
+    (story: any) => (
+      <Provider store={store}>
+        <SnackbarProvider>{story()}</SnackbarProvider>
+      </Provider>
+    ),
+  ],
   excludeStories: /.*MockedState$/,
   parameters: {
     docs: {
@@ -136,6 +148,11 @@ const Template: ComponentStory<typeof ClassroomScheduling> = (args) => (
 export const ClassroomSchedulingDetails = Template.bind({});
 export const CalculateClassroomDuration = Template.bind({});
 export const ClassroomSchedulingWithAttendees = Template.bind({});
+export const ClassroomSchedulingError = Template.bind({});
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 /*
     #########################################################
@@ -317,4 +334,66 @@ ClassroomSchedulingWithAttendees.play = async ({ canvasElement }) => {
   userEvent.click(within(attendees).getByText(/martin charles/i));
 
   await expect(canvas.getByRole("button", { name: /submit/i })).toBeEnabled();
+};
+
+ClassroomSchedulingError.decorators = [
+  (story: any) => (
+    <Mockstore
+      classroomState={initialClassroomState}
+      clientsState={withClientsState}
+    >
+      {story()}
+    </Mockstore>
+  ),
+];
+ClassroomSchedulingError.args = {
+  ...initialProps,
+};
+ClassroomSchedulingError.storyName = "Classroom cannot be created";
+ClassroomSchedulingError.parameters = {
+  msw: {
+    handlers: [
+      rest.post("http://localhost:8081/classrooms", (req, res, _) => {
+        return res(
+          compose(
+            context.status(400),
+            context.json({ detail: [{ msg: "Error occurred", type: "Error" }] })
+          )
+        );
+      }),
+    ],
+  },
+};
+ClassroomSchedulingError.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  userEvent.type(
+    canvas.getByRole("textbox", { name: /classroom's name/i }),
+    "Cours tapis duo"
+  );
+  fireEvent.mouseDown(canvas.getByRole("button", { name: /subject/i }));
+  userEvent.click(canvas.getByText(/mat/i));
+  fireEvent.mouseDown(canvas.getByRole("button", { name: /position 1/i }));
+  userEvent.click(canvas.getByText(/3/i));
+  const startDateElement = canvas.getByLabelText(/choose start date/i);
+  userEvent.clear(within(startDateElement).getByRole("textbox"));
+  userEvent.type(
+    within(startDateElement).getByRole("textbox"),
+    "05/07/2021 10:00"
+  );
+  fireEvent.mouseDown(canvas.getByRole("button", { name: /duration 1h00/i }));
+  userEvent.click(canvas.getByText(/2h00/i));
+  userEvent.click(within(canvas.getByRole("combobox")).getByRole("textbox"));
+  const attendees = within(screen.getByRole("presentation")).getByRole(
+    "listbox"
+  );
+  userEvent.click(within(attendees).getByText(/martin charles/i));
+  userEvent.click(canvas.getByRole("button", { name: /submit/i }));
+  await sleep(100);
+
+  await expect(
+    canvas.getByText(
+      "Error occurred - Classroom 'Cours tapis duo' could not be created"
+    )
+  ).toBeInTheDocument();
 };

@@ -55,7 +55,7 @@ const mapToClassroom = (classroom: ApiClassroom): Classroom => {
 export const addClassroom = createAsyncThunk<
   Classroom | undefined,
   Classroom,
-  { rejectValue: ApiError }
+  { rejectValue: ErrorMessage[] }
 >("classroom/add", async (classroom, thunkAPI) => {
   try {
     const { login } = thunkAPI.getState() as unknown as RootState;
@@ -71,7 +71,12 @@ export const addClassroom = createAsyncThunk<
     });
     return mapToClassroom(response.data as ApiClassroom) as Classroom;
   } catch (e) {
-    thunkAPI.rejectWithValue(e as ApiError);
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error(
+        `Classroom '${classroom.classroomName}' could not be created`,
+        e as ApiError
+      )
+    );
   }
 });
 
@@ -87,10 +92,7 @@ const classroomsSlice = createSlice({
       })
       .addCase(addClassroom.rejected, (state, action) => {
         state.status = ClassroomStatus.FAILED;
-        state.error = map_action_thunk_error(
-          "Add classroom",
-          action.payload as ApiError
-        );
+        state.error = action.payload as ErrorMessage[];
       });
   },
 });
