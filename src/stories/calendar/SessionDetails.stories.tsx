@@ -11,10 +11,10 @@ import { Session } from "../../features/domain/session";
 import { Provider } from "react-redux";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 import {
+  SessionStatus,
   sessionCancel,
   sessionCheckin,
   sessionCheckout,
-  SessionStatus,
 } from "../../features/sessionsSlice";
 import { store } from "../../app/store";
 import { compose, context, rest } from "msw";

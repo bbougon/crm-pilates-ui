@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  FormControl,
   Grid,
   InputLabel,
   MenuItem,
@@ -11,12 +12,11 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import { FormControl } from "@material-ui/core";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import * as React from "react";
 import { BaseSyntheticEvent, useReducer } from "react";
 import set from "date-fns/set";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectAllClients } from "../../features/clientsSlice";
 import { addClassroom } from "../../features/classroomSlice";
 import { formatISO, intlFormat, isValid } from "date-fns";
@@ -26,8 +26,8 @@ import { Client } from "../../features/domain/client";
 import { subjects } from "../../utils/translation";
 import { DateTimePicker, LocalizationProvider } from "@mui/lab";
 import {
-  schedulingReducer,
   SchedulingState,
+  schedulingReducer,
   updateAttendees,
   updateClassroomEndDate,
   updateClassroomName,
@@ -218,8 +218,6 @@ export const ClassroomScheduling = ({
                       <TextField
                         {...params}
                         aria-labelledby="Choose start date"
-                        aria-label="Choose start date"
-                        helperText="Choose start date"
                         variant="standard"
                       />
                     )}
@@ -250,7 +248,6 @@ export const ClassroomScheduling = ({
                         {...props}
                         variant="standard"
                         aria-labelledby="Recurrence"
-                        aria-label="Recurrence"
                       />
                     )}
                     inputFormat={FORMAT}

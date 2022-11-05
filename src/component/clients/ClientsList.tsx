@@ -1,8 +1,12 @@
 import * as React from "react";
 import { BaseSyntheticEvent, ReactElement, useEffect, useState } from "react";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Avatar,
   Box,
+  Button,
   Divider,
   FormControl,
   Grid,
@@ -11,24 +15,18 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addCredits,
   ClientStatus,
+  addCredits,
   fetchClients,
   getClientById,
   getClientCredits,
   selectAllClients,
 } from "../../features/clientsSlice";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonIcon from "@mui/icons-material/Person";
 import { DisplayError } from "../errors/DisplayError";
 import { ErrorMessage } from "../../features/errors";
 import { RootState } from "../../app/store";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Button,
-} from "@material-ui/core";
 import { Client, Credits } from "../../features/domain/client";
 import { subjects } from "../../utils/translation";
 import styled from "styled-components";

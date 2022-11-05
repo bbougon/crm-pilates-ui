@@ -6,11 +6,9 @@
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@fortawesome/fontawesome-free": "^6.2.0",
-    "@material-ui/core": "^4.12.3",
-    "@material-ui/icons": "^4.11.2",
     "@mui/icons-material": "^5.0.3",
     "@mui/lab": "^5.0.0-alpha.51",
-    "@mui/material": "^5.0.3",
+    "@mui/material": "^5.10.12",
     "@reduxjs/toolkit": "^1.6.2",
     "@types/node": "^16.11.7",
     "@types/parse-link-header": "^2.0.0",
@@ -48,6 +46,7 @@
     "test:storybook:coverage": "test-storybook --coverage",
     "webstorm-integration": "vitest --config ./vitest.config.js --watch --reporter=dot --reporter=json --outputFile=.vitest-result.json",
     "lint": "eslint --fix . --ext .ts,.tsx,.jsx",
+    "prettier": "prettier --write src",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "chromatic": "npx chromatic"
@@ -94,6 +93,7 @@
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.2.1-alpha-e0aa5e205-20211109",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "file-loader": "^6.2.0",
     "global-jsdom": "^8.5.0",
     "happy-dom": "^5.3.1",
@@ -114,8 +114,14 @@
     "vitest": "^0.15.1"
   },
   "lint-staged": {
-    "*.{js,jsx}": ["eslint --fix . --ext .js,.jsx", "prettier --check src/"],
-    "*.{ts,tsx}": ["eslint --fix . --ext .ts,.tsx", "prettier --check src/"]
+    "*.{js,jsx}": [
+      "eslint --fix . --ext .js,.jsx",
+      "prettier --check src"
+    ],
+    "*.{ts,tsx}": [
+      "eslint --fix . --ext .ts,.tsx",
+      "prettier --check"
+    ]
   },
   "msw": {
     "workerDirectory": "public"

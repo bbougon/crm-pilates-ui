@@ -1,7 +1,8 @@
 import * as React from "react";
-import { createContext, FC, useState } from "react";
+import { FC, createContext, useState } from "react";
 import { Alert, Snackbar } from "@mui/material";
 import { ErrorMessage } from "../features/errors";
+import { createPortal } from "react-dom";
 
 export interface SnackbarAction {
   display: (error: ErrorMessage[]) => void;
@@ -26,12 +27,21 @@ export const SnackbarProvider: FC = ({ children }) => {
         },
       }}
     >
+      <div id="error-portal"></div>
       {children}
-      <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-        <Alert severity="error">
-          {error.map((error) => `${error.message} - ${error.origin}`).join(";")}
-        </Alert>
-      </Snackbar>
+      {open
+        ? createPortal(
+            <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+              <Alert severity="error">
+                {error
+                  .map((error) => `${error.message} - ${error.origin}`)
+                  .join(";")}
+              </Alert>
+            </Snackbar>,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            document.getElementById("error-portal")!
+          )
+        : null}
     </SnackbarContext.Provider>
   );
 };

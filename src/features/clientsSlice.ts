@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api, ApiClient } from "../api";
+import { ApiClient, api } from "../api";
 import map_action_thunk_error, { ApiError, ErrorMessage } from "./errors";
 import { RootState } from "../app/store";
 import { Client, Credits } from "./domain/client";
@@ -62,7 +62,7 @@ export const createClient = createAsyncThunk<
 export const fetchClients = createAsyncThunk<
   { clients: ApiClient[] },
   undefined,
-  { rejectValue: ApiError }
+  { rejectValue: ErrorMessage[] }
 >("clients/fetch", async (_, thunkAPI) => {
   try {
     const { login } = thunkAPI.getState() as unknown as RootState;
@@ -77,7 +77,9 @@ export const fetchClients = createAsyncThunk<
     });
     return { clients: response.data as ApiClient[] };
   } catch (e: ApiError | unknown) {
-    return thunkAPI.rejectWithValue(e as ApiError);
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error("Clients could not be retrieved", e as ApiError)
+    );
   }
 });
 
@@ -147,10 +149,7 @@ const clientsSlice = createSlice({
       })
       .addCase(fetchClients.rejected, (state, action) => {
         state.status = ClientStatus.FAILED;
-        state.error = map_action_thunk_error(
-          "Get clients",
-          action.payload as ApiError
-        );
+        state.error = action.payload as ErrorMessage[];
       })
       .addCase(createClient.fulfilled, (state, action) => {
         state.status = ClientStatus.SUCCEEDED;

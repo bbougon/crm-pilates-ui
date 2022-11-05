@@ -1,17 +1,6 @@
-import {
-  Accordion,
-  AccordionActions,
-  AccordionDetails,
-  AccordionSummary,
-  Button,
-  Divider,
-  FormControl,
-  TextField,
-  Typography,
-} from "@material-ui/core";
 import * as React from "react";
 import { BaseSyntheticEvent, ReactElement, useState } from "react";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientStatus, createClient } from "../../features/clientsSlice";
@@ -23,7 +12,18 @@ import { AddCreditButton } from "./AddCreditButton";
 import { AddCreditForm } from "./AddCreditForm";
 import { subjects } from "../../utils/translation";
 import { CreditItem } from "./CreditItem";
-import { Grid } from "@mui/material";
+import {
+  Accordion,
+  AccordionActions,
+  AccordionDetails,
+  AccordionSummary,
+  Button,
+  Divider,
+  FormControl,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 
 const Wrapper = styled.div`
   display: flex;

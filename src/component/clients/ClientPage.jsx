@@ -1,8 +1,8 @@
 import * as React from "react";
-import { Grid } from "@material-ui/core";
 import { ClientsList } from "./ClientsList";
 import { AddClientForm } from "./ClientForm";
 import { MainContainer } from "../../const/containers";
+import { Grid } from "@mui/material";
 
 export class Clients extends React.Component {
   render() {

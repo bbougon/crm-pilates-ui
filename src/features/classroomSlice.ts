@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api, ApiClassroom } from "../api";
+import { ApiClassroom, api } from "../api";
 import map_action_thunk_error, { ApiError, ErrorMessage } from "./errors";
 import { Subjects } from "./domain/subjects";
 import { Classroom } from "./domain/classroom";

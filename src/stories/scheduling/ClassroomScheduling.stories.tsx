@@ -14,7 +14,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { AuthStatus } from "../../features/auth";
 import { Classroom } from "../../features/domain/classroom";
 import { ErrorMessage } from "../../features/errors";
-import { addClassroom, ClassroomStatus } from "../../features/classroomSlice";
+import { ClassroomStatus, addClassroom } from "../../features/classroomSlice";
 import { Client } from "../../features/domain/client";
 import { ClientStatus } from "../../features/clientsSlice";
 import { ClassroomScheduling } from "../../component/scheduling/ClassroomScheduling";
@@ -193,12 +193,10 @@ ClassroomSchedulingDetails.play = async ({ canvasElement }) => {
     )
   ).toBeInTheDocument();
   await expect(canvas.getByLabelText(/position/i)).toHaveTextContent("1");
-  const startDateElement = canvas.getByLabelText(/choose start date/i);
-  await expect(within(startDateElement).getByRole("textbox")).toHaveValue(
+  await expect(await canvas.findByLabelText(/choose start date/i)).toHaveValue(
     "05/07/2021 09:00"
   );
-  const recurrenceElement = canvas.getByLabelText(/recurrence/i);
-  await expect(within(recurrenceElement).getByRole("textbox")).toHaveValue(
+  await expect(await canvas.findByLabelText(/recurrence/i)).toHaveValue(
     "05/07/2021 10:00"
   );
   const durationElement = canvas.getAllByLabelText("Duration")[0];
@@ -249,18 +247,12 @@ CalculateClassroomDuration.play = async ({ canvasElement }) => {
     )
   ).toBeInTheDocument();
   await expect(canvas.getByLabelText(/position/i)).toHaveTextContent("1");
-  const startDateElement = canvas.getByLabelText(/choose start date/i);
-  userEvent.clear(within(startDateElement).getByRole("textbox"));
-  userEvent.type(
-    within(startDateElement).getByRole("textbox"),
-    "05/07/2021 09:00"
-  );
-  const recurrenceElement = canvas.getByLabelText(/recurrence/i);
-  userEvent.clear(within(recurrenceElement).getByRole("textbox"));
-  userEvent.type(
-    within(recurrenceElement).getByRole("textbox"),
-    "05/07/2021 10:30"
-  );
+  const startDateElement = await canvas.findByLabelText(/choose start date/i);
+  userEvent.clear(startDateElement);
+  userEvent.type(startDateElement, "05/07/2021 09:00");
+  const recurrenceElement = await canvas.findByLabelText(/recurrence/i);
+  userEvent.clear(recurrenceElement);
+  userEvent.type(recurrenceElement, "05/07/2021 10:30");
   userEvent.type(
     canvas.getByRole("textbox", { name: /classroom's name/i }),
     "Cours tapis duo"
@@ -310,7 +302,6 @@ ClassroomSchedulingWithAttendees.parameters = {
 
 ClassroomSchedulingWithAttendees.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
-
   userEvent.type(
     canvas.getByRole("textbox", { name: /classroom's name/i }),
     "Cours tapis duo"
@@ -319,15 +310,12 @@ ClassroomSchedulingWithAttendees.play = async ({ canvasElement }) => {
   userEvent.click(canvas.getByText(/mat/i));
   fireEvent.mouseDown(canvas.getByRole("button", { name: /position 1/i }));
   userEvent.click(canvas.getByText(/3/i));
-  const startDateElement = canvas.getByLabelText(/choose start date/i);
-  userEvent.clear(within(startDateElement).getByRole("textbox"));
-  userEvent.type(
-    within(startDateElement).getByRole("textbox"),
-    "05/07/2021 10:00"
-  );
+  const startDateElement = await canvas.findByLabelText(/choose start date/i);
+  userEvent.clear(startDateElement);
+  userEvent.type(startDateElement, "05/07/2021 10:00");
   fireEvent.mouseDown(canvas.getByRole("button", { name: /duration 1h00/i }));
   userEvent.click(canvas.getByText(/2h00/i));
-  userEvent.click(within(canvas.getByRole("combobox")).getByRole("textbox"));
+  userEvent.click(canvas.getByRole("combobox"));
   const attendees = within(screen.getByRole("presentation")).getByRole(
     "listbox"
   );
@@ -375,15 +363,12 @@ ClassroomSchedulingError.play = async ({ canvasElement }) => {
   userEvent.click(canvas.getByText(/mat/i));
   fireEvent.mouseDown(canvas.getByRole("button", { name: /position 1/i }));
   userEvent.click(canvas.getByText(/3/i));
-  const startDateElement = canvas.getByLabelText(/choose start date/i);
-  userEvent.clear(within(startDateElement).getByRole("textbox"));
-  userEvent.type(
-    within(startDateElement).getByRole("textbox"),
-    "05/07/2021 10:00"
-  );
+  const startDateElement = await canvas.findByLabelText(/choose start date/i);
+  userEvent.clear(startDateElement);
+  userEvent.type(startDateElement, "05/07/2021 10:00");
   fireEvent.mouseDown(canvas.getByRole("button", { name: /duration 1h00/i }));
   userEvent.click(canvas.getByText(/2h00/i));
-  userEvent.click(within(canvas.getByRole("combobox")).getByRole("textbox"));
+  userEvent.click(canvas.getByRole("combobox"));
   const attendees = within(screen.getByRole("presentation")).getByRole(
     "listbox"
   );
@@ -392,7 +377,7 @@ ClassroomSchedulingError.play = async ({ canvasElement }) => {
   await sleep(100);
 
   await expect(
-    canvas.getByText(
+    screen.getByText(
       "Error occurred - Classroom 'Cours tapis duo' could not be created"
     )
   ).toBeInTheDocument();

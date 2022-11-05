@@ -35,9 +35,13 @@ describe("Authentication reducer", () => {
     };
     const token = { token: "", type: "bearer" };
     const action = new RejectedAction(login)
-      .withErrorPayload({
-        detail: [{ msg: "Unauthorized", type: "create_token" }],
-      })
+      .withErrorPayload([
+        {
+          message: "Unauthorized",
+          type: "create_token",
+          origin: "Create token",
+        },
+      ])
       .build();
 
     expect(reducer(previousState, action)).toEqual({

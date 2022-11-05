@@ -1,6 +1,5 @@
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Grid } from "@material-ui/core";
-import { Box, Typography } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { Box, Grid, Typography } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import * as React from "react";
 import { formatHours } from "../../utils/date";

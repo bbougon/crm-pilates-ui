@@ -25,7 +25,7 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { formatFullDate, formatHours } from "../../utils/date";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Attendance, Attendee, Session } from "../../features/domain/session";

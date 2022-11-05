@@ -1,6 +1,6 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   addMonths,
   format,
@@ -13,7 +13,6 @@ import {
 import {
   fetchSessions,
   selectMonthlySessions,
-  SessionStatus,
 } from "../../features/sessionsSlice";
 import {
   MonthlyBody,
@@ -21,16 +20,15 @@ import {
   useMonthlyBody,
   useMonthlyCalendar,
 } from "@zach.codes/react-calendar";
-import { Box } from "@material-ui/core";
 import { fetchClients } from "../../features/clientsSlice";
-import { Grid, List } from "@mui/material";
+import { Box, Grid, List } from "@mui/material";
 import { blueGrey } from "@mui/material/colors";
 import { RootState } from "../../app/store";
 import { ClassroomEventItem } from "./ClassroomEventItem";
 import { ClassroomSchedulingItem } from "../scheduling/ClassroomSchedulingItem";
-import { ErrorMessage } from "../../features/errors";
-import { DisplayError } from "../errors/DisplayError";
 import { Session, SessionsLink } from "../../features/domain/session";
+import { useAppDispatch } from "../../hooks/redux";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 interface MonthlyDayProps<TEvent> {
   render(events: TEvent): JSX.Element[];
@@ -43,23 +41,29 @@ export interface PilatesMonthlyCalendarProps {
 export const PilatesMonthlyCalendar = ({
   date,
 }: PilatesMonthlyCalendarProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { display } = useSnackbar();
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(date));
   const sessions = useSelector(selectMonthlySessions);
   const link = useSelector<RootState, SessionsLink | undefined>(
     (state) => state.sessions.link
   );
-  const error: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>(
-    (state) => state.sessions.error
-  );
-  const status: SessionStatus = useSelector<RootState, SessionStatus>(
-    (state) => state.sessions.status
-  );
+
+  const errorCallback = useCallback((err) => {
+    display(err);
+  }, []);
 
   useEffect(() => {
-    dispatch(fetchSessions());
-    dispatch(fetchClients());
-  }, [dispatch]);
+    dispatch(fetchSessions())
+      .unwrap()
+      .catch((err) => errorCallback(err));
+  }, [dispatch, errorCallback]);
+
+  useEffect(() => {
+    dispatch(fetchClients())
+      .unwrap()
+      .catch((err) => errorCallback(err));
+  }, [dispatch, errorCallback]);
 
   const handleClassroomAdded = async () => {
     dispatch(fetchSessions(link?.current.url));
@@ -171,21 +175,11 @@ export const PilatesMonthlyCalendar = ({
     };
   }
 
-  let content = undefined;
-  if (
-    status === SessionStatus.FAILED ||
-    status === SessionStatus.CHECKIN_IN_FAILED ||
-    status === SessionStatus.CHECKOUT_FAILED
-  ) {
-    content = <DisplayError {...{ error: error }} />;
-  }
-
   return (
     <MonthlyCalendar
       currentMonth={currentMonth}
       onCurrentMonthChange={(date) => setCurrentMonth(date)}
     >
-      {content}
       <MonthlyNav />
       <MonthlyBody
         events={sessions.map((session) => mapToCalendarEvent(session))}

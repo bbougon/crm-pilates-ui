@@ -4,7 +4,7 @@ import { Clients } from "../ClientPage";
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "../../../test-utils/test-utils";
-import { apiClient, ClientsBuilder } from "../../../test-utils/clients/clients";
+import { ClientsBuilder, apiClient } from "../../../test-utils/clients/clients";
 import {
   RequestHandlerBuilders,
   ServerBuilder,

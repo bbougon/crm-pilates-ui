@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import map_action_thunk_error, { ApiError, ErrorMessage } from "./errors";
-import { api, ApiToken } from "../api";
+import { ApiToken, api } from "../api";
 import { Token } from "./domain/token";
 import { RootState } from "../app/store";
 import jwtDecode, { JwtPayload } from "jwt-decode";
@@ -60,13 +60,15 @@ const initialState: AuthState = initializeState();
 export const login = createAsyncThunk<
   ApiToken,
   Login,
-  { rejectValue: ApiError }
+  { rejectValue: ErrorMessage[] }
 >("login", async (login, thunkAPI) => {
   try {
     const response = await api.login(login);
     return response.data as ApiToken;
   } catch (e) {
-    return thunkAPI.rejectWithValue(e as ApiError);
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error("Create token", e as ApiError)
+    );
   }
 });
 
@@ -83,10 +85,7 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.status = AuthStatus.FAILED;
-        state.error = map_action_thunk_error(
-          "Create token",
-          action.payload as ApiError
-        );
+        state.error = action.payload as ErrorMessage[];
         state.token = { token: "", type: "bearer" };
         sessionStorage.removeItem("token");
       })

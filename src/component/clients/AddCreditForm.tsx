@@ -2,6 +2,7 @@ import * as React from "react";
 import { BaseSyntheticEvent, useReducer } from "react";
 import { Subjects } from "../../features/domain/subjects";
 import {
+  Button,
   FormControl,
   Grid,
   InputLabel,
@@ -10,7 +11,6 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import { Button } from "@material-ui/core";
 
 type AddCreditFormProps = {
   subjects: { subject: Subjects; title: string }[] | [];
@@ -23,7 +23,7 @@ enum ActionType {
 }
 
 type State = {
-  subject?: Subjects | unknown;
+  subject?: Subjects;
   creditsAmount: number;
 };
 
@@ -58,14 +58,17 @@ export const AddCreditForm = ({
   onAddCredits,
   subjects,
 }: AddCreditFormProps) => {
-  const [state, dispatchReducer] = useReducer(reducer, { creditsAmount: 0 });
+  const [state, dispatchReducer] = useReducer(reducer, {
+    creditsAmount: 0,
+    subject: undefined,
+  });
 
   const onSubjectChanged = (e: SelectChangeEvent<Subjects | unknown>) =>
     dispatchReducer(selectSubject(e.target.value as Subjects));
   const onCreditsAmountChanged = (e: BaseSyntheticEvent) =>
     dispatchReducer(addCredits(+e.target.value));
-  const onSubmitClicked = (e: BaseSyntheticEvent) => {
-    onAddCredits(state.creditsAmount, state.subject);
+  const onSubmitClicked = (_: BaseSyntheticEvent) => {
+    onAddCredits(state.creditsAmount, state.subject!);
   };
 
   return (

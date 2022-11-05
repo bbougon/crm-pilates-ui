@@ -1,10 +1,7 @@
 import reducer, { addCredits, fetchClients } from "../clientsSlice";
 import { LoadingState } from "../../test-utils/features/clients/clientStateFixtures";
-import {
-  FulFilledAction,
-  RejectedAction,
-} from "../../test-utils/features/actionFixtures";
-import { client, ClientsBuilder } from "../../test-utils/clients/clients";
+import { FulFilledAction } from "../../test-utils/features/actionFixtures";
+import { ClientsBuilder, client } from "../../test-utils/clients/clients";
 import { Subjects } from "../domain/subjects";
 
 describe("ClientsSlice", () => {
@@ -38,58 +35,6 @@ describe("ClientsSlice", () => {
         clients: all_clients,
         status: "succeeded",
         error: [],
-      });
-    });
-
-    describe("Errors", () => {
-      it("should handle errors from api", async () => {
-        const previousState = new LoadingState().build();
-        const action = new RejectedAction(fetchClients)
-          .withStructuredPayload()
-          .build();
-
-        expect(reducer(previousState, action)).toEqual({
-          clients: [],
-          status: "failed",
-          error: [
-            {
-              message: "an error message",
-              type: "an error type",
-              origin: "Get clients",
-            },
-          ],
-        });
-      });
-
-      it("should handle errors in payload", async () => {
-        const previousState = new LoadingState().build();
-        const action = new RejectedAction(fetchClients)
-          .withErrorPayload()
-          .build();
-
-        expect(reducer(previousState, action)).toEqual({
-          clients: [],
-          status: "failed",
-          error: [{ message: "error", type: "type", origin: "Get clients" }],
-        });
-      });
-
-      it("should handle errors with no payload", async () => {
-        const previousState = new LoadingState().build();
-        const action = new RejectedAction(fetchClients)
-          .withoutPayload()
-          .build();
-
-        expect(reducer(previousState, action)).toEqual({
-          clients: [],
-          status: "failed",
-          error: [
-            {
-              message: "We could not fetch the request",
-              origin: "Get clients",
-            },
-          ],
-        });
       });
     });
   });

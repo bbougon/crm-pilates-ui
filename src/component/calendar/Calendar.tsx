@@ -1,8 +1,8 @@
 import "@zach.codes/react-calendar/dist/calendar-tailwind.css";
 import * as React from "react";
 import { MainContainer } from "../../const/containers";
-import { Grid } from "@material-ui/core";
 import { PilatesMonthlyCalendar } from "./PilatesMonthlyCalendar";
+import { Grid } from "@mui/material";
 
 export const Calendar = ({ date }: { date: Date }) => {
   return (

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ActionType, schedulingReducer, SchedulingState } from "../reducers";
+import { ActionType, SchedulingState, schedulingReducer } from "../reducers";
 import { formatISO, parseISO } from "date-fns";
 import { faker } from "@faker-js/faker";
 
@@ -222,7 +222,7 @@ class SchedulingStateBuilder {
       availableDurations: this.availableDurations,
       availablePositions: this.availablePositions,
       subject: this.subject,
-      fieldsAreFilled: (state1) => false,
+      fieldsAreFilled: (_) => false,
     };
   }
 }

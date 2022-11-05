@@ -1,6 +1,5 @@
-import { CardContent, Stack, Typography } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Card, Grid } from "@material-ui/core";
+import { Card, CardContent, Grid, Stack, Typography } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import * as React from "react";
 import { ErrorMessage } from "../../features/errors";
 

@@ -8,11 +8,8 @@ import {
 import {
   ApiAttendeeBuilder,
   ApiSessionsBuilder,
-  attendee,
   SessionsBuilder,
 } from "../test-utils/classroom/session";
-import { formatISO } from "date-fns";
-import { Attendance } from "../features/domain/session";
 import { render } from "../test-utils/test-utils";
 import App from "../App";
 import userEvent from "@testing-library/user-event";

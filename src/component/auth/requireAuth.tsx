@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { Token } from "../../features/domain/token";
-import { Outlet, Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 const RequireAuth = () => {
   const token: Token = useAuth();

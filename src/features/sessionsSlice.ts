@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { api, ApiAttendee, ApiSession } from "../api";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { ApiAttendee, ApiSession, api } from "../api";
 import map_action_thunk_error, { ApiError, ErrorMessage } from "./errors";
 import { isEqual, parseISO } from "date-fns";
 import { RootState } from "../app/store";
@@ -70,7 +70,7 @@ export interface Checkout {
 export const fetchSessions = createAsyncThunk<
   { sessions: Session[]; link: string | null },
   string | undefined,
-  { rejectValue: ApiError }
+  { rejectValue: ErrorMessage[] }
 >("sessions/fetch", async (link = "/sessions", thunkAPI) => {
   try {
     const { login } = thunkAPI.getState() as unknown as RootState;
@@ -90,7 +90,9 @@ export const fetchSessions = createAsyncThunk<
       link: response.headers.get("X-Link"),
     };
   } catch (e) {
-    return thunkAPI.rejectWithValue(e as ApiError);
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error("Sessions could not be retrieved", e as ApiError)
+    );
   }
 });
 
@@ -230,7 +232,7 @@ export const sessionsSlice = createSlice({
     }
 
     builder
-      .addCase(fetchSessions.pending, (state, action) => {
+      .addCase(fetchSessions.pending, (state, _) => {
         state.status = SessionStatus.LOADING;
       })
       .addCase(fetchSessions.fulfilled, (state, action) => {
@@ -249,12 +251,9 @@ export const sessionsSlice = createSlice({
       })
       .addCase(fetchSessions.rejected, (state, action) => {
         state.status = SessionStatus.FAILED;
-        state.error = map_action_thunk_error(
-          "Get sessions",
-          action.payload as ApiError
-        );
+        state.error = action.payload as ErrorMessage[];
       })
-      .addCase(sessionCheckin.pending, (state, action) => {
+      .addCase(sessionCheckin.pending, (state, _) => {
         state.status = SessionStatus.CHECKIN_IN_PROGRESS;
       })
       .addCase(sessionCheckin.rejected, (state, action) => {
@@ -268,7 +267,7 @@ export const sessionsSlice = createSlice({
         updateAttendees(session, sessionCheckedIn);
         updateCredits(state.sessions, sessionCheckedIn);
       })
-      .addCase(sessionCheckout.pending, (state, action) => {
+      .addCase(sessionCheckout.pending, (state, _) => {
         state.status = SessionStatus.CHECKOUT_IN_PROGRESS;
       })
       .addCase(sessionCheckout.rejected, (state, action) => {

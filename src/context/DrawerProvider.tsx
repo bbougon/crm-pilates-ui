@@ -1,7 +1,7 @@
 import * as React from "react";
-import { createContext, FC, ReactElement, useState } from "react";
+import { FC, ReactElement, createContext, useState } from "react";
 import { Box, Card, ClickAwayListener, Drawer } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { createPortal } from "react-dom";
 
 export interface DrawerAction {
@@ -78,6 +78,7 @@ export const DrawProvider: FC = ({ children }) => {
                 </Card>
               </ThemeProvider>
             </Drawer>,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             document.getElementById("portal")!
           )
         : null}

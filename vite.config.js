@@ -17,7 +17,7 @@ export default defineConfig({
                 manualChunks: {
                     calendar: ['@zach.codes/react-calendar'],
                     datefns: ['date-fns'],
-                    mui: ['@material-ui/core', '@material-ui/icons', '@mui/icons-material', '@mui/lab', '@mui/material'],
+                    mui: ['@mui/icons-material', '@mui/lab', '@mui/material'],
                 }
             }
         }

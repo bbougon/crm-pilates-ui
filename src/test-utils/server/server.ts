@@ -1,5 +1,5 @@
 import { setupServer } from "msw/node";
-import { compose, context, RequestHandler, rest } from "msw";
+import { RequestHandler, compose, context, rest } from "msw";
 import { isDeepStrictEqual } from "util";
 import { API_URI } from "../../utils/constants";
 
