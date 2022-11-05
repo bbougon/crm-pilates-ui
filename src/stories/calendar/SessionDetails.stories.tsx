@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import {
   ApiAttendeeBuilder,
-  ApiSessionsBuilder,
+  ApiSessionBuilder,
   AttendeeBuilder,
   AttendeesBuilder,
   ScheduleBuilder,
@@ -264,7 +264,7 @@ SessionCheckin.parameters = {
         const response = checkinResponse(
           defaultSession.id ?? "1",
           defaultSession.classroomId,
-          new ApiSessionsBuilder()
+          new ApiSessionBuilder()
             .withId(defaultSession.id!)
             .withClassroom(defaultSession.classroomId)
             .withName(defaultSession.name)
@@ -363,7 +363,7 @@ SessionCheckout.parameters = {
         const response = checkinResponse(
           sessionWithOneCheckedInAttendee.id ?? "1",
           sessionWithOneCheckedInAttendee.classroomId,
-          new ApiSessionsBuilder()
+          new ApiSessionBuilder()
             .withId(sessionWithOneCheckedInAttendee.id!)
             .withClassroom(sessionWithOneCheckedInAttendee.classroomId)
             .withName(sessionWithOneCheckedInAttendee.name)
@@ -469,7 +469,7 @@ CancelSession.parameters = {
           const response = cancellationResponse(
             defaultSession.id ?? "1",
             defaultSession.classroomId,
-            new ApiSessionsBuilder()
+            new ApiSessionBuilder()
               .withId(defaultSession.id!)
               .withClassroom(defaultSession.classroomId)
               .withName(defaultSession.name)

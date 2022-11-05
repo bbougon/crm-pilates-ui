@@ -1,4 +1,4 @@
-import { addHours, formatISO, parseISO } from "date-fns";
+import { addHours, addWeeks, formatISO, parseISO } from "date-fns";
 import { ApiAttendee, ApiCredits, ApiSession } from "../../api";
 import {
   Attendance,
@@ -90,82 +90,6 @@ export class SessionsBuilder {
   };
 }
 
-export class ApiSessionsBuilder {
-  private id: string | undefined = undefined;
-  private classroomId = "1";
-  private name = "Cours tapis";
-  private schedule: Schedule = new ScheduleBuilder(new Date()).build();
-  private subject = "MAT";
-  private position = 1;
-  private attendees?: [ApiAttendee];
-
-  public withId = (id: string): ApiSessionsBuilder => {
-    this.id = id;
-    return this;
-  };
-
-  public withClassroom = (classroomId: string): ApiSessionsBuilder => {
-    this.classroomId = classroomId;
-    return this;
-  };
-
-  public withName = (name: string): ApiSessionsBuilder => {
-    this.name = name;
-    return this;
-  };
-
-  public withMachineTrio = (): ApiSessionsBuilder => {
-    this.subject = "MACHINE_TRIO";
-    return this;
-  };
-
-  public withSchedule = (schedule: Schedule): ApiSessionsBuilder => {
-    this.schedule = schedule;
-    return this;
-  };
-
-  public withScheduleAsString = (date: string): ApiSessionsBuilder => {
-    this.schedule.start = date;
-    this.schedule.stop = formatISO(addHours(parseISO(date), 1));
-    return this;
-  };
-
-  public withPosition = (position: number): ApiSessionsBuilder => {
-    this.position = position;
-    return this;
-  };
-
-  public withAttendee = (attendee: ApiAttendee): ApiSessionsBuilder => {
-    this.attendees === undefined
-      ? (this.attendees = [attendee])
-      : this.attendees?.push(attendee);
-    return this;
-  };
-
-  withAttendees = (
-    attendees: [ApiAttendee] | undefined
-  ): ApiSessionsBuilder => {
-    this.attendees === undefined
-      ? (this.attendees = attendees)
-      : attendees !== undefined
-      ? this.attendees.push(...attendees)
-      : (this.attendees = undefined);
-    return this;
-  };
-
-  build = (): ApiSession => {
-    return {
-      id: this.id,
-      classroom_id: this.classroomId,
-      name: this.name,
-      subject: this.subject,
-      schedule: this.schedule,
-      position: this.position,
-      attendees: this.attendees,
-    };
-  };
-}
-
 export class SessionBuilder {
   private id: string | undefined = undefined;
   private classroomId = "1";
@@ -227,6 +151,121 @@ export class SessionBuilder {
       classroomId: this.classroomId,
       subject: this.subject,
       name: this.name,
+      schedule: this.schedule,
+      position: this.position,
+      attendees: this.attendees,
+    };
+  };
+}
+
+export class RecurrentSessionsBuilder {
+  private session_template: ApiSessionBuilder | SessionBuilder =
+    new ApiSessionBuilder();
+  private duration: { period: "WEEKS"; for: number } = {
+    period: "WEEKS",
+    for: 3,
+  };
+
+  public withSession = (
+    session: ApiSessionBuilder | SessionBuilder
+  ): RecurrentSessionsBuilder => {
+    this.session_template = session;
+    return this;
+  };
+
+  public every = (duration: {
+    period: "WEEKS";
+    for: number;
+  }): RecurrentSessionsBuilder => {
+    this.duration = duration;
+    return this;
+  };
+
+  public build = (): [ApiSession | Session] => {
+    const apiSession = this.session_template.build();
+    const session: [ApiSession | Session] = [apiSession];
+    for (let i = 1; i <= this.duration.for; i++) {
+      session.push(
+        this.session_template
+          .withSchedule(
+            new ScheduleBuilder(
+              addWeeks(parseISO(apiSession.schedule.start), i)
+            ).build()
+          )
+          .build()
+      );
+    }
+    return session;
+  };
+}
+
+export class ApiSessionBuilder {
+  private id: string | undefined = undefined;
+  private classroomId = "1";
+  private name = "Cours tapis";
+  private schedule: Schedule = new ScheduleBuilder(new Date()).build();
+  private subject = "MAT";
+  private position = 1;
+  private attendees?: [ApiAttendee];
+
+  public withId = (id: string): ApiSessionBuilder => {
+    this.id = id;
+    return this;
+  };
+
+  public withClassroom = (classroomId: string): ApiSessionBuilder => {
+    this.classroomId = classroomId;
+    return this;
+  };
+
+  public withName = (name: string): ApiSessionBuilder => {
+    this.name = name;
+    return this;
+  };
+
+  public withMachineTrio = (): ApiSessionBuilder => {
+    this.subject = "MACHINE_TRIO";
+    return this;
+  };
+
+  public withSchedule = (schedule: Schedule): ApiSessionBuilder => {
+    this.schedule = schedule;
+    return this;
+  };
+
+  public withScheduleAsString = (date: string): ApiSessionBuilder => {
+    this.schedule.start = date;
+    this.schedule.stop = formatISO(addHours(parseISO(date), 1));
+    return this;
+  };
+
+  public withPosition = (position: number): ApiSessionBuilder => {
+    this.position = position;
+    return this;
+  };
+
+  public withAttendee = (attendee: ApiAttendee): ApiSessionBuilder => {
+    this.attendees === undefined
+      ? (this.attendees = [attendee])
+      : this.attendees?.push(attendee);
+    return this;
+  };
+
+  withAttendees = (attendees: [ApiAttendee] | undefined): ApiSessionBuilder => {
+    this.attendees === undefined
+      ? (this.attendees = attendees)
+      : attendees !== undefined
+      ? this.attendees.push(...attendees)
+      : (this.attendees = undefined);
+    return this;
+  };
+
+  build = (): ApiSession => {
+    return {
+      id: this.id,
+      classroom_id: this.classroomId,
+      name: this.name,
+      subject: this.subject,
       schedule: this.schedule,
       position: this.position,
       attendees: this.attendees,

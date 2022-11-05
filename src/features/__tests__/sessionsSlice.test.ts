@@ -220,8 +220,8 @@ describe("SessionsSlice", () => {
         .withState(sessions as Session[])
         .build();
       const action = new FulFilledAction(sessionCheckin)
-        .withPayload(
-          new SessionBuilder()
+        .withPayload({
+          ...new SessionBuilder()
             .withId("2")
             .withClassroom("1")
             .withName("Pilates Trio")
@@ -245,8 +245,8 @@ describe("SessionsSlice", () => {
                 .noCredits()
                 .build()
             )
-            .build()
-        )
+            .build(),
+        })
         .build();
 
       expect(reducer(previousState, action)).toEqual({
@@ -454,8 +454,8 @@ describe("SessionsSlice", () => {
         .withState(sessions as Session[])
         .build();
       const action = new FulFilledAction(sessionCheckout)
-        .withPayload(
-          new SessionBuilder()
+        .withPayload({
+          ...new SessionBuilder()
             .withId("1")
             .withClassroom("1")
             .withName("Pilates avancé")
@@ -478,8 +478,8 @@ describe("SessionsSlice", () => {
                 .noCredits()
                 .build()
             )
-            .build()
-        )
+            .build(),
+        })
         .build();
 
       expect(reducer(previousState, action)).toEqual({

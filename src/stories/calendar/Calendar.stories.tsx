@@ -1,10 +1,10 @@
 import React, { ReactElement } from "react";
-import { Session } from "../../features/domain/session";
+import { Session, SessionsLink } from "../../features/domain/session";
 import { Provider } from "react-redux";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import { SessionStatus, fetchSessions } from "../../features/sessionsSlice";
+import { fetchSessions, SessionStatus } from "../../features/sessionsSlice";
 import { store } from "../../app/store";
-import { within } from "@storybook/testing-library";
+import { userEvent, within } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
 import { ComponentStory } from "@storybook/react";
 import { AuthStatus } from "../../features/auth";
@@ -17,12 +17,18 @@ import { Client } from "../../features/domain/client";
 import { ClientStatus, fetchClients } from "../../features/clientsSlice";
 import { waitFor } from "@testing-library/react";
 import { compose, context, rest } from "msw";
+import {
+  ApiSessionBuilder,
+  RecurrentSessionsBuilder,
+  ScheduleBuilder,
+  SessionBuilder,
+} from "../../test-utils/classroom/session";
 
 type SessionState = {
   sessions: Session[];
   status: SessionStatus;
   error: ErrorMessage[];
-  link: string | undefined;
+  link: SessionsLink | undefined;
 };
 
 type ClientState = {
@@ -37,6 +43,15 @@ type ClientState = {
 };
 
 const error = { detail: [{ msg: "Error occurred", type: "Error" }] };
+
+const sessions = new RecurrentSessionsBuilder()
+  .withSession(
+    new SessionBuilder().withSchedule(
+      new ScheduleBuilder(parseISO("2019-10-01T10:00:00")).build()
+    )
+  )
+  .every({ period: "WEEKS", for: 5 })
+  .build() as [Session];
 
 type MockStoreProps = {
   sessionState: SessionState;
@@ -57,6 +72,7 @@ const Mockstore = ({ sessionState, clientState, children }: MockStoreProps) => {
               builder
                 .addCase(fetchSessions.fulfilled, (state, action) => {
                   state.status = SessionStatus.SUCCEEDED;
+                  state.sessions = action.payload.sessions;
                 })
                 .addCase(fetchSessions.rejected, (state, action) => {
                   state.status = SessionStatus.FAILED;
@@ -119,6 +135,7 @@ const Template: ComponentStory<typeof Calendar> = (args) => (
 export const CalendarDefault = Template.bind({});
 export const CalendarDefaultOnSessionFetchingError = Template.bind({});
 export const CalendarDefaultOnClientsFetchingError = Template.bind({});
+export const CalendarPeriodChange = Template.bind({});
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -151,7 +168,12 @@ const defaultClientState: ClientState = {
 CalendarDefault.decorators = [
   (story: any) => (
     <Mockstore
-      sessionState={defaultSessionState}
+      sessionState={{
+        sessions,
+        status: SessionStatus.SUCCEEDED,
+        error: [],
+        link: undefined,
+      }}
       clientState={defaultClientState}
     >
       {story()}
@@ -182,6 +204,20 @@ CalendarDefault.play = async ({ canvasElement }) => {
 
   expect(await waitFor(() => canvas.getAllByTestId("AddIcon"))).toHaveLength(
     27
+  );
+  const allDaysOfWeek = await waitFor(() =>
+    canvas.getAllByLabelText("Day of Week")
+  );
+  expect(allDaysOfWeek.map((value) => value.textContent)).toEqual([
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ]);
+  expect(await waitFor(() => canvas.getAllByText("Cours tapis"))).toHaveLength(
+    5
   );
 };
 
@@ -261,4 +297,94 @@ CalendarDefaultOnClientsFetchingError.play = async ({ canvasElement }) => {
       canvas.getByText("Error occurred - Clients could not be retrieved")
     )
   ).toBeInTheDocument();
+};
+
+/*
+    #########################################################
+    # Period change                                         #
+    #########################################################
+ */
+
+const apiSessions = new RecurrentSessionsBuilder()
+  .withSession(
+    new ApiSessionBuilder().withSchedule(
+      new ScheduleBuilder(parseISO("2019-09-10T10:00:00")).build()
+    )
+  )
+  .every({ period: "WEEKS", for: 2 })
+  .build();
+
+CalendarPeriodChange.decorators = [
+  (story: any) => (
+    <Mockstore
+      sessionState={{
+        sessions,
+        status: SessionStatus.IDLE,
+        error: [],
+        link: {
+          current: {
+            url: "/sessions?start_date=2022-10-01T00:00:00+00:00&end_date=2022-10-31T23:59:59+00:00",
+          },
+          next: {
+            url: "/sessions?start_date=2022-11-01T00:00:00+00:00&end_date=2022-11-30T23:59:59+00:00",
+          },
+          previous: {
+            url: "/sessions?start_date=2022-09-01T00:00:00+00:00&end_date=2022-09-30T23:59:59+00:00",
+          },
+        },
+      }}
+      clientState={defaultClientState}
+    >
+      {story()}
+    </Mockstore>
+  ),
+];
+CalendarPeriodChange.args = {
+  date: parseISO("2019-10-10T11:20:00"),
+};
+CalendarPeriodChange.storyName = "Should be able to switch months";
+CalendarPeriodChange.parameters = {
+  msw: {
+    handlers: [
+      rest.get("http://localhost:8081/sessions", (req, res, _) => {
+        return res(
+          compose(
+            context.status(200),
+            context.json(apiSessions),
+            context.set({
+              "X-Link":
+                '</sessions?start_date=2022-09-01T00%3A00%3A00%2B00%3A00&end_date=2022-09-30T23%3A59%3A59%2B00%3A00>; rel="previous", </sessions?start_date=2022-10-01T00%3A00%3A00%2B00%3A00&end_date=2022-10-31T23%3A59%3A59%2B00%3A00>; rel="current", </sessions?start_date=2022-11-01T00%3A00%3A00%2B00%3A00&end_date=2022-11-30T23%3A59%3A59%2B00%3A00>; rel="next"',
+            })
+          )
+        );
+      }),
+      rest.get("http://localhost:8081/sessions", (req, res, _) => {
+        req.url.searchParams;
+        return res(
+          compose(
+            context.status(200),
+            context.json(apiSessions),
+            context.set({
+              "X-Link":
+                '</sessions?start_date=2022-09-01T00%3A00%3A00%2B00%3A00&end_date=2022-09-30T23%3A59%3A59%2B00%3A00>; rel="previous", </sessions?start_date=2022-10-01T00%3A00%3A00%2B00%3A00&end_date=2022-10-31T23%3A59%3A59%2B00%3A00>; rel="current", </sessions?start_date=2022-11-01T00%3A00%3A00%2B00%3A00&end_date=2022-11-30T23%3A59%3A59%2B00%3A00>; rel="next"',
+            })
+          )
+        );
+      }),
+      rest.get("http://localhost:8081/clients", (req, res, _) => {
+        return res(compose(context.status(200), context.json([])));
+      }),
+    ],
+  },
+};
+
+CalendarPeriodChange.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  await sleep(20);
+
+  userEvent.click(canvas.getByRole("button", { name: /previous/i }));
+  await sleep(100);
+  expect(await waitFor(() => canvas.getAllByText("Cours tapis"))).toHaveLength(
+    3
+  );
 };

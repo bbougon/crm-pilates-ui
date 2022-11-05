@@ -7,7 +7,7 @@ import {
 } from "../test-utils/server/server";
 import {
   ApiAttendeeBuilder,
-  ApiSessionsBuilder,
+  ApiSessionBuilder,
   SessionsBuilder,
 } from "../test-utils/classroom/session";
 import { render } from "../test-utils/test-utils";
@@ -30,7 +30,7 @@ describe.skip("Calendar page", () => {
       .body(
         new SessionsBuilder()
           .withSession(
-            new ApiSessionsBuilder()
+            new ApiSessionBuilder()
               .withClassroom("1")
               .withName("Cours Duo")
               .withSchedule(classroomDate)
