@@ -139,17 +139,17 @@ const Mockstore = ({ sessionState, children }: MockStoreProps) => {
             reducers: {},
             extraReducers(builder) {
               builder
-                .addCase(sessionCheckin.fulfilled, (state, action) => {
+                .addCase(sessionCheckin.fulfilled, (state, _) => {
                   state.status = SessionStatus.CHECKIN_IN_SUCCEEDED;
                 })
                 .addCase(sessionCheckin.rejected, (state, action) => {
                   state.status = SessionStatus.CHECKIN_IN_FAILED;
                   state.error = action.payload as ErrorMessage[];
                 })
-                .addCase(sessionCheckout.fulfilled, (state, action) => {
+                .addCase(sessionCheckout.fulfilled, (state, _) => {
                   state.status = SessionStatus.CHECKOUT_SUCCEEDED;
                 })
-                .addCase(sessionCancel.fulfilled, (state, action) => {
+                .addCase(sessionCancel.fulfilled, (state, _) => {
                   state.status = SessionStatus.CANCEL_SUCCEEDED;
                 });
             },
@@ -299,7 +299,7 @@ SessionCheckin.play = async ({ canvasElement }) => {
   await expect(canvas.getByText("C")).toBeInTheDocument();
 
   await waitFor(async () => {
-    await fireEvent.click(canvas.getByRole("button", { name: /more/i }));
+    fireEvent.click(canvas.getByRole("button", { name: /more/i }));
   });
 
   const presentation = within(screen.getByRole("presentation"));
@@ -401,7 +401,7 @@ SessionCheckout.play = async ({ canvasElement }) => {
   await expect(canvas.getByText("R")).toBeInTheDocument();
 
   await waitFor(async () => {
-    await fireEvent.click(canvas.getByRole("button", { name: /more/i }));
+    fireEvent.click(canvas.getByRole("button", { name: /more/i }));
   });
 
   const presentation = within(screen.getByRole("presentation"));
@@ -493,14 +493,12 @@ CancelSession.play = async ({ canvasElement }) => {
   await expect(canvas.getByText("Bruno Germain")).toBeInTheDocument();
 
   await waitFor(async () => {
-    await fireEvent.click(canvas.getByRole("button", { name: /more/i }));
+    fireEvent.click(canvas.getByRole("button", { name: /more/i }));
   });
 
   const presentation = within(screen.getByRole("presentation"));
   await waitFor(async () => {
-    await fireEvent.click(
-      presentation.getByRole("menuitem", { name: /cancel/i })
-    );
+    fireEvent.click(presentation.getByRole("menuitem", { name: /cancel/i }));
   });
   await sleep(200);
 
@@ -537,14 +535,12 @@ CancelSessionError.play = async ({ canvasElement }) => {
   await expect(canvas.getByText("Bruno Germain")).toBeInTheDocument();
 
   await waitFor(async () => {
-    await fireEvent.click(canvas.getByRole("button", { name: /more/i }));
+    fireEvent.click(canvas.getByRole("button", { name: /more/i }));
   });
 
   const presentation = within(screen.getByRole("presentation"));
   await waitFor(async () => {
-    await fireEvent.click(
-      presentation.getByRole("menuitem", { name: /cancel/i })
-    );
+    fireEvent.click(presentation.getByRole("menuitem", { name: /cancel/i }));
   });
   await sleep(200);
 
