@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 import { fetchSessions, SessionStatus } from "../../features/sessionsSlice";
 import { store } from "../../app/store";
-import { userEvent, within } from "@storybook/testing-library";
+import { userEvent, within, waitFor } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
 import { ComponentStory } from "@storybook/react";
 import { AuthStatus } from "../../features/auth";
@@ -15,7 +15,6 @@ import CalendarDoc from "./Calendar.docs.mdx";
 import { parseISO } from "date-fns";
 import { Client } from "../../features/domain/client";
 import { ClientStatus, fetchClients } from "../../features/clientsSlice";
-import { waitFor } from "@testing-library/react";
 import { compose, context, rest } from "msw";
 import {
   ApiSessionBuilder,
@@ -59,7 +58,7 @@ type MockStoreProps = {
   children: ReactElement;
 };
 
-const Mockstore = ({ sessionState, clientState, children }: MockStoreProps) => {
+const MockStore = ({ sessionState, clientState, children }: MockStoreProps) => {
   return (
     <Provider
       store={configureStore({
@@ -74,7 +73,7 @@ const Mockstore = ({ sessionState, clientState, children }: MockStoreProps) => {
                   state.status = SessionStatus.SUCCEEDED;
                   state.sessions = action.payload.sessions;
                 })
-                .addCase(fetchSessions.rejected, (state, action) => {
+                .addCase(fetchSessions.rejected, (state, _) => {
                   state.status = SessionStatus.FAILED;
                 });
             },
@@ -84,10 +83,10 @@ const Mockstore = ({ sessionState, clientState, children }: MockStoreProps) => {
             initialState: clientState,
             reducers: {},
             extraReducers(builder) {
-              builder.addCase(fetchClients.fulfilled, (state, action) => {
+              builder.addCase(fetchClients.fulfilled, (state, _) => {
                 state.status = ClientStatus.SUCCEEDED;
               });
-              builder.addCase(fetchClients.rejected, (state, action) => {
+              builder.addCase(fetchClients.rejected, (state, _) => {
                 state.status = ClientStatus.FAILED;
               });
             },
@@ -167,7 +166,7 @@ const defaultClientState: ClientState = {
 
 CalendarDefault.decorators = [
   (story: any) => (
-    <Mockstore
+    <MockStore
       sessionState={{
         sessions,
         status: SessionStatus.SUCCEEDED,
@@ -177,7 +176,7 @@ CalendarDefault.decorators = [
       clientState={defaultClientState}
     >
       {story()}
-    </Mockstore>
+    </MockStore>
   ),
 ];
 CalendarDefault.args = {
@@ -223,12 +222,12 @@ CalendarDefault.play = async ({ canvasElement }) => {
 
 CalendarDefaultOnSessionFetchingError.decorators = [
   (story: any) => (
-    <Mockstore
+    <MockStore
       sessionState={defaultSessionState}
       clientState={defaultClientState}
     >
       {story()}
-    </Mockstore>
+    </MockStore>
   ),
 ];
 CalendarDefaultOnSessionFetchingError.args = {
@@ -262,12 +261,12 @@ CalendarDefaultOnSessionFetchingError.play = async ({ canvasElement }) => {
 
 CalendarDefaultOnClientsFetchingError.decorators = [
   (story: any) => (
-    <Mockstore
+    <MockStore
       sessionState={defaultSessionState}
       clientState={defaultClientState}
     >
       {story()}
-    </Mockstore>
+    </MockStore>
   ),
 ];
 CalendarDefaultOnClientsFetchingError.args = {
@@ -316,7 +315,7 @@ const apiSessions = new RecurrentSessionsBuilder()
 
 CalendarPeriodChange.decorators = [
   (story: any) => (
-    <Mockstore
+    <MockStore
       sessionState={{
         sessions,
         status: SessionStatus.IDLE,
@@ -336,7 +335,7 @@ CalendarPeriodChange.decorators = [
       clientState={defaultClientState}
     >
       {story()}
-    </Mockstore>
+    </MockStore>
   ),
 ];
 CalendarPeriodChange.args = {
