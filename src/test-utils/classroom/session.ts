@@ -222,23 +222,10 @@ export class ApiSessionBuilder {
     this.name = name;
     return this;
   };
-
-  public withMachineTrio = (): ApiSessionBuilder => {
-    this.subject = "MACHINE_TRIO";
-    return this;
-  };
-
   public withSchedule = (schedule: Schedule): ApiSessionBuilder => {
     this.schedule = schedule;
     return this;
   };
-
-  public withScheduleAsString = (date: string): ApiSessionBuilder => {
-    this.schedule.start = date;
-    this.schedule.stop = formatISO(addHours(parseISO(date), 1));
-    return this;
-  };
-
   public withPosition = (position: number): ApiSessionBuilder => {
     this.position = position;
     return this;
@@ -304,12 +291,6 @@ export class ApiAttendeeBuilder implements Builder<ApiAttendee> {
     this.lastname = lastname;
     return this;
   };
-
-  noCredits = (): ApiAttendeeBuilder => {
-    this.credits = undefined;
-    return this;
-  };
-
   checkedIn = (): ApiAttendeeBuilder => {
     this.attendance = "CHECKED_IN";
     return this;

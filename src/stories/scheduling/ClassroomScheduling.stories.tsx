@@ -14,12 +14,12 @@ import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { AuthStatus } from "../../features/auth";
 import { Classroom } from "../../features/domain/classroom";
 import { ErrorMessage } from "../../features/errors";
-import { ClassroomStatus, addClassroom } from "../../features/classroomSlice";
+import { addClassroom, ClassroomStatus } from "../../features/classroomSlice";
 import { Client } from "../../features/domain/client";
 import { ClientStatus } from "../../features/clientsSlice";
 import { ClassroomScheduling } from "../../component/scheduling/ClassroomScheduling";
 import ClassroomSchedulingDoc from "./ClassroomScheduling.docs.mdx";
-import { client } from "../../test-utils/clients/clients";
+import { ClientBuilder } from "../../test-utils/clients/clients";
 import { compose, context, rest } from "msw";
 import { APIClassroomBuilder } from "../../test-utils/classroom/classroom";
 import { SnackbarProvider } from "../../context/SnackbarProvider";
@@ -58,7 +58,10 @@ const initialClientsState: ClientState = {
 };
 
 const withClientsState: ClientState = {
-  clients: [client(), client("Charles", "Martin", "2")],
+  clients: [
+    new ClientBuilder().build(),
+    new ClientBuilder().withFirstname("Charles").withLastname("Martin").build(),
+  ],
   status: ClientStatus.SUCCEEDED,
   error: [],
 };

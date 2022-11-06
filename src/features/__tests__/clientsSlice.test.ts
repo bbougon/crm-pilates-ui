@@ -1,30 +1,34 @@
 import reducer, { addCredits, fetchClients } from "../clientsSlice";
 import { LoadingState } from "../../test-utils/features/clients/clientStateFixtures";
 import { FulFilledAction } from "../../test-utils/features/actionFixtures";
-import { ClientsBuilder, client } from "../../test-utils/clients/clients";
+import {
+  ClientBuilder,
+  ClientsBuilder,
+} from "../../test-utils/clients/clients";
 import { Subjects } from "../domain/subjects";
 
 describe("ClientsSlice", () => {
   describe("Fetching clients", () => {
     it("should override previous state with fetched clients", async () => {
-      const previousState = new LoadingState().withClient(client()).build();
-      const all_clients = new ClientsBuilder()
-        .withClient(client(undefined, undefined, undefined, undefined))
+      const previousState = new LoadingState()
         .withClient(
-          client(
-            "Pierre",
-            "Martin",
-            "33da6f24-efda-4c16-b8af-e5e822fc5860",
-            undefined
-          )
+          new ClientBuilder().withFirstname("John").withLastname("Doe").build()
+        )
+        .build();
+      const all_clients = new ClientsBuilder()
+        .withClient(new ClientBuilder().build())
+        .withClient(
+          new ClientBuilder()
+            .withFirstname("Pierre")
+            .withLastname("Martin")
+            .build()
         )
         .withClient(
-          client(
-            "Henri",
-            "Verneuil",
-            "33da6bca-efda-4c16-b8af-e5e822fc5901",
-            undefined
-          )
+          new ClientBuilder()
+            .withId("33da6bca-efda-4c16-b8af-e5e822fc5901")
+            .withFirstname("Henri")
+            .withLastname("Verneuil")
+            .build()
         )
         .build();
       const action = new FulFilledAction(fetchClients)
@@ -43,12 +47,17 @@ describe("ClientsSlice", () => {
     it("should add credits to client", async () => {
       const previousState = new LoadingState()
         .withClient(
-          client("John", "Doe", "1", [
-            {
-              value: 5,
-              subject: Subjects.MAT,
-            },
-          ])
+          new ClientBuilder()
+            .withId("1")
+            .withFirstname("John")
+            .withLastname("Doe")
+            .withCredits([
+              {
+                value: 5,
+                subject: Subjects.MAT,
+              },
+            ])
+            .build()
         )
         .build();
 
@@ -86,12 +95,17 @@ describe("ClientsSlice", () => {
     it("should update client credits", async () => {
       const previousState = new LoadingState()
         .withClient(
-          client("John", "Doe", "1", [
-            {
-              value: 5,
-              subject: Subjects.MAT,
-            },
-          ])
+          new ClientBuilder()
+            .withId("1")
+            .withFirstname("John")
+            .withLastname("Doe")
+            .withCredits([
+              {
+                value: 5,
+                subject: Subjects.MAT,
+              },
+            ])
+            .build()
         )
         .build();
 

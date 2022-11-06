@@ -4,7 +4,10 @@ import { Clients } from "../ClientPage";
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "../../../test-utils/test-utils";
-import { ClientsBuilder, apiClient } from "../../../test-utils/clients/clients";
+import {
+  ApiClientBuilder,
+  ClientsBuilder,
+} from "../../../test-utils/clients/clients";
 import {
   RequestHandlerBuilders,
   ServerBuilder,
@@ -12,27 +15,45 @@ import {
 
 describe("ClientList page", function () {
   const clients = new ClientsBuilder()
-    .withClient(apiClient())
     .withClient(
-      apiClient("Pierre", "Martin", "1", [
-        { value: 2, subject: "MAT" },
-        {
-          value: 5,
-          subject: "MACHINE_DUO",
-        },
-      ])
+      new ApiClientBuilder().withFirstname("John").withLastname("Doe").build()
     )
-    .withClient(apiClient("Henri", "Verneuil", "2"))
     .withClient(
-      apiClient("Bertholt", "Brecht", "3", [
-        { value: 2, subject: "MAT" },
-        {
-          value: 5,
-          subject: "MACHINE_DUO",
-        },
-        { value: 5, subject: "MACHINE_TRIO" },
-        { value: 5, subject: "MACHINE_PRIVATE" },
-      ])
+      new ApiClientBuilder()
+        .withFirstname("Pierre")
+        .withLastname("Martin")
+        .withId("1")
+        .withCredits([
+          { value: 2, subject: "MAT" },
+          {
+            value: 5,
+            subject: "MACHINE_DUO",
+          },
+        ])
+        .build()
+    )
+    .withClient(
+      new ApiClientBuilder()
+        .withFirstname("Henri")
+        .withLastname("Verneuil")
+        .withId("2")
+        .build()
+    )
+    .withClient(
+      new ApiClientBuilder()
+        .withFirstname("Bertholt")
+        .withLastname("Brecht")
+        .withId("3")
+        .withCredits([
+          { value: 2, subject: "MAT" },
+          {
+            value: 5,
+            subject: "MACHINE_DUO",
+          },
+          { value: 5, subject: "MACHINE_TRIO" },
+          { value: 5, subject: "MACHINE_PRIVATE" },
+        ])
+        .build()
     )
     .build();
   const server = new ServerBuilder().serve(
@@ -90,13 +111,18 @@ describe("ClientList page", function () {
         it("should add credits to existing credits", async () => {
           const clients = new ClientsBuilder()
             .withClient(
-              apiClient("Pierre", "Martin", "1", [
-                { value: 2, subject: "MAT" },
-                {
-                  value: 5,
-                  subject: "MACHINE_DUO",
-                },
-              ])
+              new ApiClientBuilder()
+                .withFirstname("Pierre")
+                .withLastname("Martin")
+                .withId("1")
+                .withCredits([
+                  { value: 2, subject: "MAT" },
+                  {
+                    value: 5,
+                    subject: "MACHINE_DUO",
+                  },
+                ])
+                .build()
             )
             .build();
           server.resetHandlers(
@@ -153,13 +179,18 @@ describe("ClientList page", function () {
         it("should add a form to add credits when clicking on `+`", async () => {
           const clients = new ClientsBuilder()
             .withClient(
-              apiClient("Pierre", "Martin", "1", [
-                { value: 2, subject: "MAT" },
-                {
-                  value: 5,
-                  subject: "MACHINE_DUO",
-                },
-              ])
+              new ApiClientBuilder()
+                .withFirstname("Pierre")
+                .withLastname("Martin")
+                .withId("1")
+                .withCredits([
+                  { value: 2, subject: "MAT" },
+                  {
+                    value: 5,
+                    subject: "MACHINE_DUO",
+                  },
+                ])
+                .build()
             )
             .build();
           server.resetHandlers(
@@ -247,13 +278,18 @@ describe("ClientList page", function () {
           it("should display amount of credits filed in error when negative value is filled", async () => {
             const clients = new ClientsBuilder()
               .withClient(
-                apiClient("Pierre", "Martin", "1", [
-                  { value: 2, subject: "MAT" },
-                  {
-                    value: 5,
-                    subject: "MACHINE_DUO",
-                  },
-                ])
+                new ApiClientBuilder()
+                  .withFirstname("Pierre")
+                  .withLastname("Martin")
+                  .withId("1")
+                  .withCredits([
+                    { value: 2, subject: "MAT" },
+                    {
+                      value: 5,
+                      subject: "MACHINE_DUO",
+                    },
+                  ])
+                  .build()
               )
               .build();
             server.resetHandlers(
@@ -308,7 +344,12 @@ describe("ClientList page", function () {
           new RequestHandlerBuilders()
             .post("/clients")
             .ok()
-            .body(apiClient())
+            .body(
+              new ApiClientBuilder()
+                .withFirstname("John")
+                .withLastname("Doe")
+                .build()
+            )
             .build()
         );
         render(<Clients />);
@@ -345,13 +386,18 @@ describe("ClientList page", function () {
             .post("/clients")
             .ok()
             .body(
-              apiClient("Joseph", "Pilates", "2", [
-                { value: 10, subject: "MACHINE_TRIO" },
-                {
-                  value: 6,
-                  subject: "MACHINE_DUO",
-                },
-              ])
+              new ApiClientBuilder()
+                .withFirstname("Joseph")
+                .withLastname("Pilates")
+                .withId("2")
+                .withCredits([
+                  { value: 10, subject: "MACHINE_TRIO" },
+                  {
+                    value: 6,
+                    subject: "MACHINE_DUO",
+                  },
+                ])
+                .build()
             )
             .request({
               firstname: "Joseph",

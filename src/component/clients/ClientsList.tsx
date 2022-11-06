@@ -1,5 +1,11 @@
 import * as React from "react";
-import { BaseSyntheticEvent, ReactElement, useEffect, useState } from "react";
+import {
+  BaseSyntheticEvent,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -15,18 +21,13 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  ClientStatus,
   addCredits,
   fetchClients,
   getClientById,
   getClientCredits,
-  selectAllClients,
 } from "../../features/clientsSlice";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonIcon from "@mui/icons-material/Person";
-import { DisplayError } from "../errors/DisplayError";
-import { ErrorMessage } from "../../features/errors";
-import { RootState } from "../../app/store";
 import { Client, Credits } from "../../features/domain/client";
 import { subjects } from "../../utils/translation";
 import styled from "styled-components";
@@ -34,6 +35,8 @@ import { Subjects } from "../../features/domain/subjects";
 import { AddCreditForm } from "./AddCreditForm";
 import { CreditItem } from "./CreditItem";
 import { AddCreditButton } from "./AddCreditButton";
+import { useAppDispatch } from "../../hooks/redux";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 const Wrapper = styled.div`
   display: flex;
@@ -240,30 +243,25 @@ const ClientItem = ({ clientId }: ClientItemProps) => {
 };
 
 export const ClientsList = () => {
-  const dispatch = useDispatch();
-  const clients: Client[] = useSelector(selectAllClients);
-  const error: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>(
-    (state) => state.clients.error
-  );
-  const status: ClientStatus = useSelector<RootState, ClientStatus>(
-    (state) => state.clients.status
-  );
-  let content;
+  const dispatch = useAppDispatch();
+  const { display } = useSnackbar();
+  const [clients, setClients] = useState<Client[]>([]);
+  const errorCallback = useCallback((error) => {
+    display(error);
+  }, []);
 
   useEffect(() => {
-    dispatch(fetchClients());
-  }, [dispatch]);
-
-  content = clients.map((client) => (
-    <ClientItem key={client.id} clientId={client.id} />
-  ));
-  if (status === ClientStatus.FAILED) {
-    content = <DisplayError {...{ error: error }} />;
-  }
+    dispatch(fetchClients())
+      .unwrap()
+      .then((clients) => setClients(clients.clients))
+      .catch((err) => errorCallback(err));
+  }, [dispatch, errorCallback]);
 
   return (
     <Grid container direction="column" sx={{ paddingTop: "10px" }}>
-      {content}
+      {clients.map((client) => (
+        <ClientItem key={client.id} clientId={client.id} />
+      ))}
     </Grid>
   );
 };

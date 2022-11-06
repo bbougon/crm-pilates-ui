@@ -60,7 +60,7 @@ export const createClient = createAsyncThunk<
 });
 
 export const fetchClients = createAsyncThunk<
-  { clients: ApiClient[] },
+  { clients: Client[] },
   undefined,
   { rejectValue: ErrorMessage[] }
 >("clients/fetch", async (_, thunkAPI) => {
@@ -75,7 +75,9 @@ export const fetchClients = createAsyncThunk<
         },
       },
     });
-    return { clients: response.data as ApiClient[] };
+    return {
+      clients: response.data.map((client: ApiClient) => mapClient(client)),
+    };
   } catch (e: ApiError | unknown) {
     return thunkAPI.rejectWithValue(
       map_action_thunk_error("Clients could not be retrieved", e as ApiError)
@@ -117,35 +119,33 @@ export const addCredits = createAsyncThunk<
   }
 });
 
+function mapCredits(credits: { value: number; subject: string }[] | []) {
+  return credits?.map((value) => {
+    return { value: value.value, subject: value.subject as Subjects };
+  });
+}
+
+function mapClient(client: ApiClient): Client {
+  return {
+    id: client.id,
+    firstname: client.firstname,
+    lastname: client.lastname,
+    credits: mapCredits(client.credits),
+  };
+}
+
 const clientsSlice = createSlice({
   name: "clients",
   initialState,
   reducers: {},
   extraReducers(builder) {
-    function mapCredits(credits: { value: number; subject: string }[] | []) {
-      return credits?.map((value) => {
-        return { value: value.value, subject: value.subject as Subjects };
-      });
-    }
-
-    function mapClient(client: ApiClient): Client {
-      return {
-        id: client.id,
-        firstname: client.firstname,
-        lastname: client.lastname,
-        credits: mapCredits(client.credits),
-      };
-    }
-
     builder
       .addCase(fetchClients.pending, (state, _) => {
         state.status = ClientStatus.LOADING;
       })
       .addCase(fetchClients.fulfilled, (state, action) => {
         state.status = ClientStatus.SUCCEEDED;
-        state.clients = action.payload.clients.map((client) =>
-          mapClient(client)
-        );
+        state.clients = action.payload.clients;
       })
       .addCase(fetchClients.rejected, (state, action) => {
         state.status = ClientStatus.FAILED;

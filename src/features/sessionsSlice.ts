@@ -24,7 +24,6 @@ export enum SessionStatus {
 
 export interface SessionState {
   sessions: Session[];
-  selectedSession: Session | undefined;
   status:
     | SessionStatus.IDLE
     | SessionStatus.CHECKIN_IN_PROGRESS
@@ -44,7 +43,6 @@ export interface SessionState {
 
 const initialState: SessionState = {
   sessions: [],
-  selectedSession: undefined,
   status: SessionStatus.IDLE,
   error: [],
   link: undefined,

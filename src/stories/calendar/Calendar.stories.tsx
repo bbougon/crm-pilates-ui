@@ -1,20 +1,26 @@
 import React, { ReactElement } from "react";
-import { Session, SessionsLink } from "../../features/domain/session";
+import { Session } from "../../features/domain/session";
 import { Provider } from "react-redux";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import { fetchSessions, SessionStatus } from "../../features/sessionsSlice";
+import {
+  fetchSessions,
+  SessionState,
+  SessionStatus,
+} from "../../features/sessionsSlice";
 import { store } from "../../app/store";
-import { userEvent, within, waitFor } from "@storybook/testing-library";
+import { userEvent, waitFor, within } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
 import { ComponentStory } from "@storybook/react";
 import { AuthStatus } from "../../features/auth";
-import { ErrorMessage } from "../../features/errors";
 import { SnackbarProvider } from "../../context/SnackbarProvider";
 import Calendar from "../../component/calendar/Calendar";
 import CalendarDoc from "./Calendar.docs.mdx";
 import { parseISO } from "date-fns";
-import { Client } from "../../features/domain/client";
-import { ClientStatus, fetchClients } from "../../features/clientsSlice";
+import {
+  ClientState,
+  ClientStatus,
+  fetchClients,
+} from "../../features/clientsSlice";
 import { compose, context, rest } from "msw";
 import {
   ApiSessionBuilder,
@@ -22,24 +28,6 @@ import {
   ScheduleBuilder,
   SessionBuilder,
 } from "../../test-utils/classroom/session";
-
-type SessionState = {
-  sessions: Session[];
-  status: SessionStatus;
-  error: ErrorMessage[];
-  link: SessionsLink | undefined;
-};
-
-type ClientState = {
-  clients: Client[];
-  status:
-    | ClientStatus.IDLE
-    | ClientStatus.LOADING
-    | ClientStatus.SUCCEEDED
-    | ClientStatus.FAILED
-    | ClientStatus.CREATION_FAILED;
-  error: ErrorMessage[];
-};
 
 const error = { detail: [{ msg: "Error occurred", type: "Error" }] };
 
