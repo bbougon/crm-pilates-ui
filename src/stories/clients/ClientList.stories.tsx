@@ -70,7 +70,7 @@ const MockStore = ({ clientState, children }: MockStoreProps) => {
 
 export default {
   component: ClientsList,
-  title: "ClientList",
+  title: "Client List",
   decorators: [
     (story: any) => (
       <Provider store={store}>
