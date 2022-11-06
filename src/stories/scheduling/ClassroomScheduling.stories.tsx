@@ -14,7 +14,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { AuthStatus } from "../../features/auth";
 import { Classroom } from "../../features/domain/classroom";
 import { ErrorMessage } from "../../features/errors";
-import { addClassroom, ClassroomStatus } from "../../features/classroomSlice";
+import { ClassroomStatus, addClassroom } from "../../features/classroomSlice";
 import { Client } from "../../features/domain/client";
 import { ClientStatus } from "../../features/clientsSlice";
 import { ClassroomScheduling } from "../../component/scheduling/ClassroomScheduling";

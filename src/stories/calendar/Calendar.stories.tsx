@@ -3,9 +3,9 @@ import { Session } from "../../features/domain/session";
 import { Provider } from "react-redux";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 import {
-  fetchSessions,
   SessionState,
   SessionStatus,
+  fetchSessions,
 } from "../../features/sessionsSlice";
 import { store } from "../../app/store";
 import { userEvent, waitFor, within } from "@storybook/testing-library";

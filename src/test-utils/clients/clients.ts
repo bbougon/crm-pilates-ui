@@ -1,7 +1,8 @@
-import { ApiClient } from "../../api";
+import { ApiClient, ApiCredits } from "../../api";
 import { Client, Credits } from "../../features/domain/client";
 import { Builder } from "../builder";
 import { faker } from "@faker-js/faker";
+import { Subjects } from "../../features/domain/subjects";
 
 export class ClientsBuilder implements Builder<(Client | ApiClient)[]> {
   private clients: (Client | ApiClient)[] = [];
@@ -13,6 +14,26 @@ export class ClientsBuilder implements Builder<(Client | ApiClient)[]> {
 
   public build = (): (Client | ApiClient)[] => {
     return this.clients;
+  };
+}
+
+export class ClientCreditsBuilder
+  implements Builder<{ value: number; subject: string }[]>
+{
+  private credits: { value: number; subject: string }[] = [];
+
+  build(): { value: number; subject: string }[] {
+    return this.credits;
+  }
+
+  all = (): ClientCreditsBuilder => {
+    for (let subject in Subjects) {
+      this.credits.push({
+        value: faker.datatype.number({ min: 1, max: 10 }),
+        subject,
+      });
+    }
+    return this;
   };
 }
 

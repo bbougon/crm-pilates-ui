@@ -11,7 +11,7 @@ import {
   ServerBuilder,
 } from "../../../test-utils/server/server";
 
-describe("ClientList page", function () {
+describe.skip("ClientList page", function () {
   describe("faces an error when creating a client", function () {
     const emptyClients = new RequestHandlerBuilders()
       .get("/clients")

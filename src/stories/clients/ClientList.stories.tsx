@@ -1,7 +1,6 @@
 import React, { ReactElement } from "react";
 import { Provider } from "react-redux";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import { SessionStatus } from "../../features/sessionsSlice";
 import { store } from "../../app/store";
 import { waitFor, within } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
@@ -9,7 +8,6 @@ import { ComponentStory } from "@storybook/react";
 import { AuthStatus } from "../../features/auth";
 import { SnackbarProvider } from "../../context/SnackbarProvider";
 import ClientListDoc from "./ClientList.docs.mdx";
-import { parseISO } from "date-fns";
 import {
   ClientState,
   ClientStatus,
@@ -17,7 +15,6 @@ import {
 } from "../../features/clientsSlice";
 import { compose, context, rest } from "msw";
 import { ClientsList } from "../../component/clients/ClientsList";
-import { APIClassroomBuilder } from "../../test-utils/classroom/classroom";
 import {
   ApiClientBuilder,
   ClientsBuilder,
@@ -41,7 +38,6 @@ const MockStore = ({ clientState, children }: MockStoreProps) => {
             reducers: {},
             extraReducers(builder) {
               builder.addCase(fetchClients.fulfilled, (state, action) => {
-                console.log({ _: action });
                 state.status = ClientStatus.SUCCEEDED;
                 state.clients = action.payload.clients;
               });
@@ -107,10 +103,10 @@ const defaultClientState: ClientState = {
     #########################################################
  */
 
-let firstClient = new ApiClientBuilder().build();
-let secondClient = new ApiClientBuilder().build();
-let thirdClient = new ApiClientBuilder().build();
-let threeClients = new ClientsBuilder()
+const firstClient = new ApiClientBuilder().build();
+const secondClient = new ApiClientBuilder().build();
+const thirdClient = new ApiClientBuilder().build();
+const threeClients = new ClientsBuilder()
   .withClient(firstClient)
   .withClient(secondClient)
   .withClient(thirdClient)

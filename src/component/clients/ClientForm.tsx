@@ -143,27 +143,24 @@ export const AddClientForm = () => {
             <Grid item xs={12} md={3}>
               <FormControl>
                 <TextField
-                  id="client-name"
                   className="sizeSmall"
-                  label="Client's name"
-                  helperText="Provide a client's name"
+                  aria-label="Client lastname"
+                  label="Provide a client lastname"
+                  helperText="Provide a client lastname"
                   required
                   onChange={onLastnameChanged}
-                  aria-describedby="client-name-help"
                   value={lastname}
                 />
               </FormControl>
             </Grid>
             <Grid item xs={12} md={3}>
-              <FormControl>
+              <FormControl aria-label="Client firstname">
                 <TextField
-                  id="client-first-name"
                   className="sizeSmall"
-                  label="Client's firstname"
+                  label="Client firstname"
                   helperText="Provide a client's firstname"
                   required
                   onChange={onFirstnameChanged}
-                  aria-describedby="client-first-name-help"
                   value={firstname}
                 />
               </FormControl>
