@@ -25,6 +25,7 @@ import {
   fetchClients,
   getClientById,
   getClientCredits,
+  selectAllClients,
 } from "../../features/clientsSlice";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonIcon from "@mui/icons-material/Person";
@@ -245,7 +246,7 @@ const ClientItem = ({ clientId }: ClientItemProps) => {
 export const ClientsList = () => {
   const dispatch = useAppDispatch();
   const { display } = useSnackbar();
-  const [clients, setClients] = useState<Client[]>([]);
+  const clients = useSelector(selectAllClients);
   const errorCallback = useCallback((error) => {
     display(error);
   }, []);
@@ -253,7 +254,6 @@ export const ClientsList = () => {
   useEffect(() => {
     dispatch(fetchClients())
       .unwrap()
-      .then((clients) => setClients(clients.clients))
       .catch((err) => errorCallback(err));
   }, [dispatch, errorCallback]);
 
