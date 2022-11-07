@@ -26,12 +26,9 @@ import {
   ClientCreditsBuilder,
   ClientsBuilder,
 } from "../../test-utils/clients/clients";
-import { AddClientForm } from "../../component/clients/ClientForm";
 import { Subjects } from "../../features/domain/subjects";
-import { ClientListDefault, ClientListOnError } from "./ClientList.stories";
 import ClientPage from "../../component/clients/ClientPage";
 import { translate } from "../../utils/translation";
-import { ApiClient } from "../../api";
 
 const error = { detail: [{ msg: "Error occurred", type: "Error" }] };
 
@@ -199,7 +196,7 @@ ClientPageAddNewClient.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await sleep(20);
 
-  userEvent.click(canvas.getByTestId("ExpandMoreIcon"));
+  userEvent.click(canvas.getAllByTestId("ExpandMoreIcon")[0]);
   const clientLastnameElement = within(
     await canvas.findByLabelText("Client lastname")
   ).getByRole("textbox");

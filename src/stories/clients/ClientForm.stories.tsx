@@ -27,7 +27,6 @@ import {
 } from "../../test-utils/clients/clients";
 import { AddClientForm } from "../../component/clients/ClientForm";
 import { Subjects } from "../../features/domain/subjects";
-import { ClientListOnError } from "./ClientList.stories";
 
 const error = { detail: [{ msg: "Error occurred", type: "Error" }] };
 

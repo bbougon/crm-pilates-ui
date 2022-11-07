@@ -1,38 +1,21 @@
 import React, { ReactElement } from "react";
-import { Session } from "../../features/domain/session";
 import { Provider } from "react-redux";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import {
-  SessionState,
-  SessionStatus,
-  fetchSessions,
-} from "../../features/sessionsSlice";
+
 import { store } from "../../app/store";
-import { userEvent, waitFor, within } from "@storybook/testing-library";
+import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
 import { ComponentStory } from "@storybook/react";
 import { AuthState, AuthStatus, login } from "../../features/auth";
 import { SnackbarProvider } from "../../context/SnackbarProvider";
-import Calendar from "../../component/calendar/Calendar";
 import AuthDoc from "./Auth.docs.mdx";
-import { add, parseISO } from "date-fns";
-import {
-  ClientState,
-  ClientStatus,
-  fetchClients,
-} from "../../features/clientsSlice";
+import { add } from "date-fns";
+
 import { compose, context, rest } from "msw";
-import {
-  ApiSessionBuilder,
-  RecurrentSessionsBuilder,
-  ScheduleBuilder,
-  SessionBuilder,
-} from "../../test-utils/classroom/session";
+
 import Login from "../../component/login/Login";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import Home from "../../component/home";
-import { screen } from "@testing-library/react";
-import { AddNewClientOnError } from "../clients/ClientForm.stories";
 import sign from "jwt-encode";
 
 const error = { detail: [{ msg: "Error occurred", type: "Error" }] };
