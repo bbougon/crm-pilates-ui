@@ -154,7 +154,8 @@ ClientListOnError.decorators = [
     <MockStore clientState={defaultClientState}>{story()}</MockStore>
   ),
 ];
-ClientListOnError.storyName = "Should snack bar when clients cannot be loaded";
+ClientListOnError.storyName =
+  "Should display a snack bar when clients cannot be loaded";
 ClientListOnError.parameters = {
   msw: {
     handlers: [

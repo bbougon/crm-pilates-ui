@@ -6,6 +6,7 @@ import {
   fireEvent,
   screen,
   userEvent,
+  waitFor,
   within,
 } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
@@ -25,6 +26,7 @@ import {
 } from "../../test-utils/clients/clients";
 import { AddClientForm } from "../../component/clients/ClientForm";
 import { Subjects } from "../../features/domain/subjects";
+import { ClientListOnError } from "./ClientList.stories";
 
 const error = { detail: [{ msg: "Error occurred", type: "Error" }] };
 
@@ -93,6 +95,7 @@ const Template: ComponentStory<typeof AddClientForm> = () => <AddClientForm />;
 export const ClientFormDefault = Template.bind({});
 export const AddNewClient = Template.bind({});
 export const AddNewClientWithCredits = Template.bind({});
+export const AddNewClientOnError = Template.bind({});
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -240,4 +243,51 @@ AddNewClientWithCredits.play = async ({ canvasElement }) => {
   }
   expect(canvas.getByRole("button", { name: "add" })).toBeDisabled();
   userEvent.click(canvas.getByRole("button", { name: /submit/i }));
+};
+
+/*
+    #########################################################
+    # Add new client on error                               #
+    #########################################################
+ */
+AddNewClientOnError.decorators = [
+  (story: any) => (
+    <MockStore clientState={defaultClientState}>{story()}</MockStore>
+  ),
+];
+AddNewClientOnError.storyName =
+  "Should display a snack bar when new client cannot be created";
+AddNewClientOnError.parameters = {
+  msw: {
+    handlers: [
+      rest.post("http://localhost:8081/clients", (req, res, _) => {
+        return res(compose(context.status(422), context.json(error)));
+      }),
+    ],
+  },
+};
+
+AddNewClientOnError.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  await sleep(20);
+
+  userEvent.click(canvas.getByTestId("ExpandMoreIcon"));
+  const clientLastnameElement = within(
+    await canvas.findByLabelText("Client lastname")
+  ).getByRole("textbox");
+  userEvent.clear(clientLastnameElement);
+  userEvent.type(clientLastnameElement, oneClient.lastname);
+  const clientFirstnameElement = within(
+    await canvas.findByLabelText("Client firstname")
+  ).getByRole("textbox");
+  userEvent.clear(clientFirstnameElement);
+  userEvent.type(clientFirstnameElement, oneClient.firstname);
+  userEvent.click(canvas.getByRole("button", { name: /submit/i }));
+  await sleep(100);
+
+  expect(
+    await waitFor(() =>
+      canvas.getByText("Error occurred - Client could not be created")
+    )
+  ).toBeInTheDocument();
 };

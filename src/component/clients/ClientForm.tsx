@@ -2,11 +2,7 @@ import * as React from "react";
 import { useReducer } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import styled from "styled-components";
-import { useSelector } from "react-redux";
-import { ClientStatus, createClient } from "../../features/clientsSlice";
-import { DisplayError } from "../errors/DisplayError";
-import { ErrorMessage } from "../../features/errors";
-import { RootState } from "../../app/store";
+import { createClient } from "../../features/clientsSlice";
 import { Subjects } from "../../features/domain/subjects";
 import { AddCreditButton } from "./AddCreditButton";
 import { subjects } from "../../utils/translation";
@@ -31,6 +27,7 @@ import {
   updateFirstname,
   updateLastname,
 } from "./reducer";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 const Wrapper = styled.div`
   display: flex;
@@ -56,6 +53,8 @@ const AddClientAccordionSummary = () => {
 
 export const AddClientForm = () => {
   const dispatch = useAppDispatch();
+  const { display } = useSnackbar();
+
   const [state, dispatchReducer] = useReducer(addClientReducer, {
     lastname: "",
     firstname: "",
@@ -64,14 +63,6 @@ export const AddClientForm = () => {
     availableSubjects: subjects,
     addCreditForm: undefined,
   });
-
-  const errorMessages: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>(
-    (state) => state.clients.error
-  );
-  const status: ClientStatus = useSelector<RootState, ClientStatus>(
-    (state) => state.clients.status
-  );
-  let errorContent = undefined;
 
   const onSubmitClicked = async () => {
     dispatch(
@@ -84,7 +75,8 @@ export const AddClientForm = () => {
       .unwrap()
       .then(() => {
         dispatchReducer(clientCreated());
-      });
+      })
+      .catch((err) => display(err));
   };
 
   const onAddCredits = (creditsAmount: number, subject: Subjects) => {
@@ -92,16 +84,6 @@ export const AddClientForm = () => {
       creditsAdded({ value: creditsAmount as number, subject: subject })
     );
   };
-
-  if (status === ClientStatus.CREATION_FAILED) {
-    errorContent = (
-      <Grid container>
-        <Grid item xs={12} md={12}>
-          <DisplayError {...{ error: errorMessages }} />
-        </Grid>
-      </Grid>
-    );
-  }
 
   return (
     <Accordion>
@@ -157,7 +139,6 @@ export const AddClientForm = () => {
               dispatchReducer(addCreditChanged(onAddCredits))
             }
           />
-          {errorContent}
         </Wrapper>
       </AccordionDetails>
       <Divider />

@@ -39,7 +39,7 @@ export interface ClientCreation {
 export const createClient = createAsyncThunk<
   ClientCreation,
   ClientCreation,
-  { rejectValue: ApiError }
+  { rejectValue: ErrorMessage[] }
 >("clients/create", async (client, thunkAPI) => {
   try {
     const { login } = thunkAPI.getState() as unknown as RootState;
@@ -55,7 +55,9 @@ export const createClient = createAsyncThunk<
     });
     return response.data as ApiClient;
   } catch (e) {
-    return thunkAPI.rejectWithValue(e as ApiError);
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error("Client could not be created", e as ApiError)
+    );
   }
 });
 
@@ -157,10 +159,7 @@ const clientsSlice = createSlice({
       })
       .addCase(createClient.rejected, (state, action) => {
         state.status = ClientStatus.CREATION_FAILED;
-        state.error = map_action_thunk_error(
-          "Add client",
-          action.payload as ApiError
-        );
+        state.error = action.payload as ErrorMessage[];
       })
       .addCase(addCredits.pending, (state, _) => {
         state.status = ClientStatus.LOADING;
