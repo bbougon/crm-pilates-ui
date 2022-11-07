@@ -248,7 +248,7 @@ export const ClientsList = () => {
   const { display } = useSnackbar();
   const clients = useSelector(selectAllClients);
   const errorCallback = useCallback((error) => {
-    display(error);
+    display(error, "error");
   }, []);
 
   useEffect(() => {

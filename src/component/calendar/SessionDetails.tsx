@@ -154,7 +154,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
             dispatchReducer(attendeeCheckedIn(attendee));
           }
         })
-        .catch((err) => display(err));
+        .catch((err) => display(err, "error"));
       setCheckin(null);
     }
     if (checkout) {
@@ -166,7 +166,7 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
             dispatchReducer(attendeeCheckedOut(attendee));
           }
         })
-        .catch((err) => display(err));
+        .catch((err) => display(err, "error"));
       setCheckOut(null);
     }
   }, [dispatch, checkin, checkout, state, display]);
@@ -372,7 +372,7 @@ export const SessionDetails = ({ session }: { session: Session }) => {
         .then((session) => {
           setCurrentSession(session);
         })
-        .catch((err) => display(err));
+        .catch((err) => display(err, "error"));
     },
     [dispatch, display]
   );

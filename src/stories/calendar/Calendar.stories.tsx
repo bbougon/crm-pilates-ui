@@ -242,7 +242,7 @@ CalendarDefaultOnSessionFetchingError.play = async ({ canvasElement }) => {
 
   expect(
     await waitFor(() =>
-      canvas.getByText("Error occurred - Sessions could not be retrieved")
+      canvas.getByText("Retrieving sessions - Error occurred")
     )
   ).toBeInTheDocument();
 };
@@ -280,9 +280,7 @@ CalendarDefaultOnClientsFetchingError.play = async ({ canvasElement }) => {
   await sleep(100);
 
   expect(
-    await waitFor(() =>
-      canvas.getByText("Error occurred - Clients could not be retrieved")
-    )
+    await waitFor(() => canvas.getByText("Retrieving clients - Error occurred"))
   ).toBeInTheDocument();
 };
 

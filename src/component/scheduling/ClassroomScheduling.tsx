@@ -124,7 +124,7 @@ export const ClassroomScheduling = ({
     dispatch(addClassroom(classroom))
       .unwrap()
       .then(() => onClassroomScheduled())
-      .catch((err) => display(err));
+      .catch((err) => display(err, "error"));
   };
 
   return (

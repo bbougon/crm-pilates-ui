@@ -73,10 +73,23 @@ export const AddClientForm = () => {
       })
     )
       .unwrap()
-      .then(() => {
-        dispatchReducer(clientCreated());
+      .catch((err) => {
+        display(err, "error");
       })
-      .catch((err) => display(err));
+      .then((result) => {
+        if (result !== undefined) {
+          dispatchReducer(clientCreated());
+          display(
+            [
+              {
+                message: "Client created successfully",
+                origin: "Client creation",
+              },
+            ],
+            "success"
+          );
+        }
+      });
   };
 
   const onAddCredits = (creditsAmount: number, subject: Subjects) => {

@@ -89,7 +89,7 @@ export const fetchSessions = createAsyncThunk<
     };
   } catch (e) {
     return thunkAPI.rejectWithValue(
-      map_action_thunk_error("Sessions could not be retrieved", e as ApiError)
+      map_action_thunk_error("Retrieving sessions", e as ApiError)
     );
   }
 });
@@ -118,7 +118,7 @@ export const sessionCheckin = createAsyncThunk<
     return mapSession(response.data as ApiSession);
   } catch (e) {
     return thunkAPI.rejectWithValue(
-      map_action_thunk_error(`Checkin could not be completed`, e as ApiError)
+      map_action_thunk_error(`Session checkin`, e as ApiError)
     );
   }
 });
@@ -147,7 +147,7 @@ export const sessionCheckout = createAsyncThunk<
     return mapSession(response.data as ApiSession);
   } catch (e) {
     return thunkAPI.rejectWithValue(
-      map_action_thunk_error(`Checkout could not be completed`, e as ApiError)
+      map_action_thunk_error(`Session checkout`, e as ApiError)
     );
   }
 });
@@ -177,7 +177,7 @@ export const sessionCancel = createAsyncThunk<
     return mapSession(response.data as ApiSession);
   } catch (e) {
     return thunkAPI.rejectWithValue(
-      map_action_thunk_error(`Session could not be cancelled`, e as ApiError)
+      map_action_thunk_error(`Session cancellation`, e as ApiError)
     );
   }
 });

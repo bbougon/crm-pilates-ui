@@ -50,7 +50,7 @@ export const PilatesMonthlyCalendar = ({
   );
 
   const errorCallback = useCallback((err) => {
-    display(err);
+    display(err, "error");
   }, []);
 
   useEffect(() => {

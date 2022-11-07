@@ -17,6 +17,7 @@ import ClientFormDoc from "./ClientForm.docs.mdx";
 import {
   ClientState,
   ClientStatus,
+  createClient,
   fetchClients,
 } from "../../features/clientsSlice";
 import { compose, context, rest } from "msw";
@@ -51,6 +52,12 @@ const MockStore = ({ clientState, children }: MockStoreProps) => {
               });
               builder.addCase(fetchClients.rejected, (state, _) => {
                 state.status = ClientStatus.FAILED;
+              });
+              builder.addCase(createClient.fulfilled, (state, _) => {
+                state.status = ClientStatus.SUCCEEDED;
+              });
+              builder.addCase(createClient.rejected, (state, _) => {
+                state.status = ClientStatus.CREATION_FAILED;
               });
             },
           }).reducer,
@@ -286,8 +293,6 @@ AddNewClientOnError.play = async ({ canvasElement }) => {
   await sleep(100);
 
   expect(
-    await waitFor(() =>
-      canvas.getByText("Error occurred - Client could not be created")
-    )
+    await waitFor(() => canvas.getByText("Client creation - Error occurred"))
   ).toBeInTheDocument();
 };

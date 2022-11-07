@@ -171,8 +171,6 @@ ClientListOnError.play = async ({ canvasElement }) => {
   await sleep(100);
 
   expect(
-    await waitFor(() =>
-      canvas.getByText("Error occurred - Clients could not be retrieved")
-    )
+    await waitFor(() => canvas.getByText("Retrieving clients - Error occurred"))
   ).toBeInTheDocument();
 };

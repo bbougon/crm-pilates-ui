@@ -56,7 +56,7 @@ export const createClient = createAsyncThunk<
     return response.data as ApiClient;
   } catch (e) {
     return thunkAPI.rejectWithValue(
-      map_action_thunk_error("Client could not be created", e as ApiError)
+      map_action_thunk_error("Client creation", e as ApiError)
     );
   }
 });
@@ -82,7 +82,7 @@ export const fetchClients = createAsyncThunk<
     };
   } catch (e: ApiError | unknown) {
     return thunkAPI.rejectWithValue(
-      map_action_thunk_error("Clients could not be retrieved", e as ApiError)
+      map_action_thunk_error("Retrieving clients", e as ApiError)
     );
   }
 });

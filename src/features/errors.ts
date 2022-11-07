@@ -7,10 +7,13 @@ export type ApiError = {
   ];
 };
 
-export type ErrorMessage = {
+export type Message = {
   message: string;
-  type?: string;
   origin: string;
+};
+
+export type ErrorMessage = Message & {
+  type?: string;
 };
 
 const map_action_thunk_error = (

@@ -380,8 +380,6 @@ ClassroomSchedulingError.play = async ({ canvasElement }) => {
   await sleep(100);
 
   await expect(
-    screen.getByText(
-      "Error occurred - Classroom 'Cours tapis duo' could not be created"
-    )
+    screen.getByText("Classroom 'Cours tapis duo' creation - Error occurred")
   ).toBeInTheDocument();
 };

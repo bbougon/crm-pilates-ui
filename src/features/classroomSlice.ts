@@ -73,7 +73,7 @@ export const addClassroom = createAsyncThunk<
   } catch (e) {
     return thunkAPI.rejectWithValue(
       map_action_thunk_error(
-        `Classroom '${classroom.classroomName}' could not be created`,
+        `Classroom '${classroom.classroomName}' creation`,
         e as ApiError
       )
     );

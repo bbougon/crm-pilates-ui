@@ -336,7 +336,7 @@ SessionCheckinError.play = async ({ canvasElement }) => {
   await sleep(100);
 
   await expect(
-    canvas.getByText("Error occurred - Checkin could not be completed")
+    canvas.getByText("Session checkin - Error occurred")
   ).toBeInTheDocument();
 };
 
@@ -440,7 +440,7 @@ SessionCheckoutError.play = async ({ canvasElement }) => {
   await sleep(200);
 
   await expect(
-    canvas.getByText("Error occurred - Checkout could not be completed")
+    canvas.getByText("Session checkout - Error occurred")
   ).toBeInTheDocument();
 };
 
@@ -550,6 +550,6 @@ CancelSessionError.play = async ({ canvasElement }) => {
 
   expect(canvas.queryByText("Bruno Germain")).toBeInTheDocument();
   await expect(
-    canvas.getByText("Error occurred - Session could not be cancelled")
+    canvas.getByText("Session cancellation - Error occurred")
   ).toBeInTheDocument();
 };
