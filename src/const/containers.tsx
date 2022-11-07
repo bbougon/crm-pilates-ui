@@ -2,7 +2,6 @@ import * as React from "react";
 import { ReactElement } from "react";
 import styled from "styled-components";
 import { DrawProvider } from "../context/DrawerProvider";
-import { SnackbarProvider } from "../context/SnackbarProvider";
 
 interface Props {
   className?: string;
@@ -10,14 +9,12 @@ interface Props {
 }
 
 export const Container: React.FC<Props> = ({ className, children }: Props) => (
-  <SnackbarProvider>
-    <DrawProvider>
-      <div className={className}>
-        <div id="portal"></div>
-        {children}
-      </div>
-    </DrawProvider>
-  </SnackbarProvider>
+  <DrawProvider>
+    <div className={className}>
+      <div id="portal"></div>
+      {children}
+    </div>
+  </DrawProvider>
 );
 
 export const MainContainer = styled(Container)`

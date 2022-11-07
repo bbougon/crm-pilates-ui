@@ -9,22 +9,25 @@ import Login from "./component/login/Login";
 import { AuthProvider } from "./context/AuthProvider";
 import RequireAuth from "./component/auth/requireAuth";
 import { SideBar } from "./navigation/side-bar";
+import { SnackbarProvider } from "./context/SnackbarProvider";
 
 function App() {
   return (
     <div className="App">
       <Router>
         <AuthProvider>
-          <NavigationBar />
-          <SideBar />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route element={<RequireAuth />}>
-              <Route exact path="/" element={<Home />} />
-              <Route path="/clients" key="clients" element={<Clients />} />
-              <Route path="/calendar" element={<Calendar />} />
-            </Route>
-          </Routes>
+          <SnackbarProvider>
+            <NavigationBar />
+            <SideBar />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<RequireAuth />}>
+                <Route exact path="/" element={<Home />} />
+                <Route path="/clients" key="clients" element={<Clients />} />
+                <Route path="/calendar" element={<Calendar />} />
+              </Route>
+            </Routes>
+          </SnackbarProvider>
         </AuthProvider>
       </Router>
     </div>

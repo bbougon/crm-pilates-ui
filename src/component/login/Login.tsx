@@ -11,26 +11,23 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { AuthStatus, login } from "../../features/auth";
 import { RootState } from "../../app/store";
-import { DisplayError } from "../errors/DisplayError";
-import { ErrorMessage } from "../../features/errors";
+import { useSnackbar } from "../../hooks/useSnackbar";
+import { useAppDispatch } from "../../hooks/redux";
 
 const Login = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { display } = useSnackbar();
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const errorMessages: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>(
-    (state) => state.login.error
-  );
   const status: AuthStatus = useSelector<RootState, AuthStatus>(
     (state) => state.login.status
   );
-  let errorContent = undefined;
 
   const onUsernameChanged = (e: BaseSyntheticEvent) => {
     setUsername(e.target.value);
@@ -41,12 +38,18 @@ const Login = () => {
   };
 
   const onLoginClicked = async () => {
-    await dispatch(login({ username, password }));
+    dispatch(login({ username, password }))
+      .unwrap()
+      .catch((err) => {
+        display(err, "error");
+      });
   };
 
   const onKeyDown = async (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter") {
-      await dispatch(login({ username, password }));
+      dispatch(login({ username, password }))
+        .unwrap()
+        .catch((err) => display(err, "error"));
     }
   };
 
@@ -55,16 +58,6 @@ const Login = () => {
       navigate("/");
     }
   });
-
-  if (status === AuthStatus.FAILED) {
-    errorContent = (
-      <Grid container>
-        <Grid item xs={12} md={12}>
-          <DisplayError {...{ error: errorMessages }} />
-        </Grid>
-      </Grid>
-    );
-  }
 
   return (
     <MainContainer>
@@ -77,14 +70,13 @@ const Login = () => {
                 <Grid item xs={12} md={6}>
                   <FormControl>
                     <TextField
-                      id="username"
                       className="sizeSmall"
-                      label="Username"
+                      aria-label="Username"
                       helperText="Username"
+                      placeholder="Username"
                       required
                       variant="standard"
                       onChange={onUsernameChanged}
-                      aria-describedby="username-help"
                     />
                   </FormControl>
                 </Grid>
@@ -93,16 +85,15 @@ const Login = () => {
                 <Grid item xs={12} md={6}>
                   <FormControl>
                     <TextField
-                      id="password"
                       className="sizeSmall"
                       type="password"
-                      label="Password"
+                      aria-label="Password"
                       helperText="Password"
+                      placeholder="Password"
                       required
                       variant="standard"
                       onChange={onPasswordChanged}
                       onKeyDown={onKeyDown}
-                      aria-describedby="password-help"
                     />
                   </FormControl>
                 </Grid>
@@ -123,7 +114,6 @@ const Login = () => {
             </Grid>
           </CardContent>
         </Card>
-        {errorContent}
       </Grid>
     </MainContainer>
   );
