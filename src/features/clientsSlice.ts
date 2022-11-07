@@ -37,7 +37,7 @@ export interface ClientCreation {
 }
 
 export const createClient = createAsyncThunk<
-  ClientCreation,
+  Client,
   ClientCreation,
   { rejectValue: ErrorMessage[] }
 >("clients/create", async (client, thunkAPI) => {
@@ -53,7 +53,7 @@ export const createClient = createAsyncThunk<
         },
       },
     });
-    return response.data as ApiClient;
+    return mapClient(response.data as ApiClient);
   } catch (e) {
     return thunkAPI.rejectWithValue(
       map_action_thunk_error("Client creation", e as ApiError)
@@ -155,7 +155,7 @@ const clientsSlice = createSlice({
       })
       .addCase(createClient.fulfilled, (state, action) => {
         state.status = ClientStatus.SUCCEEDED;
-        state.clients.push(mapClient(action.payload as ApiClient));
+        state.clients.push(action.payload);
       })
       .addCase(createClient.rejected, (state, action) => {
         state.status = ClientStatus.CREATION_FAILED;
