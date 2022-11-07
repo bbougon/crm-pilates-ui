@@ -168,6 +168,7 @@ AddNewClient.play = async ({ canvasElement }) => {
   userEvent.type(clientFirstnameElement, oneClient.firstname);
   expect(canvas.getByRole("button", { name: /submit/i })).toBeEnabled();
   userEvent.click(canvas.getByRole("button", { name: /submit/i }));
+  await sleep(100);
   expect(clientLastnameElement).toHaveValue("");
   expect(clientFirstnameElement).toHaveValue("");
 };

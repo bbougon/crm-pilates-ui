@@ -1,17 +1,15 @@
 import * as React from "react";
-import { BaseSyntheticEvent, ReactElement, useState } from "react";
+import { useReducer } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import styled from "styled-components";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { ClientStatus, createClient } from "../../features/clientsSlice";
 import { DisplayError } from "../errors/DisplayError";
 import { ErrorMessage } from "../../features/errors";
 import { RootState } from "../../app/store";
 import { Subjects } from "../../features/domain/subjects";
 import { AddCreditButton } from "./AddCreditButton";
-import { AddCreditForm } from "./AddCreditForm";
 import { subjects } from "../../utils/translation";
-import { CreditItem } from "./CreditItem";
 import {
   Accordion,
   AccordionActions,
@@ -24,6 +22,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useAppDispatch } from "../../hooks/redux";
+import {
+  addClientReducer,
+  addCreditChanged,
+  clientCreated,
+  creditsAdded,
+  updateFirstname,
+  updateLastname,
+} from "./reducer";
 
 const Wrapper = styled.div`
   display: flex;
@@ -48,7 +55,15 @@ const AddClientAccordionSummary = () => {
 };
 
 export const AddClientForm = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const [state, dispatchReducer] = useReducer(addClientReducer, {
+    lastname: "",
+    firstname: "",
+    credits: [],
+    creditsItems: [],
+    availableSubjects: subjects,
+    addCreditForm: undefined,
+  });
 
   const errorMessages: ErrorMessage[] = useSelector<RootState, ErrorMessage[]>(
     (state) => state.clients.error
@@ -56,72 +71,26 @@ export const AddClientForm = () => {
   const status: ClientStatus = useSelector<RootState, ClientStatus>(
     (state) => state.clients.status
   );
-  const [addCreditForms, setAddCreditForms] = useState<
-    ReactElement | undefined
-  >(undefined);
-  const [creditItems, setCreditItems] = useState<ReactElement[]>([]);
-  const [availableSubjects, setAvailableSubjects] =
-    useState<{ subject: Subjects; title: string }[]>(subjects);
-  const [addCreditsInProgress, setAddCreditsInProgress] = useState(false);
   let errorContent = undefined;
 
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [credits, setCredits] = useState<
-    { value: number; subject: string }[] | []
-  >([]);
-
-  const onFirstnameChanged = (e: BaseSyntheticEvent) =>
-    setFirstname(e.target.value);
-  const onLastnameChanged = (e: BaseSyntheticEvent) =>
-    setLastname(e.target.value);
-
   const onSubmitClicked = async () => {
-    dispatch(createClient({ firstname, lastname, credits }));
-    setLastname("");
-    setFirstname("");
-    setCreditItems([]);
+    dispatch(
+      createClient({
+        firstname: state.firstname,
+        lastname: state.lastname,
+        credits: state.credits,
+      })
+    )
+      .unwrap()
+      .then(() => {
+        dispatchReducer(clientCreated());
+      });
   };
 
   const onAddCredits = (creditsAmount: number, subject: Subjects) => {
-    setCredits([
-      ...credits,
-      { value: creditsAmount as number, subject: subject },
-    ]);
-    setCreditItems([
-      ...creditItems,
-      <Grid
-        key={"credit-item-container-".concat(Math.random().toString())}
-        container
-        direction="row"
-        sx={{
-          paddingTop: "4px",
-        }}
-      >
-        <CreditItem
-          key={"credit-item".concat(Math.random().toString())}
-          credits={{ value: creditsAmount, subject: subject }}
-        />
-      </Grid>,
-    ]);
-    setAddCreditForms(undefined);
-    setAddCreditsInProgress(false);
-    setAvailableSubjects(
-      availableSubjects.filter(
-        (currentSubject) => subject !== currentSubject.subject
-      )
+    dispatchReducer(
+      creditsAdded({ value: creditsAmount as number, subject: subject })
     );
-  };
-
-  const onAddCreditButton = () => {
-    setAddCreditForms(
-      <AddCreditForm
-        key={`add-credit-form-`.concat(Math.random().toString())}
-        subjects={availableSubjects}
-        onAddCredits={onAddCredits}
-      />
-    );
-    setAddCreditsInProgress(true);
   };
 
   if (status === ClientStatus.CREATION_FAILED) {
@@ -148,8 +117,10 @@ export const AddClientForm = () => {
                   label="Provide a client lastname"
                   helperText="Provide a client lastname"
                   required
-                  onChange={onLastnameChanged}
-                  value={lastname}
+                  onChange={(e) =>
+                    dispatchReducer(updateLastname(e.target.value))
+                  }
+                  value={state.lastname}
                 />
               </FormControl>
             </Grid>
@@ -160,8 +131,10 @@ export const AddClientForm = () => {
                   label="Client firstname"
                   helperText="Provide a client's firstname"
                   required
-                  onChange={onFirstnameChanged}
-                  value={firstname}
+                  onChange={(e) =>
+                    dispatchReducer(updateFirstname(e.target.value))
+                  }
+                  value={state.firstname}
                 />
               </FormControl>
             </Grid>
@@ -171,13 +144,18 @@ export const AddClientForm = () => {
             container
             direction="column"
           >
-            {creditItems}
+            {state.creditsItems}
           </Grid>
-          {addCreditForms}
+          {state.addCreditForm}
           <AddCreditButton
             key={`add-credit-button-`.concat(Math.random().toString())}
-            disabled={addCreditsInProgress || availableSubjects.length === 0}
-            onAddCreditButton={onAddCreditButton}
+            disabled={
+              state.addCreditForm !== undefined ||
+              state.availableSubjects.length === 0
+            }
+            onAddCreditButton={() =>
+              dispatchReducer(addCreditChanged(onAddCredits))
+            }
           />
           {errorContent}
         </Wrapper>
@@ -186,7 +164,7 @@ export const AddClientForm = () => {
       <AccordionActions>
         <Button
           onClick={onSubmitClicked}
-          disabled={firstname === "" || lastname === ""}
+          disabled={state.firstname === "" || state.lastname === ""}
         >
           Submit
         </Button>
