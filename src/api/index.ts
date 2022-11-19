@@ -30,6 +30,13 @@ export const api = async (
   let data;
   try {
     const response = await fetch(API_URI + endpoint, config);
+    if (response.status == 204) {
+      return {
+        status: response.status,
+        headers: response.headers,
+        url: response.url,
+      };
+    }
     data = await response.json();
     if (response.ok) {
       return {

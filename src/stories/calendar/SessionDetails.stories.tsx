@@ -11,10 +11,11 @@ import { Session } from "../../features/domain/session";
 import { Provider } from "react-redux";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 import {
-  SessionStatus,
   sessionCancel,
   sessionCheckin,
   sessionCheckout,
+  SessionState,
+  SessionStatus,
 } from "../../features/sessionsSlice";
 import { store } from "../../app/store";
 import { compose, context, rest } from "msw";
@@ -36,13 +37,9 @@ import { SessionDetails } from "../../component/calendar/SessionDetails";
 import SessionDetailsDoc from "./SessionDetails.docs.mdx";
 import { ErrorMessage } from "../../features/errors";
 import { SnackbarProvider } from "../../context/SnackbarProvider";
-
-type State = {
-  sessions: Session[];
-  status: SessionStatus;
-  error: ErrorMessage[];
-  link: string | undefined;
-};
+import { ClientState, ClientStatus } from "../../features/clientsSlice";
+import { ClientsBuilder } from "../../test-utils/clients/clients";
+import { Client } from "../../features/domain/client";
 
 const error = { detail: [{ msg: "Error occurred", type: "Error" }] };
 
@@ -64,6 +61,11 @@ const defaultSession: Session = new SessionBuilder()
       )
       .build()
   )
+  .build();
+
+const emptySession: Session = new SessionBuilder()
+  .withId("1")
+  .withPosition(2)
   .build();
 
 const brunoGermain = new AttendeeBuilder()
@@ -102,33 +104,55 @@ const sessionWithTwoAttendees: Session = new SessionBuilder()
   )
   .build();
 
-const SessionWithTwoAttendees: State = {
+const EmptySessionState: SessionState = {
+  sessions: [emptySession],
+  status: SessionStatus.IDLE,
+  error: [],
+  link: undefined,
+};
+
+const SessionWithTwoAttendees: SessionState = {
   sessions: [sessionWithTwoAttendees],
   status: SessionStatus.IDLE,
   error: [],
   link: undefined,
 };
 
-const SessionWithOneRegisteredAttendee: State = {
+const SessionWithOneRegisteredAttendee: SessionState = {
   sessions: [defaultSession],
   status: SessionStatus.IDLE,
   error: [],
   link: undefined,
 };
 
-const SessionWithOneCheckedInAttendee: State = {
+const SessionWithOneCheckedInAttendee: SessionState = {
   sessions: [sessionWithOneCheckedInAttendee],
   status: SessionStatus.IDLE,
   error: [],
   link: undefined,
 };
 
+const EmptyClientState: ClientState = {
+  clients: [],
+  error: [],
+  status: ClientStatus.IDLE,
+};
+
+const clients = new ClientsBuilder().for(5).build() as Client[];
+
+const ClientStateWithFiveClients: ClientState = {
+  clients: clients,
+  error: [],
+  status: ClientStatus.SUCCEEDED,
+};
+
 type MockStoreProps = {
-  sessionState: State;
+  sessionState: SessionState;
+  clientState: ClientState;
   children: ReactElement;
 };
 
-const Mockstore = ({ sessionState, children }: MockStoreProps) => {
+const Mockstore = ({ sessionState, clientState, children }: MockStoreProps) => {
   return (
     <Provider
       store={configureStore({
@@ -161,6 +185,12 @@ const Mockstore = ({ sessionState, children }: MockStoreProps) => {
               status: AuthStatus.SUCCEEDED,
               error: [],
             },
+            reducers: {},
+            extraReducers: {},
+          }).reducer,
+          clients: createSlice({
+            name: "clients",
+            initialState: clientState,
             reducers: {},
             extraReducers: {},
           }).reducer,
@@ -206,6 +236,25 @@ export const SessionCheckoutError = Template.bind({
 export const CancelSession = Template.bind({});
 export const CancelSessionError = Template.bind({});
 
+export const AddAttendeeToSession = Template.bind({});
+export const AddAttendeeToSessionError = Template.bind({});
+
+const getMockstore = ({
+  story,
+  sessionState = SessionWithOneRegisteredAttendee,
+  clientState = EmptyClientState,
+}: {
+  story: any;
+  sessionState?: SessionState;
+  clientState?: ClientState;
+}) => {
+  return (
+    <Mockstore sessionState={sessionState} clientState={clientState}>
+      {story()}
+    </Mockstore>
+  );
+};
+
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -215,10 +264,10 @@ function sleep(ms: number) {
     # Display default session details                       #
     #########################################################
  */
+
 DisplaySessionDetails.decorators = [
-  (story: any) => (
-    <Mockstore sessionState={SessionWithTwoAttendees}>{story()}</Mockstore>
-  ),
+  (story: any) =>
+    getMockstore({ story, sessionState: SessionWithTwoAttendees }),
 ];
 DisplaySessionDetails.args = {
   session: sessionWithTwoAttendees,
@@ -239,6 +288,7 @@ DisplaySessionDetails.play = async ({ canvasElement }) => {
   await expect(canvas.getByText("Bertrand Bougon")).toBeInTheDocument();
   await expect(canvas.getByText("5")).toBeInTheDocument();
   await expect(canvas.getByText("R")).toBeInTheDocument();
+  await expect(canvas.getByLabelText("add")).toBeDisabled();
 };
 
 /*
@@ -247,11 +297,8 @@ DisplaySessionDetails.play = async ({ canvasElement }) => {
     #########################################################
  */
 SessionCheckin.decorators = [
-  (story: any) => (
-    <Mockstore sessionState={SessionWithOneRegisteredAttendee}>
-      {story()}
-    </Mockstore>
-  ),
+  (story: any) =>
+    getMockstore({ story, sessionState: SessionWithOneRegisteredAttendee }),
 ];
 SessionCheckin.storyName = "Bruno Germain performs checkin";
 SessionCheckin.args = {
@@ -309,11 +356,8 @@ SessionCheckin.play = async ({ canvasElement }) => {
 };
 
 SessionCheckinError.decorators = [
-  (story: any) => (
-    <Mockstore sessionState={SessionWithOneRegisteredAttendee}>
-      {story()}
-    </Mockstore>
-  ),
+  (story: any) =>
+    getMockstore({ story, sessionState: SessionWithOneRegisteredAttendee }),
 ];
 SessionCheckinError.storyName = "Bruno Germain could not checkin";
 SessionCheckinError.args = {
@@ -346,11 +390,8 @@ SessionCheckinError.play = async ({ canvasElement }) => {
     #########################################################
  */
 SessionCheckout.decorators = [
-  (story: any) => (
-    <Mockstore sessionState={SessionWithOneCheckedInAttendee}>
-      {story()}
-    </Mockstore>
-  ),
+  (story: any) =>
+    getMockstore({ story, sessionState: SessionWithOneCheckedInAttendee }),
 ];
 SessionCheckout.storyName = "Bruno Germain performs checkout";
 SessionCheckout.args = {
@@ -411,11 +452,8 @@ SessionCheckout.play = async ({ canvasElement }) => {
 };
 
 SessionCheckoutError.decorators = [
-  (story: any) => (
-    <Mockstore sessionState={SessionWithOneCheckedInAttendee}>
-      {story()}
-    </Mockstore>
-  ),
+  (story: any) =>
+    getMockstore({ story, sessionState: SessionWithOneCheckedInAttendee }),
 ];
 SessionCheckoutError.storyName = "Bruno Germain cannot checkout";
 SessionCheckoutError.args = {
@@ -450,11 +488,8 @@ SessionCheckoutError.play = async ({ canvasElement }) => {
     #########################################################
  */
 CancelSession.decorators = [
-  (story: any) => (
-    <Mockstore sessionState={SessionWithOneRegisteredAttendee}>
-      {story()}
-    </Mockstore>
-  ),
+  (story: any) =>
+    getMockstore({ story, sessionState: SessionWithOneRegisteredAttendee }),
 ];
 CancelSession.storyName = "Bruno Germain cancel his session";
 CancelSession.args = {
@@ -507,13 +542,7 @@ CancelSession.play = async ({ canvasElement }) => {
   expect(canvas.queryByText("Bruno Germain")).not.toBeInTheDocument();
 };
 
-CancelSessionError.decorators = [
-  (story: any) => (
-    <Mockstore sessionState={SessionWithOneRegisteredAttendee}>
-      {story()}
-    </Mockstore>
-  ),
-];
+CancelSessionError.decorators = [(story: any) => getMockstore({ story })];
 CancelSessionError.storyName = "Bruno Germain cannot cancel his session";
 CancelSessionError.args = {
   session: defaultSession,
@@ -551,5 +580,114 @@ CancelSessionError.play = async ({ canvasElement }) => {
   expect(canvas.queryByText("Bruno Germain")).toBeInTheDocument();
   await expect(
     canvas.getByText("Session cancellation - Error occurred")
+  ).toBeInTheDocument();
+};
+
+/*
+    #########################################################
+    # Add Attendees                                         #
+    #########################################################
+ */
+
+AddAttendeeToSession.decorators = [
+  (story: any) =>
+    getMockstore({
+      story,
+      sessionState: EmptySessionState,
+      clientState: ClientStateWithFiveClients,
+    }),
+];
+AddAttendeeToSession.storyName = "Can add attendees";
+AddAttendeeToSession.args = {
+  session: emptySession,
+};
+AddAttendeeToSession.parameters = {
+  msw: {
+    handlers: [
+      rest.patch("http://localhost:8081/classrooms/1", (req, res, _) => {
+        return res(compose(context.status(204)));
+      }),
+    ],
+  },
+};
+
+const clickOnAutoComplete = (canvas: any) => {
+  userEvent.click(canvas.getByRole("combobox"));
+  return within(screen.getByRole("presentation")).getByRole("listbox");
+};
+
+AddAttendeeToSession.play = async ({ canvasElement }) => {
+  const canvas = await waitFor(() => within(canvasElement));
+  userEvent.click(canvas.getByTestId("AddBoxIcon"));
+  await expect(canvas.getByLabelText("add")).toBeDisabled();
+
+  userEvent.click(
+    within(clickOnAutoComplete(canvas)).getByText(
+      clients[0].lastname + " " + clients[0].firstname
+    )
+  );
+  userEvent.click(
+    within(clickOnAutoComplete(canvas)).getByText(
+      clients[3].lastname + " " + clients[3].firstname
+    )
+  );
+
+  userEvent.click(canvas.getByRole("button", { name: /submit/i }));
+  await sleep(100);
+
+  expect(canvas.queryByRole("combobox")).not.toBeInTheDocument();
+  await expect(
+    canvas.getByText(clients[0].firstname + " " + clients[0].lastname)
+  ).toBeInTheDocument();
+  await expect(canvas.getAllByText("0")).toHaveLength(2);
+  await expect(canvas.getAllByText("R")).toHaveLength(2);
+  await expect(
+    canvas.getByText(clients[3].firstname + " " + clients[3].lastname)
+  ).toBeInTheDocument();
+};
+
+AddAttendeeToSessionError.decorators = [
+  (story: any) =>
+    getMockstore({
+      story,
+      sessionState: EmptySessionState,
+      clientState: ClientStateWithFiveClients,
+    }),
+];
+AddAttendeeToSessionError.storyName = "Display snackbar on errors";
+AddAttendeeToSessionError.args = {
+  session: emptySession,
+};
+AddAttendeeToSessionError.parameters = {
+  msw: {
+    handlers: [
+      rest.patch("http://localhost:8081/classrooms/1", (req, res, _) => {
+        return res(compose(context.status(422), context.json(error)));
+      }),
+    ],
+  },
+};
+
+AddAttendeeToSessionError.play = async ({ canvasElement }) => {
+  const canvas = await waitFor(() => within(canvasElement));
+  userEvent.click(canvas.getByTestId("AddBoxIcon"));
+  await expect(canvas.getByLabelText("add")).toBeDisabled();
+
+  userEvent.click(
+    within(clickOnAutoComplete(canvas)).getByText(
+      clients[0].lastname + " " + clients[0].firstname
+    )
+  );
+  userEvent.click(
+    within(clickOnAutoComplete(canvas)).getByText(
+      clients[3].lastname + " " + clients[3].firstname
+    )
+  );
+
+  userEvent.click(canvas.getByRole("button", { name: /submit/i }));
+  await sleep(100);
+
+  await expect(
+    canvas.getByText("Add attendee to classroom - Error occurred")
   ).toBeInTheDocument();
 };

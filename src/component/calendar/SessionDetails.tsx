@@ -32,6 +32,22 @@ import { Attendance, Attendee, Session } from "../../features/domain/session";
 import { CreditBox } from "../CreditBox";
 import { useAppDispatch } from "../../hooks/redux";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { AddElementButton } from "../button/AddElementButton";
+import { Client } from "../../features/domain/client";
+import { useSelector } from "react-redux";
+import { selectAllClients } from "../../features/clientsSlice";
+import { addAttendeesToClassroom } from "../../features/classroomSlice";
+import {
+  addAttendees,
+  addAttendeesFailed,
+  addAttendeesForm,
+  attendeeCheckedIn,
+  attendeeCheckedOut,
+  initializeSessionDetailsReducer,
+  sessionAttendeeReducer,
+  sessionCancelled,
+  sessionDetailsReducer,
+} from "./reducers/reducers";
 
 const theme = createTheme({
   components: {
@@ -45,77 +61,22 @@ const theme = createTheme({
   },
 });
 
-type CancelAttendee = {
-  classroomId: string;
-  start: string;
-  attendeeId: string;
-};
-
 interface SessionAttendeeProps {
   attendee: Attendee;
   session: Session;
   onCancel: (cancel: CancelAttendee) => void;
 }
 
-enum ActionType {
-  CHECKED_IN = "CHECKED_IN",
-  CHECKED_OUT = "CHECKED_OUT",
-}
-
-type State = {
-  attendee: Attendee;
-  session: Session;
-  attendeeLabelStatus: "R" | "C";
-  attendeeLabelColor: "primary" | "success";
-};
-
-type Action =
-  | {
-      attendee: Attendee;
-      type: ActionType.CHECKED_IN;
-    }
-  | {
-      attendee: Attendee;
-      type: ActionType.CHECKED_OUT;
-    };
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case ActionType.CHECKED_OUT:
-      return {
-        ...state,
-        attendee: action.attendee,
-        attendeeLabelStatus: "R",
-        attendeeLabelColor: "primary",
-      };
-    case ActionType.CHECKED_IN:
-      return {
-        ...state,
-        attendee: action.attendee,
-        attendeeLabelStatus: "C",
-        attendeeLabelColor: "success",
-      };
-  }
-}
-
-const attendeeCheckedIn = (attendee: Attendee): Action => {
-  return {
-    attendee,
-    type: ActionType.CHECKED_IN,
-  };
-};
-
-const attendeeCheckedOut = (attendee: Attendee): Action => {
-  return {
-    attendee,
-    type: ActionType.CHECKED_OUT,
-  };
+type CancelAttendee = {
+  classroomId: string;
+  start: string;
+  attendeeId: string;
 };
 
 const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const [state, dispatchReducer] = useReducer(reducer, {
+  const [state, dispatchReducer] = useReducer(sessionAttendeeReducer, {
     attendee: sessionAttendeeProps.attendee,
     attendeeLabelColor:
       sessionAttendeeProps.attendee.attendance === Attendance.REGISTERED
@@ -353,39 +314,78 @@ const SessionAttendees = ({
 };
 
 export const SessionDetails = ({ session }: { session: Session }) => {
-  const [currentSession, setCurrentSession] = useState<Session>(session);
+  const [state, dispatchReducer] = useReducer(
+    sessionDetailsReducer,
+    initializeSessionDetailsReducer(session)
+  );
+  const clients: Client[] = useSelector(selectAllClients);
+
   const dispatch = useAppDispatch();
   const { display } = useSnackbar();
 
-  const sessionStart = currentSession.schedule.start;
-  const sessionEnd = currentSession.schedule.stop;
-  const dateSubheader = formatFullDate(sessionStart)
-    .concat(` ${formatHours(sessionStart)}`)
+  const dateSubheader = formatFullDate(state.session.schedule.start)
+    .concat(` ${formatHours(state.session.schedule.start)}`)
     .concat(" to ")
-    .concat(formatFullDate(sessionEnd))
-    .concat(` ${formatHours(sessionEnd)}`);
+    .concat(formatFullDate(state.session.schedule.stop))
+    .concat(` ${formatHours(state.session.schedule.stop)}`);
 
   const cancelSession = useCallback(
     (cancel: CancelAttendee) => {
       dispatch(sessionCancel(cancel))
         .unwrap()
         .then((session) => {
-          setCurrentSession(session);
+          dispatchReducer(sessionCancelled(session));
         })
         .catch((err) => display(err, "error"));
     },
-    [dispatch, display]
+    [dispatch, display, dispatchReducer]
+  );
+
+  const onAttendeesAdded = useCallback(
+    (attendees: Attendee[]) => {
+      dispatchReducer(
+        addAttendees(
+          attendees,
+          (classroomId: string, attendeesToAdd: Attendee[]) =>
+            dispatch(
+              addAttendeesToClassroom({
+                classroomId: classroomId,
+                attendees: attendeesToAdd,
+              })
+            )
+              .unwrap()
+              .catch((err) =>
+                dispatchReducer(
+                  addAttendeesFailed(
+                    attendees,
+                    () => display(err, "error"),
+                    clients,
+                    onAttendeesAdded
+                  )
+                )
+              )
+        )
+      );
+    },
+    [dispatch, display, dispatchReducer]
   );
 
   return (
     <Card sx={{ width: 1 }}>
       <CardHeader
-        title={currentSession.name}
+        title={state.session.name}
         subheader={dateSubheader}
         component="div"
       />
       <CardContent>
-        <SessionAttendees session={currentSession} onCancel={cancelSession} />
+        <SessionAttendees session={state.session} onCancel={cancelSession} />
+        {state.form}
+        <AddElementButton
+          onAddElementButton={() =>
+            dispatchReducer(addAttendeesForm(clients, onAttendeesAdded))
+          }
+          disabled={state.addAttendeeButtonDisabled}
+        />
       </CardContent>
     </Card>
   );

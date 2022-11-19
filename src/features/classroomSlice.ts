@@ -4,12 +4,15 @@ import map_action_thunk_error, { ApiError, ErrorMessage } from "./errors";
 import { Subjects } from "./domain/subjects";
 import { Classroom } from "./domain/classroom";
 import { RootState } from "../app/store";
+import { Attendee } from "./domain/session";
 
 export enum ClassroomStatus {
   IDLE = "idle",
   LOADING = "loading",
   SUCCEEDED = "succeeded",
   FAILED = "failed",
+  ADD_ATTENDEES_SUCCEEDED = "ADD_ATTENDEES_SUCCEEDED",
+  ADD_ATTENDEES_FAILED = "ADD_ATTENDEES_FAILED",
 }
 
 interface ClassroomState {
@@ -18,7 +21,9 @@ interface ClassroomState {
     | ClassroomStatus.IDLE
     | ClassroomStatus.LOADING
     | ClassroomStatus.FAILED
-    | ClassroomStatus.SUCCEEDED;
+    | ClassroomStatus.SUCCEEDED
+    | ClassroomStatus.ADD_ATTENDEES_SUCCEEDED
+    | ClassroomStatus.ADD_ATTENDEES_FAILED;
   error: ErrorMessage[];
 }
 
@@ -80,6 +85,40 @@ export const addClassroom = createAsyncThunk<
   }
 });
 
+interface AttendeesToAdd {
+  classroomId: string;
+  attendees: Attendee[];
+}
+
+export const addAttendeesToClassroom = createAsyncThunk<
+  { test: string },
+  AttendeesToAdd,
+  { rejectValue: ErrorMessage[] }
+>("classroom/attendees/add", async (attendeesToAdd, thunkAPI) => {
+  try {
+    const { login } = thunkAPI.getState() as unknown as RootState;
+    await api(`/classrooms/${attendeesToAdd.classroomId}`, {
+      customConfig: {
+        body: JSON.stringify({
+          attendees: attendeesToAdd.attendees.map((attendee) => ({
+            id: attendee.id,
+          })),
+        }),
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${login.token.token}`,
+        },
+      },
+    });
+    return { test: "" };
+  } catch (e) {
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error(`Add attendee to classroom`, e as ApiError)
+    );
+  }
+});
+
 const classroomsSlice = createSlice({
   name: "classrooms",
   initialState,
@@ -93,6 +132,9 @@ const classroomsSlice = createSlice({
       .addCase(addClassroom.rejected, (state, action) => {
         state.status = ClassroomStatus.FAILED;
         state.error = action.payload as ErrorMessage[];
+      })
+      .addCase(addAttendeesToClassroom.fulfilled, (state, action) => {
+        state.status = ClassroomStatus.ADD_ATTENDEES_SUCCEEDED;
       });
   },
 });

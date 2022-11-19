@@ -4,7 +4,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import styled from "styled-components";
 import { createClient } from "../../features/clientsSlice";
 import { Subjects } from "../../features/domain/subjects";
-import { AddCreditButton } from "./AddCreditButton";
 import { subjects } from "../../utils/translation";
 import {
   Accordion,
@@ -26,8 +25,9 @@ import {
   creditsAdded,
   updateFirstname,
   updateLastname,
-} from "./reducer";
+} from "./reducers/Client";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { AddElementButton } from "../button/AddElementButton";
 
 const Wrapper = styled.div`
   display: flex;
@@ -142,13 +142,13 @@ export const AddClientForm = () => {
             {state.creditsItems}
           </Grid>
           {state.addCreditForm}
-          <AddCreditButton
+          <AddElementButton
             key={`add-credit-button-`.concat(Math.random().toString())}
             disabled={
               state.addCreditForm !== undefined ||
               state.availableSubjects.length === 0
             }
-            onAddCreditButton={() =>
+            onAddElementButton={() =>
               dispatchReducer(addCreditChanged(onAddCredits))
             }
           />

@@ -7,13 +7,20 @@ import { Subjects } from "../../features/domain/subjects";
 export class ClientsBuilder implements Builder<(Client | ApiClient)[]> {
   private clients: (Client | ApiClient)[] = [];
 
-  public withClient = (client: Client | ApiClient) => {
+  public withClient = (client: Client | ApiClient): ClientsBuilder => {
     this.clients.push(client);
     return this;
   };
 
   public build = (): (Client | ApiClient)[] => {
     return this.clients;
+  };
+
+  public for = (numberOfClients: number): ClientsBuilder => {
+    for (let i = 0; i < numberOfClients; i++) {
+      this.clients.push(new ClientBuilder().build());
+    }
+    return this;
   };
 }
 

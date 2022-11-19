@@ -149,7 +149,7 @@ ClientPageDefault.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await sleep(20);
 
-  userEvent.click(canvas.getByTestId("ExpandMoreIcon"));
+  userEvent.click(canvas.getAllByTestId("ExpandMoreIcon")[0]);
   expect(canvas.getByLabelText("Client lastname")).toBeInTheDocument();
   expect(canvas.getByLabelText("Client firstname")).toBeInTheDocument();
   expect(canvas.getByRole("button", { name: "add" })).toBeInTheDocument();

@@ -60,7 +60,7 @@ export const DrawProvider: FC = ({ children }) => {
         ? createPortal(
             <Drawer anchor="right" open={true}>
               <ThemeProvider theme={theme}>
-                <Card sx={{ minWidth: 300, maxWidth: 600, display: "flex" }}>
+                <Card sx={{ minWidth: 370, maxWidth: 600, display: "flex" }}>
                   <ClickAwayListener
                     onClickAway={() => setElement(null)}
                     disableReactTree={false}

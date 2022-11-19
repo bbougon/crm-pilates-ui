@@ -2,14 +2,14 @@ import { Grid, IconButton } from "@mui/material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import * as React from "react";
 
-type AddCreditButtonProps = {
-  onAddCreditButton: () => void;
+type AddElementButtonProps = {
+  onAddElementButton: () => void;
   disabled?: boolean;
 };
-export const AddCreditButton = ({
-  onAddCreditButton,
+export const AddElementButton = ({
+  onAddElementButton,
   disabled,
-}: AddCreditButtonProps) => {
+}: AddElementButtonProps) => {
   return (
     <Grid
       container
@@ -30,7 +30,7 @@ export const AddCreditButton = ({
         <IconButton
           aria-label="add"
           disabled={disabled}
-          onClick={onAddCreditButton}
+          onClick={onAddElementButton}
         >
           <AddBoxIcon />
         </IconButton>

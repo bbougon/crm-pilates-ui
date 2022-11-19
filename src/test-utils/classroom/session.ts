@@ -22,6 +22,13 @@ export class AttendeesBuilder implements Builder<Attendee[]> {
     return this;
   };
 
+  for = (numberOfAttendees: number): AttendeesBuilder => {
+    for (let i = 0; i < numberOfAttendees; i++) {
+      this.attendees.push(new AttendeeBuilder().build());
+    }
+    return this;
+  };
+
   build = (): Attendee[] => {
     return this.attendees;
   };
@@ -93,7 +100,7 @@ export class SessionsBuilder {
 export class SessionBuilder {
   private id: string | undefined = undefined;
   private classroomId = "1";
-  private name = "Cours tapis";
+  private name = faker.random.word();
   private schedule: Schedule = new ScheduleBuilder(new Date()).build();
   private position = 1;
   private subject: Subjects = Subjects.MAT;

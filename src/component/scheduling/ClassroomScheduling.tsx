@@ -1,5 +1,4 @@
 import {
-  Autocomplete,
   Button,
   Card,
   CardContent,
@@ -38,6 +37,7 @@ import {
 } from "./reducers";
 import { useAppDispatch } from "../../hooks/redux";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { AttendeeSelector } from "./AttendeeSelector";
 
 const FORMAT = "MM/dd/yyyy HH:mm";
 
@@ -283,27 +283,12 @@ export const ClassroomScheduling = ({
           </Grid>
           <Grid container spacing={1} direction="row">
             <Grid item xs={12} md={12}>
-              <FormControl fullWidth>
-                <Autocomplete
-                  multiple
-                  id="attendees"
-                  options={clients}
-                  getOptionLabel={(option) =>
-                    `${option.lastname} ${option.firstname}`
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="standard"
-                      label="Attendees"
-                      placeholder="Attendees"
-                    />
-                  )}
-                  onChange={(event, value) => {
-                    dispatchReducer(updateAttendees(value));
-                  }}
-                />
-              </FormControl>
+              <AttendeeSelector
+                clients={clients}
+                onChange={(attendees) =>
+                  dispatchReducer(updateAttendees(attendees))
+                }
+              />
             </Grid>
           </Grid>
           <Grid container spacing={1}>

@@ -1,10 +1,10 @@
-import { Subjects } from "../../features/domain/subjects";
+import { Subjects } from "../../../features/domain/subjects";
 import * as React from "react";
 import { ReactElement } from "react";
 import { Grid } from "@mui/material";
-import { CreditItem } from "./CreditItem";
-import { AddCreditForm } from "./AddCreditForm";
-import { subjects } from "../../utils/translation";
+import { CreditItem } from "../CreditItem";
+import { AddCreditForm } from "../AddCreditForm";
+import { subjects } from "../../../utils/translation";
 
 enum ActionType {
   LASTNAME_CHANGED = "LASTNAME_CHANGED",
@@ -42,7 +42,30 @@ type AddClientAction =
   | {
       type: ActionType.CLIENT_CREATED;
     };
-export const addClientReducer = (
+const CreditItemContainer = ({
+  creditsAmount,
+  subject,
+}: {
+  creditsAmount: number;
+  subject: Subjects;
+}) => {
+  return (
+    <Grid
+      key={"credit-item-container-".concat(Math.random().toString())}
+      container
+      direction="row"
+      sx={{
+        paddingTop: "4px",
+      }}
+    >
+      <CreditItem
+        key={"credit-item".concat(Math.random().toString())}
+        credits={{ value: creditsAmount, subject: subject }}
+      />
+    </Grid>
+  );
+};
+const addClientReducer = (
   state: AddClientState,
   action: AddClientAction
 ): AddClientState => {
@@ -92,46 +115,32 @@ export const addClientReducer = (
       return { ...state, lastname: action.lastname };
   }
 };
-export const updateLastname = (lastname: string): AddClientAction => {
+const updateLastname = (lastname: string): AddClientAction => {
   return { lastname, type: ActionType.LASTNAME_CHANGED };
 };
-export const updateFirstname = (firstname: string): AddClientAction => {
+const updateFirstname = (firstname: string): AddClientAction => {
   return { firstname, type: ActionType.FIRSTNAME_CHANGED };
 };
-export const clientCreated = (): AddClientAction => {
+const clientCreated = (): AddClientAction => {
   return { type: ActionType.CLIENT_CREATED };
 };
-export const creditsAdded = (credits: {
+const creditsAdded = (credits: {
   subject: Subjects;
   value: number;
 }): AddClientAction => {
   return { credits, type: ActionType.CREDITS_ADDED };
 };
-export const addCreditChanged = (
+const addCreditChanged = (
   fn: (creditsAmount: number, subject: Subjects) => void
 ): AddClientAction => {
   return { onAddCredits: fn, type: ActionType.ADD_CREDIT_CHANGED };
 };
-const CreditItemContainer = ({
-  creditsAmount,
-  subject,
-}: {
-  creditsAmount: number;
-  subject: Subjects;
-}) => {
-  return (
-    <Grid
-      key={"credit-item-container-".concat(Math.random().toString())}
-      container
-      direction="row"
-      sx={{
-        paddingTop: "4px",
-      }}
-    >
-      <CreditItem
-        key={"credit-item".concat(Math.random().toString())}
-        credits={{ value: creditsAmount, subject: subject }}
-      />
-    </Grid>
-  );
+
+export {
+  addClientReducer,
+  creditsAdded,
+  addCreditChanged,
+  clientCreated,
+  updateLastname,
+  updateFirstname,
 };

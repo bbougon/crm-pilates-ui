@@ -35,9 +35,9 @@ import styled from "styled-components";
 import { Subjects } from "../../features/domain/subjects";
 import { AddCreditForm } from "./AddCreditForm";
 import { CreditItem } from "./CreditItem";
-import { AddCreditButton } from "./AddCreditButton";
 import { useAppDispatch } from "../../hooks/redux";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { AddElementButton } from "../button/AddElementButton";
 
 const Wrapper = styled.div`
   display: flex;
@@ -226,7 +226,7 @@ const ClientItem = ({ clientId }: ClientItemProps) => {
             />
           )) || []}
           {addForm}
-          <AddCreditButton
+          <AddElementButton
             key={`add-credit-button-`.concat(
               client?.id || Math.random().toString()
             )}
@@ -235,7 +235,7 @@ const ClientItem = ({ clientId }: ClientItemProps) => {
                 ?.map((credits) => credits.subject)
                 .includes(subject as Subjects)
             )}
-            onAddCreditButton={onAddCreditButton}
+            onAddElementButton={onAddCreditButton}
           />
         </Wrapper>
       </AccordionDetails>

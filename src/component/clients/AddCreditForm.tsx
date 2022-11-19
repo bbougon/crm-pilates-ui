@@ -11,62 +11,32 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
+import {
+  creditsReducer,
+  selectSubject,
+  updateCredits,
+} from "./reducers/Credits";
 
 type AddCreditFormProps = {
   subjects: { subject: Subjects; title: string }[] | [];
   onAddCredits: (creditsAmount: number, subject: Subjects) => void;
 };
 
-enum ActionType {
-  SUBJECT_SELECTED = "SUBJECT_SELECTED",
-  CREDITS_ADDED = "CREDITS_ADDED",
-}
-
-type State = {
-  subject?: Subjects;
-  creditsAmount: number;
-};
-
-type Action =
-  | {
-      type: ActionType.SUBJECT_SELECTED;
-      subject: Subjects;
-    }
-  | {
-      type: ActionType.CREDITS_ADDED;
-      creditsAmount: number;
-    };
-
-const selectSubject = (subject: Subjects): Action => {
-  return { subject, type: ActionType.SUBJECT_SELECTED };
-};
-
-const addCredits = (creditsAmount: number): Action => {
-  return { creditsAmount, type: ActionType.CREDITS_ADDED };
-};
-
-const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case ActionType.SUBJECT_SELECTED:
-      return { ...state, subject: action.subject };
-    case ActionType.CREDITS_ADDED:
-      return { ...state, creditsAmount: action.creditsAmount };
-  }
-};
-
 export const AddCreditForm = ({
   onAddCredits,
   subjects,
 }: AddCreditFormProps) => {
-  const [state, dispatchReducer] = useReducer(reducer, {
+  const [state, dispatchReducer] = useReducer(creditsReducer, {
     creditsAmount: 0,
     subject: undefined,
   });
 
   const onSubjectChanged = (e: SelectChangeEvent<Subjects | unknown>) =>
     dispatchReducer(selectSubject(e.target.value as Subjects));
-  const onCreditsAmountChanged = (e: BaseSyntheticEvent) =>
-    dispatchReducer(addCredits(+e.target.value));
+  const onCreditsAmountChanged = (e: BaseSyntheticEvent) => {
+    const creditsAmount: number = +e.target.value;
+    return dispatchReducer(updateCredits(creditsAmount));
+  };
   const onSubmitClicked = (_: BaseSyntheticEvent) => {
     onAddCredits(state.creditsAmount, state.subject!);
   };
@@ -125,6 +95,7 @@ export const AddCreditForm = ({
             size="small"
             type="number"
             label="Amount of credits"
+            InputProps={{ inputProps: { min: 1 } }}
             required
             variant="standard"
             onChange={onCreditsAmountChanged}

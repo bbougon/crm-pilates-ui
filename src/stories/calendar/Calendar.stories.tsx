@@ -203,9 +203,9 @@ CalendarDefault.play = async ({ canvasElement }) => {
     "Friday",
     "Saturday",
   ]);
-  expect(await waitFor(() => canvas.getAllByText("Cours tapis"))).toHaveLength(
-    5
-  );
+  expect(
+    await waitFor(() => canvas.getAllByText(sessions[0].name))
+  ).toHaveLength(5);
 };
 
 CalendarDefaultOnSessionFetchingError.decorators = [
