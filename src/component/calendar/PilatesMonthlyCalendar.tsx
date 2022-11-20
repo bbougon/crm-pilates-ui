@@ -65,7 +65,7 @@ export const PilatesMonthlyCalendar = ({
       .catch((err) => errorCallback(err));
   }, [dispatch, errorCallback]);
 
-  const handleClassroomAdded = async () => {
+  const refreshSessions = async () => {
     dispatch(fetchSessions(link?.current.url));
   };
 
@@ -198,7 +198,7 @@ export const PilatesMonthlyCalendar = ({
               events.push(
                 <ClassroomSchedulingItem
                   key={Math.random()}
-                  onClassroomScheduled={handleClassroomAdded}
+                  onClassroomScheduled={refreshSessions}
                 />
               );
               return events;

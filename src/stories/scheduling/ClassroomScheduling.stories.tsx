@@ -128,7 +128,7 @@ const Mockstore = ({
 
 export default {
   component: ClassroomScheduling,
-  title: "Add classroom form",
+  title: "Scheduling classroom",
   decorators: [
     (story: any) => (
       <Provider store={store}>
