@@ -146,6 +146,34 @@ const ClientStateWithFiveClients: ClientState = {
   status: ClientStatus.SUCCEEDED,
 };
 
+const twoAttendeesFromClientList = new AttendeesBuilder()
+  .withAttendee(
+    new AttendeeBuilder()
+      .id(clients[0].id)
+      .firstname(clients[0].firstname)
+      .lastname(clients[0].lastname)
+      .build()
+  )
+  .withAttendee(
+    new AttendeeBuilder()
+      .id(clients[1].id)
+      .firstname(clients[1].firstname)
+      .lastname(clients[1].lastname)
+      .build()
+  )
+  .build();
+
+const sessionWithTwoAttendeesFromClientList: Session = new SessionBuilder()
+  .withAttendees(twoAttendeesFromClientList)
+  .build();
+
+const SessionStateWithTwoAttendeesFromClientList: SessionState = {
+  error: [],
+  link: undefined,
+  sessions: [sessionWithTwoAttendeesFromClientList],
+  status: SessionStatus.IDLE,
+};
+
 type MockStoreProps = {
   sessionState: SessionState;
   clientState: ClientState;
@@ -237,6 +265,7 @@ export const CancelSession = Template.bind({});
 export const CancelSessionError = Template.bind({});
 
 export const AddAttendeeToSession = Template.bind({});
+export const AddAttendeeToSessionCleanClientList = Template.bind({});
 export const AddAttendeeToSessionError = Template.bind({});
 
 const getMockstore = ({
@@ -589,6 +618,11 @@ CancelSessionError.play = async ({ canvasElement }) => {
     #########################################################
  */
 
+const clickOnAutoComplete = (canvas: any) => {
+  userEvent.click(canvas.getByRole("combobox"));
+  return within(screen.getByRole("presentation")).getByRole("listbox");
+};
+
 AddAttendeeToSession.decorators = [
   (story: any) =>
     getMockstore({
@@ -601,6 +635,7 @@ AddAttendeeToSession.storyName = "Can add attendees";
 AddAttendeeToSession.args = {
   session: emptySession,
 };
+
 AddAttendeeToSession.parameters = {
   msw: {
     handlers: [
@@ -609,11 +644,6 @@ AddAttendeeToSession.parameters = {
       }),
     ],
   },
-};
-
-const clickOnAutoComplete = (canvas: any) => {
-  userEvent.click(canvas.getByRole("combobox"));
-  return within(screen.getByRole("presentation")).getByRole("listbox");
 };
 
 AddAttendeeToSession.play = async ({ canvasElement }) => {
@@ -644,6 +674,48 @@ AddAttendeeToSession.play = async ({ canvasElement }) => {
   await expect(
     canvas.getByText(clients[3].firstname + " " + clients[3].lastname)
   ).toBeInTheDocument();
+};
+
+AddAttendeeToSessionCleanClientList.decorators = [
+  (story: any) =>
+    getMockstore({
+      story,
+      sessionState: SessionStateWithTwoAttendeesFromClientList,
+      clientState: ClientStateWithFiveClients,
+    }),
+];
+AddAttendeeToSessionCleanClientList.storyName = "Filter clients from attendees";
+AddAttendeeToSessionCleanClientList.args = {
+  session: sessionWithTwoAttendeesFromClientList,
+};
+
+AddAttendeeToSessionCleanClientList.parameters = {
+  msw: {
+    handlers: [],
+  },
+};
+
+AddAttendeeToSessionCleanClientList.play = async ({ canvasElement }) => {
+  const canvas = await waitFor(() => within(canvasElement));
+  userEvent.click(canvas.getByTestId("AddBoxIcon"));
+  await expect(canvas.getByLabelText("add")).toBeDisabled();
+
+  const clientList = clickOnAutoComplete(canvas);
+
+  expect(
+    within(clientList).queryByText(
+      twoAttendeesFromClientList[0].lastname +
+        " " +
+        twoAttendeesFromClientList[0].firstname
+    )
+  ).not.toBeInTheDocument();
+  expect(
+    within(clientList).queryByText(
+      twoAttendeesFromClientList[1].lastname +
+        " " +
+        twoAttendeesFromClientList[1].firstname
+    )
+  ).not.toBeInTheDocument();
 };
 
 AddAttendeeToSessionError.decorators = [

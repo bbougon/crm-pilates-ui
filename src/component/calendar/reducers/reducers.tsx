@@ -130,17 +130,24 @@ export const sessionDetailsReducer = (
         form: undefined,
       };
     }
-    case SessionDetailsActionType.ADD_ATTENDEE_FORM:
+    case SessionDetailsActionType.ADD_ATTENDEE_FORM: {
+      const attendees = action.clients.filter(
+        (client) =>
+          !state.session.attendees?.find(
+            (attendee) => attendee.id === client.id
+          )
+      );
       return {
         ...state,
         addAttendeeButtonDisabled: true,
         form: (
           <AddAttendeeForm
-            attendees={action.clients}
+            attendees={attendees}
             onAttendeesAdded={action.callback}
           />
         ),
       };
+    }
     case SessionDetailsActionType.SESSION_CANCELLED:
       return { ...state, session: action.session };
   }

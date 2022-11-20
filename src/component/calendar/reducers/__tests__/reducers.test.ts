@@ -70,7 +70,7 @@ describe("Add attendees", () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         () => {},
         new ClientsBuilder().for(3).build() as Client[],
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        // eslint-disable-next-line @typescript-eslint/no-empty-function,unused-imports/no-unused-vars
         (attendees: Attendee[]) => {}
       )
     );
