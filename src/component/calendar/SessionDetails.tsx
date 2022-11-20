@@ -48,6 +48,7 @@ import {
   sessionCancelled,
   sessionDetailsReducer,
 } from "./reducers/reducers";
+import { useRefreshSessions } from "../../hooks/useRefreshSessions";
 
 const theme = createTheme({
   components: {
@@ -322,6 +323,7 @@ export const SessionDetails = ({ session }: { session: Session }) => {
 
   const dispatch = useAppDispatch();
   const { display } = useSnackbar();
+  const { refresh } = useRefreshSessions();
 
   const dateSubheader = formatFullDate(state.session.schedule.start)
     .concat(` ${formatHours(state.session.schedule.start)}`)
@@ -354,6 +356,7 @@ export const SessionDetails = ({ session }: { session: Session }) => {
               })
             )
               .unwrap()
+              .then(() => refresh())
               .catch((err) =>
                 dispatchReducer(
                   addAttendeesFailed(
@@ -367,7 +370,7 @@ export const SessionDetails = ({ session }: { session: Session }) => {
         )
       );
     },
-    [dispatch, display, dispatchReducer]
+    [dispatch, refresh, clients, display]
   );
 
   return (

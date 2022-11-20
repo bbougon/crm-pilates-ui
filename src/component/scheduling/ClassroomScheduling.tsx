@@ -38,18 +38,14 @@ import {
 import { useAppDispatch } from "../../hooks/redux";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { AttendeeSelector } from "./AttendeeSelector";
+import { useRefreshSessions } from "../../hooks/useRefreshSessions";
 
 const FORMAT = "MM/dd/yyyy HH:mm";
 
-export const ClassroomScheduling = ({
-  date,
-  onClassroomScheduled,
-}: {
-  date: Date;
-  onClassroomScheduled: () => void;
-}) => {
+export const ClassroomScheduling = ({ date }: { date: Date }) => {
   const dispatch = useAppDispatch();
   const { display } = useSnackbar();
+  const { refresh } = useRefreshSessions();
 
   const [state, dispatchReducer] = useReducer(schedulingReducer, {
     classroomName: "",
@@ -123,7 +119,7 @@ export const ClassroomScheduling = ({
     };
     dispatch(addClassroom(classroom))
       .unwrap()
-      .then(() => onClassroomScheduled())
+      .then(() => refresh())
       .catch((err) => display(err, "error"));
   };
 

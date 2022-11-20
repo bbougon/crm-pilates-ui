@@ -65,10 +65,6 @@ export const PilatesMonthlyCalendar = ({
       .catch((err) => errorCallback(err));
   }, [dispatch, errorCallback]);
 
-  const refreshSessions = async () => {
-    dispatch(fetchSessions(link?.current.url));
-  };
-
   const MonthlyDay = (
     props: MonthlyDayProps<{ session: Session; date: Date }[]>
   ) => {
@@ -195,12 +191,7 @@ export const PilatesMonthlyCalendar = ({
                   );
                 }
               );
-              events.push(
-                <ClassroomSchedulingItem
-                  key={Math.random()}
-                  onClassroomScheduled={refreshSessions}
-                />
-              );
+              events.push(<ClassroomSchedulingItem key={Math.random()} />);
               return events;
             },
           }}

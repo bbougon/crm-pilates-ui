@@ -4,14 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useMonthlyBody } from "@zach.codes/react-calendar";
 import { ClassroomScheduling } from "./ClassroomScheduling";
 import { useDrawer } from "../../hooks/useDrawer";
-
-type AddClassroomItemProps = {
-  onClassroomScheduled: () => void;
-};
-
-export const ClassroomSchedulingItem = ({
-  onClassroomScheduled,
-}: AddClassroomItemProps) => {
+export const ClassroomSchedulingItem = () => {
   const { day } = useMonthlyBody();
   const { display } = useDrawer();
 
@@ -25,14 +18,7 @@ export const ClassroomSchedulingItem = ({
           }}
         >
           <IconButton
-            onClick={() =>
-              display(
-                <ClassroomScheduling
-                  date={day}
-                  onClassroomScheduled={() => onClassroomScheduled()}
-                />
-              )
-            }
+            onClick={() => display(<ClassroomScheduling date={day} />)}
           >
             <AddIcon fontSize="small" />
           </IconButton>
