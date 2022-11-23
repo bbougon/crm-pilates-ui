@@ -639,8 +639,32 @@ AddAttendeeToSession.args = {
 AddAttendeeToSession.parameters = {
   msw: {
     handlers: [
-      rest.patch("http://localhost:8081/classrooms/1", (req, res, _) => {
-        return res(compose(context.status(204)));
+      rest.post("http://localhost:8081/sessions/attendees", (req, res, _) => {
+        const attendees = [
+          new ApiAttendeeBuilder()
+            .withFirstname(clients[0].firstname)
+            .withLastname(clients[0].lastname)
+            .with_credits(5)
+            .build(),
+          new ApiAttendeeBuilder()
+            .withFirstname(clients[3].firstname)
+            .withLastname(clients[3].lastname)
+            .with_credits(5)
+            .build(),
+        ];
+        const apiSession = new ApiSessionBuilder()
+          .withId(sessionWithOneCheckedInAttendee.id!)
+          .withClassroom(sessionWithOneCheckedInAttendee.classroomId)
+          .withName(sessionWithOneCheckedInAttendee.name)
+          .withSchedule(
+            new ScheduleBuilder(
+              sessionWithOneCheckedInAttendee.schedule.start
+            ).build()
+          )
+          .withPosition(sessionWithOneCheckedInAttendee.position)
+          .withAttendees(attendees)
+          .build();
+        return res(compose(context.status(200), context.json(apiSession)));
       }),
     ],
   },
@@ -733,7 +757,7 @@ AddAttendeeToSessionError.args = {
 AddAttendeeToSessionError.parameters = {
   msw: {
     handlers: [
-      rest.patch("http://localhost:8081/classrooms/1", (req, res, _) => {
+      rest.post("http://localhost:8081/sessions/attendees", (req, res, _) => {
         return res(compose(context.status(422), context.json(error)));
       }),
     ],

@@ -93,18 +93,21 @@ describe("Add attendees", () => {
     };
     let receivedClassroomId = "";
     let receivedAttendees: Attendee[] = [];
+    let receivedSessionDate = "";
     const addedAttendees = new AttendeesBuilder().for(1).build();
     const sessionDetailsState = sessionDetailsReducer(
       state,
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      addAttendees(addedAttendees, (classroomId, attendees) => {
+      addAttendees(addedAttendees, (classroomId, session_date, attendees) => {
         receivedClassroomId = classroomId;
         receivedAttendees = attendees;
+        receivedSessionDate = session_date;
       })
     );
 
     expect(sessionDetailsState.addAttendeeButtonDisabled).toBeTruthy();
     expect(receivedClassroomId).toEqual(session.classroomId);
+    expect(receivedSessionDate).toEqual(session.schedule.start);
     expect(receivedAttendees).toMatchObject(
       session.attendees?.concat(addedAttendees) as unknown as Attendee[]
     );

@@ -20,6 +20,8 @@ export enum SessionStatus {
   CHECKOUT_SUCCEEDED = "checkOutSucceeded",
   CANCEL_SUCCEEDED = "revokeSucceeded",
   CANCEL_FAILED = "revokeFailed",
+  ADD_ATTENDEES_FAILED = "addAttendeesFailed",
+  ADD_ATTENDEES_SUCCEEDED = "addAttendeesSucceeded",
 }
 
 export interface SessionState {
@@ -36,7 +38,9 @@ export interface SessionState {
     | SessionStatus.CHECKOUT_FAILED
     | SessionStatus.CHECKOUT_IN_PROGRESS
     | SessionStatus.CANCEL_SUCCEEDED
-    | SessionStatus.CANCEL_FAILED;
+    | SessionStatus.CANCEL_FAILED
+    | SessionStatus.ADD_ATTENDEES_FAILED
+    | SessionStatus.ADD_ATTENDEES_SUCCEEDED;
   error: ErrorMessage[];
   link: SessionsLink | undefined;
 }
@@ -63,6 +67,12 @@ export interface Cancel {
 export interface Checkout {
   sessionId: string;
   attendeeId: string;
+}
+
+export interface AddAttendees {
+  classroomId: string;
+  session_date: string;
+  attendees: Attendee[];
 }
 
 export const fetchSessions = createAsyncThunk<
@@ -182,6 +192,37 @@ export const sessionCancel = createAsyncThunk<
   }
 });
 
+export const addAttendeesToSession = createAsyncThunk<
+  Session,
+  AddAttendees,
+  { rejectValue: ErrorMessage[] }
+>("sessions/attendees/add", async (addAttendees, thunkAPI) => {
+  try {
+    const { login } = thunkAPI.getState() as unknown as RootState;
+    const body = JSON.stringify({
+      classroom_id: addAttendees.classroomId,
+      session_date: addAttendees.session_date,
+      attendees: addAttendees.attendees.map((attendee) => attendee.id),
+    });
+    const customConfig = {
+      body,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${login.token.token}`,
+      },
+    };
+    const response = await api(`/sessions/attendees`, {
+      customConfig,
+    });
+    return mapSession(response.data as ApiSession);
+  } catch (e) {
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error(`Add attendee to classroom`, e as ApiError)
+    );
+  }
+});
+
 export const sessionsSlice = createSlice({
   name: "sessions",
   initialState,
@@ -294,6 +335,16 @@ export const sessionsSlice = createSlice({
       })
       .addCase(sessionCancel.rejected, (state, action) => {
         state.status = SessionStatus.CANCEL_FAILED;
+        state.error = action.payload as ErrorMessage[];
+      })
+      .addCase(addAttendeesToSession.fulfilled, (state, action) => {
+        state.status = SessionStatus.ADD_ATTENDEES_SUCCEEDED;
+        const sessionWithAddedAttendees = action.payload;
+        const session = findSession(state, sessionWithAddedAttendees);
+        updateAttendees(session, sessionWithAddedAttendees);
+      })
+      .addCase(addAttendeesToSession.rejected, (state, action) => {
+        state.status = SessionStatus.ADD_ATTENDEES_FAILED;
         state.error = action.payload as ErrorMessage[];
       });
   },

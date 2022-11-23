@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import {
+  addAttendeesToSession,
   findAttendeeById,
   sessionCancel,
   sessionCheckin,
@@ -36,7 +37,6 @@ import { AddElementButton } from "../button/AddElementButton";
 import { Client } from "../../features/domain/client";
 import { useSelector } from "react-redux";
 import { selectAllClients } from "../../features/clientsSlice";
-import { addAttendeesToClassroom } from "../../features/classroomSlice";
 import {
   addAttendees,
   addAttendeesFailed,
@@ -324,6 +324,9 @@ export const SessionDetails = ({ session }: { session: Session }) => {
   const dispatch = useAppDispatch();
   const { display } = useSnackbar();
   const { refresh } = useRefreshSessions();
+  const errorCallback = useCallback((error) => {
+    display(error, "error");
+  }, []);
 
   const dateSubheader = formatFullDate(state.session.schedule.start)
     .concat(` ${formatHours(state.session.schedule.start)}`)
@@ -348,25 +351,26 @@ export const SessionDetails = ({ session }: { session: Session }) => {
       dispatchReducer(
         addAttendees(
           attendees,
-          (classroomId: string, attendeesToAdd: Attendee[]) =>
+          (
+            classroomId: string,
+            session_date: string,
+            attendeesToAdd: Attendee[]
+          ) =>
             dispatch(
-              addAttendeesToClassroom({
+              addAttendeesToSession({
                 classroomId: classroomId,
+                session_date: session_date,
                 attendees: attendeesToAdd,
               })
             )
               .unwrap()
               .then(() => refresh())
-              .catch((err) =>
+              .catch((err) => {
                 dispatchReducer(
-                  addAttendeesFailed(
-                    attendees,
-                    () => display(err, "error"),
-                    clients,
-                    onAttendeesAdded
-                  )
-                )
-              )
+                  addAttendeesFailed(attendees, clients, onAttendeesAdded)
+                );
+                errorCallback(err);
+              })
         )
       );
     },

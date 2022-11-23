@@ -213,7 +213,7 @@ export class ApiSessionBuilder {
   private schedule: Schedule = new ScheduleBuilder(new Date()).build();
   private subject = "MAT";
   private position = 1;
-  private attendees?: [ApiAttendee];
+  private attendees?: ApiAttendee[];
 
   public withId = (id: string): ApiSessionBuilder => {
     this.id = id;
@@ -245,7 +245,7 @@ export class ApiSessionBuilder {
     return this;
   };
 
-  withAttendees = (attendees: [ApiAttendee] | undefined): ApiSessionBuilder => {
+  withAttendees = (attendees: ApiAttendee[] | undefined): ApiSessionBuilder => {
     this.attendees === undefined
       ? (this.attendees = attendees)
       : attendees !== undefined

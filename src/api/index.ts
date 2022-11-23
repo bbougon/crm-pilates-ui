@@ -116,7 +116,7 @@ export interface ApiSession {
     start: string;
     stop: string;
   };
-  attendees?: [ApiAttendee];
+  attendees?: ApiAttendee[];
 }
 
 export class ApiToken {}

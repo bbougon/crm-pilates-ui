@@ -77,12 +77,15 @@ type SessionDetailsAction =
     }
   | {
       attendees: Attendee[];
-      callback: (classroomId: string, attendees: Attendee[]) => void;
+      callback: (
+        classroomId: string,
+        session_date: string,
+        attendees: Attendee[]
+      ) => void;
       type: SessionDetailsActionType.ADD_ATTENDEES;
     }
   | {
       attendeesOnError: Attendee[];
-      displayErrorCallback: () => void;
       clients: Client[];
       onAttendeesAddedCallback: (attendees: Attendee[]) => void;
       type: SessionDetailsActionType.ADD_ATTENDEE_FAILED;
@@ -94,7 +97,6 @@ export const sessionDetailsReducer = (
 ): SessionDetailsState => {
   switch (action.type) {
     case SessionDetailsActionType.ADD_ATTENDEE_FAILED: {
-      action.displayErrorCallback();
       const newSession = {
         ...state.session,
         attendees: state.session.attendees?.filter(
@@ -121,7 +123,11 @@ export const sessionDetailsReducer = (
         ...state.session,
         attendees: state.session.attendees?.concat(action.attendees),
       };
-      action.callback(session.classroomId, session.attendees!);
+      action.callback(
+        session.classroomId,
+        session.schedule.start,
+        session.attendees!
+      );
       return {
         ...state,
         addAttendeeButtonDisabled:
@@ -179,19 +185,21 @@ export const addAttendeesForm = (
 };
 export const addAttendees = (
   attendees: Attendee[],
-  callback: (classroomId: string, attendees: Attendee[]) => void
+  callback: (
+    classroomId: string,
+    session_date: string,
+    attendees: Attendee[]
+  ) => void
 ): SessionDetailsAction => {
   return { attendees, callback, type: SessionDetailsActionType.ADD_ATTENDEES };
 };
 export const addAttendeesFailed = (
   attendeesOnError: Attendee[],
-  displayErrorCallback: () => void,
   clients: Client[],
   onAttendeesAddedCallback: (attendees: Attendee[]) => void
 ): SessionDetailsAction => {
   return {
     attendeesOnError,
-    displayErrorCallback,
     clients,
     onAttendeesAddedCallback,
     type: SessionDetailsActionType.ADD_ATTENDEE_FAILED,
