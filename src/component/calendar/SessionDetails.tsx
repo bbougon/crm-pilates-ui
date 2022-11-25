@@ -38,15 +38,15 @@ import { Client } from "../../features/domain/client";
 import { useSelector } from "react-redux";
 import { selectAllClients } from "../../features/clientsSlice";
 import {
-  addAttendees,
-  addAttendeesFailed,
-  addAttendeesForm,
-  attendeeCheckedIn,
-  attendeeCheckedOut,
-  initializeSessionDetailsReducer,
-  sessionAttendeeReducer,
-  sessionCancelled,
-  sessionDetailsReducer,
+    addAttendees,
+    addAttendeesFailed,
+    addAttendeesForm,
+    attendeeCheckedIn,
+    attendeeCheckedOut, attendeeCheckin, attendeeCheckout,
+    initializeSessionDetailsReducer,
+    sessionAttendeeReducer,
+    sessionCancelled,
+    sessionDetailsReducer,
 } from "./reducers/reducers";
 import { useRefreshSessions } from "../../hooks/useRefreshSessions";
 
@@ -76,8 +76,10 @@ type CancelAttendee = {
 
 const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const [state, dispatchReducer] = useReducer(sessionAttendeeReducer, {
+    const open = Boolean(anchorEl);
+
+
+    const [state, dispatchReducer] = useReducer(sessionAttendeeReducer, {
     attendee: sessionAttendeeProps.attendee,
     attendeeLabelColor:
       sessionAttendeeProps.attendee.attendance === Attendance.REGISTERED
@@ -88,27 +90,19 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
         ? "R"
         : "C",
     session: sessionAttendeeProps.session,
+        checkin: false,
+        checkout: false
   });
+
   const { display } = useSnackbar();
-
-  const [checkin, setCheckin] = useState<null | {
-    classroomId: string;
-    start: string;
-    attendeeId: string;
-  }>(null);
-
-  const [checkout, setCheckOut] = useState<null | {
-    sessionId: string;
-    attendeeId: string;
-  }>(null);
 
   const options = ["Cancel"];
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (checkin) {
-      dispatch(sessionCheckin(checkin))
+    if (state.checkin) {
+      dispatch(sessionCheckin({attendeeId: state.attendee.id, start: state.session.schedule.start, classroomId: state.session.classroomId}))
         .unwrap()
         .then((result) => {
           const attendee = findAttendeeById(result, state.attendee.id);
@@ -117,10 +111,9 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
           }
         })
         .catch((err) => display(err, "error"));
-      setCheckin(null);
     }
-    if (checkout) {
-      dispatch(sessionCheckout(checkout))
+    if (state.checkout) {
+      dispatch(sessionCheckout({attendeeId: state.attendee.id, sessionId: state.session.id!}))
         .unwrap()
         .then((result) => {
           const attendee = findAttendeeById(result, state.attendee.id);
@@ -129,9 +122,8 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
           }
         })
         .catch((err) => display(err, "error"));
-      setCheckOut(null);
     }
-  }, [dispatch, checkin, checkout, state, display]);
+  }, [dispatch, state, display]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -152,18 +144,9 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
   };
   const onSessionCheckin = async (e: BaseSyntheticEvent) => {
     if (e.target.checked) {
-      const checkin = {
-        classroomId: state.session.classroomId,
-        start: state.session.schedule.start,
-        attendeeId: state.attendee.id,
-      };
-      setCheckin(checkin);
+        dispatchReducer(attendeeCheckin())
     } else {
-      const checkout = {
-        sessionId: state.session.id || "",
-        attendeeId: state.attendee.id,
-      };
-      setCheckOut(checkout);
+        dispatchReducer(attendeeCheckout())
     }
   };
 

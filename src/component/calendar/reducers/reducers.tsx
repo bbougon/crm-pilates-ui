@@ -8,6 +8,7 @@ import { ReactElement, useState } from "react";
 import { Client } from "../../../features/domain/client";
 import { Button, Grid } from "@mui/material";
 import { AttendeeSelector } from "../../scheduling/AttendeeSelector";
+import {sessionCheckin} from "../../../features/sessionsSlice";
 
 export type SessionDetailsState = {
   session: Session;
@@ -209,6 +210,8 @@ export const addAttendeesFailed = (
 enum SessionAttendeeActionType {
   CHECKED_IN = "CHECKED_IN",
   CHECKED_OUT = "CHECKED_OUT",
+  CHECK_IN = "CHECK_IN",
+  CHECK_OUT = "CHECK_OUT",
 }
 
 type SessionAttendeeState = {
@@ -216,6 +219,8 @@ type SessionAttendeeState = {
   session: Session;
   attendeeLabelStatus: "R" | "C";
   attendeeLabelColor: "primary" | "success";
+  checkin: boolean;
+  checkout: boolean;
 };
 
 type SessionAttendeeAction =
@@ -226,19 +231,36 @@ type SessionAttendeeAction =
   | {
       attendee: Attendee;
       type: SessionAttendeeActionType.CHECKED_OUT;
-    };
+    }
+    | {
+    type: SessionAttendeeActionType.CHECK_IN;
+} | {
+    type: SessionAttendeeActionType.CHECK_OUT;
+}
+    ;
 
 export const sessionAttendeeReducer = (
   state: SessionAttendeeState,
   action: SessionAttendeeAction
 ): SessionAttendeeState => {
   switch (action.type) {
-    case SessionAttendeeActionType.CHECKED_OUT:
+      case SessionAttendeeActionType.CHECK_OUT:
+          return {
+              ...state,
+              checkout: true
+          }
+      case SessionAttendeeActionType.CHECK_IN:
+          return {
+              ...state,
+              checkin: true
+          }
+      case SessionAttendeeActionType.CHECKED_OUT:
       return {
         ...state,
         attendee: action.attendee,
         attendeeLabelStatus: "R",
         attendeeLabelColor: "primary",
+          checkout: false,
       };
     case SessionAttendeeActionType.CHECKED_IN:
       return {
@@ -246,6 +268,7 @@ export const sessionAttendeeReducer = (
         attendee: action.attendee,
         attendeeLabelStatus: "C",
         attendeeLabelColor: "success",
+          checkin: false,
       };
   }
 };
@@ -265,3 +288,15 @@ export const attendeeCheckedOut = (
     type: SessionAttendeeActionType.CHECKED_OUT,
   };
 };
+
+export const attendeeCheckin = (): SessionAttendeeAction => {
+  return {
+      type: SessionAttendeeActionType.CHECK_IN
+  }
+};
+
+export const attendeeCheckout = (): SessionAttendeeAction => {
+    return {
+        type: SessionAttendeeActionType.CHECK_OUT
+    }
+}
