@@ -99,7 +99,7 @@ const sessionDetailsReducer = (
     case SessionDetailsActionType.ADD_ATTENDEE_FAILED: {
       const newSession = {
         ...state.session,
-        attendees: state.session.attendees?.filter(
+        attendees: state.session.attendees.filter(
           (attendee) =>
             !action.attendeesOnError.find((onError) => onError === attendee)
         ),
@@ -121,17 +121,17 @@ const sessionDetailsReducer = (
     case SessionDetailsActionType.ADD_ATTENDEES: {
       const session = {
         ...state.session,
-        attendees: state.session.attendees?.concat(action.attendees),
+        attendees: state.session.attendees.concat(action.attendees),
       };
       action.callback(
         session.classroomId,
         session.schedule.start,
-        session.attendees!
+        session.attendees
       );
       return {
         ...state,
         addAttendeeButtonDisabled:
-          session.attendees?.length === session.position,
+          session.attendees.length === session.position,
         session,
         form: undefined,
       };
@@ -139,9 +139,7 @@ const sessionDetailsReducer = (
     case SessionDetailsActionType.ADD_ATTENDEE_FORM: {
       const attendees = action.clients.filter(
         (client) =>
-          !state.session.attendees?.find(
-            (attendee) => attendee.id === client.id
-          )
+          !state.session.attendees.find((attendee) => attendee.id === client.id)
       );
       return {
         ...state,
@@ -163,7 +161,7 @@ const initializeSessionDetailsReducer = (
   session: Session
 ): SessionDetailsState => {
   const addAttendeeButtonDisabled =
-    session.attendees?.length === session.position;
+    session.attendees.length === session.position;
   return {
     session,
     form: undefined,

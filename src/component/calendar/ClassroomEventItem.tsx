@@ -66,7 +66,7 @@ export const ClassroomEventItem = ({ session }: { session: Session }) => {
               }}
             >
               <Typography color={blue[400]}>
-                {session?.attendees?.length} / {session.position}
+                {session.attendees.length} / {session.position}
               </Typography>
             </Box>
           </ThemeProvider>

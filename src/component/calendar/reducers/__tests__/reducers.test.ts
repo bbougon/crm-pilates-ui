@@ -68,7 +68,6 @@ describe("Add attendees", () => {
       addAttendeesFailed(
         [attendees[1], attendees[2]],
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        () => {},
         new ClientsBuilder().for(3).build() as Client[],
         // eslint-disable-next-line @typescript-eslint/no-empty-function,unused-imports/no-unused-vars
         (attendees: Attendee[]) => {}
@@ -109,7 +108,7 @@ describe("Add attendees", () => {
     expect(receivedClassroomId).toEqual(session.classroomId);
     expect(receivedSessionDate).toEqual(session.schedule.start);
     expect(receivedAttendees).toMatchObject(
-      session.attendees?.concat(addedAttendees) as unknown as Attendee[]
+      session.attendees.concat(addedAttendees) as unknown as Attendee[]
     );
   });
 });

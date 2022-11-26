@@ -12,7 +12,7 @@ export interface Session {
   subject: Subjects;
   schedule: Schedule;
   position: number;
-  attendees?: Attendee[];
+  attendees: Attendee[];
 }
 
 export interface Attendee {

@@ -276,7 +276,7 @@ const SessionAttendees = ({
   session: Session;
   onCancel: (cancel: CancelAttendee) => void;
 }) => {
-  const content = session?.attendees?.map((attendee) => (
+  const content = session.attendees.map((attendee) => (
     <SessionAttendee
       key={attendee.id}
       attendee={attendee}

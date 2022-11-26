@@ -541,7 +541,6 @@ CancelSession.parameters = {
                 new ScheduleBuilder(defaultSession.schedule.start).build()
               )
               .withPosition(defaultSession.position)
-              .withAttendees(undefined)
               .build()
           );
           return res(compose(context.status(201), context.json(response)));

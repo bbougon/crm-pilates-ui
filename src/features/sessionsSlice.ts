@@ -233,7 +233,7 @@ export const sessionsSlice = createSlice({
       updatedSession: Session
     ) {
       if (session) {
-        session.attendees = updatedSession.attendees?.map((attendee) =>
+        session.attendees = updatedSession.attendees.map((attendee) =>
           mapAttendee(attendee)
         );
         session.id = updatedSession.id;
@@ -248,8 +248,8 @@ export const sessionsSlice = createSlice({
             (updatedSession.subject as Subjects)
         )
         .forEach((session) => {
-          updatedSession.attendees?.forEach((attendee) => {
-            session.attendees?.forEach((sessionAttendee) => {
+          updatedSession.attendees.forEach((attendee) => {
+            session.attendees.forEach((sessionAttendee) => {
               if (sessionAttendee.id === attendee.id) {
                 sessionAttendee.credits = attendee.credits;
               }
@@ -327,7 +327,7 @@ export const sessionsSlice = createSlice({
         const sessionCancelled = action.payload;
         const session = findSession(state, sessionCancelled);
         if (session) {
-          session.attendees = sessionCancelled.attendees?.map((attendee) =>
+          session.attendees = sessionCancelled.attendees.map((attendee) =>
             mapAttendee(attendee)
           );
           session.id = sessionCancelled.id;
@@ -371,7 +371,7 @@ const mapSession = (apiSession: ApiSession): Session => {
       stop: apiSession.schedule.stop,
     },
     position: apiSession.position,
-    attendees: apiSession.attendees?.map((attendee) => mapAttendee(attendee)),
+    attendees: apiSession.attendees.map((attendee) => mapAttendee(attendee)),
   };
 };
 
