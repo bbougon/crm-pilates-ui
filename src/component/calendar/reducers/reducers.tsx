@@ -8,7 +8,6 @@ import { ReactElement, useState } from "react";
 import { Client } from "../../../features/domain/client";
 import { Button, Grid } from "@mui/material";
 import { AttendeeSelector } from "../../scheduling/AttendeeSelector";
-import {sessionCheckin} from "../../../features/sessionsSlice";
 
 export type SessionDetailsState = {
   session: Session;
@@ -92,7 +91,7 @@ type SessionDetailsAction =
       type: SessionDetailsActionType.ADD_ATTENDEE_FAILED;
     };
 
-export const sessionDetailsReducer = (
+const sessionDetailsReducer = (
   state: SessionDetailsState,
   action: SessionDetailsAction
 ): SessionDetailsState => {
@@ -160,7 +159,7 @@ export const sessionDetailsReducer = (
   }
 };
 
-export const initializeSessionDetailsReducer = (
+const initializeSessionDetailsReducer = (
   session: Session
 ): SessionDetailsState => {
   const addAttendeeButtonDisabled =
@@ -171,10 +170,10 @@ export const initializeSessionDetailsReducer = (
     addAttendeeButtonDisabled,
   };
 };
-export const sessionCancelled = (session: Session): SessionDetailsAction => {
+const sessionCancelled = (session: Session): SessionDetailsAction => {
   return { session, type: SessionDetailsActionType.SESSION_CANCELLED };
 };
-export const addAttendeesForm = (
+const addAttendeesForm = (
   clients: Client[],
   callback: (attendees: Attendee[]) => void
 ): SessionDetailsAction => {
@@ -184,7 +183,7 @@ export const addAttendeesForm = (
     type: SessionDetailsActionType.ADD_ATTENDEE_FORM,
   };
 };
-export const addAttendees = (
+const addAttendees = (
   attendees: Attendee[],
   callback: (
     classroomId: string,
@@ -194,7 +193,8 @@ export const addAttendees = (
 ): SessionDetailsAction => {
   return { attendees, callback, type: SessionDetailsActionType.ADD_ATTENDEES };
 };
-export const addAttendeesFailed = (
+
+const addAttendeesFailed = (
   attendeesOnError: Attendee[],
   clients: Client[],
   onAttendeesAddedCallback: (attendees: Attendee[]) => void
@@ -212,6 +212,9 @@ enum SessionAttendeeActionType {
   CHECKED_OUT = "CHECKED_OUT",
   CHECK_IN = "CHECK_IN",
   CHECK_OUT = "CHECK_OUT",
+  CANCEL_ATTENDEE = "CANCEL_ATTENDEE",
+  CLOSE_OPTIONS = "CLOSE_OPTIONS",
+  OPEN_OPTIONS = "OPEN_OPTIONS",
 }
 
 type SessionAttendeeState = {
@@ -221,6 +224,7 @@ type SessionAttendeeState = {
   attendeeLabelColor: "primary" | "success";
   checkin: boolean;
   checkout: boolean;
+  optionsAnchor: HTMLElement | null;
 };
 
 type SessionAttendeeAction =
@@ -232,35 +236,60 @@ type SessionAttendeeAction =
       attendee: Attendee;
       type: SessionAttendeeActionType.CHECKED_OUT;
     }
-    | {
-    type: SessionAttendeeActionType.CHECK_IN;
-} | {
-    type: SessionAttendeeActionType.CHECK_OUT;
-}
-    ;
+  | {
+      type: SessionAttendeeActionType.CHECK_IN;
+    }
+  | {
+      type: SessionAttendeeActionType.CHECK_OUT;
+    }
+  | {
+      type: SessionAttendeeActionType.CANCEL_ATTENDEE;
+    }
+  | {
+      type: SessionAttendeeActionType.CLOSE_OPTIONS;
+    }
+  | {
+      anchorEl: HTMLElement;
+      type: SessionAttendeeActionType.OPEN_OPTIONS;
+    };
 
-export const sessionAttendeeReducer = (
+const sessionAttendeeReducer = (
   state: SessionAttendeeState,
   action: SessionAttendeeAction
 ): SessionAttendeeState => {
   switch (action.type) {
-      case SessionAttendeeActionType.CHECK_OUT:
-          return {
-              ...state,
-              checkout: true
-          }
-      case SessionAttendeeActionType.CHECK_IN:
-          return {
-              ...state,
-              checkin: true
-          }
-      case SessionAttendeeActionType.CHECKED_OUT:
+    case SessionAttendeeActionType.OPEN_OPTIONS:
+      return {
+        ...state,
+        optionsAnchor: action.anchorEl,
+      };
+    case SessionAttendeeActionType.CLOSE_OPTIONS:
+      return {
+        ...state,
+        optionsAnchor: null,
+      };
+    case SessionAttendeeActionType.CANCEL_ATTENDEE:
+      return {
+        ...state,
+        optionsAnchor: null,
+      };
+    case SessionAttendeeActionType.CHECK_OUT:
+      return {
+        ...state,
+        checkout: true,
+      };
+    case SessionAttendeeActionType.CHECK_IN:
+      return {
+        ...state,
+        checkin: true,
+      };
+    case SessionAttendeeActionType.CHECKED_OUT:
       return {
         ...state,
         attendee: action.attendee,
         attendeeLabelStatus: "R",
         attendeeLabelColor: "primary",
-          checkout: false,
+        checkout: false,
       };
     case SessionAttendeeActionType.CHECKED_IN:
       return {
@@ -268,35 +297,85 @@ export const sessionAttendeeReducer = (
         attendee: action.attendee,
         attendeeLabelStatus: "C",
         attendeeLabelColor: "success",
-          checkin: false,
+        checkin: false,
       };
   }
 };
-export const attendeeCheckedIn = (
-  attendee: Attendee
-): SessionAttendeeAction => {
+const attendeeCheckedIn = (attendee: Attendee): SessionAttendeeAction => {
   return {
     attendee,
     type: SessionAttendeeActionType.CHECKED_IN,
   };
 };
-export const attendeeCheckedOut = (
-  attendee: Attendee
-): SessionAttendeeAction => {
+const attendeeCheckedOut = (attendee: Attendee): SessionAttendeeAction => {
   return {
     attendee,
     type: SessionAttendeeActionType.CHECKED_OUT,
   };
 };
 
-export const attendeeCheckin = (): SessionAttendeeAction => {
+const attendeeCheckin = (): SessionAttendeeAction => {
   return {
-      type: SessionAttendeeActionType.CHECK_IN
-  }
+    type: SessionAttendeeActionType.CHECK_IN,
+  };
 };
 
-export const attendeeCheckout = (): SessionAttendeeAction => {
-    return {
-        type: SessionAttendeeActionType.CHECK_OUT
-    }
-}
+const attendeeCheckout = (): SessionAttendeeAction => {
+  return {
+    type: SessionAttendeeActionType.CHECK_OUT,
+  };
+};
+
+const cancelAttendee = (): SessionAttendeeAction => {
+  return {
+    type: SessionAttendeeActionType.CANCEL_ATTENDEE,
+  };
+};
+
+const closeOptions = (): SessionAttendeeAction => {
+  return {
+    type: SessionAttendeeActionType.CLOSE_OPTIONS,
+  };
+};
+
+const openOptions = (element: HTMLElement): SessionAttendeeAction => {
+  return {
+    anchorEl: element,
+    type: SessionAttendeeActionType.OPEN_OPTIONS,
+  };
+};
+
+const initializeSessionAttendeeState = (
+  attendee: Attendee,
+  session: Session
+): SessionAttendeeState => {
+  return {
+    attendee,
+    attendeeLabelColor:
+      attendee.attendance === Attendance.REGISTERED ? "primary" : "success",
+    attendeeLabelStatus:
+      attendee.attendance === Attendance.REGISTERED ? "R" : "C",
+    session,
+    checkin: false,
+    checkout: false,
+    optionsAnchor: null,
+  };
+};
+
+export {
+  sessionAttendeeReducer,
+  sessionDetailsReducer,
+  cancelAttendee,
+  attendeeCheckout,
+  attendeeCheckin,
+  attendeeCheckedOut,
+  attendeeCheckedIn,
+  closeOptions,
+  openOptions,
+  initializeSessionAttendeeState,
+  addAttendeesFailed,
+  addAttendees,
+  addAttendeesForm,
+  sessionCancelled,
+  initializeSessionDetailsReducer,
+};

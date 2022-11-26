@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-  BaseSyntheticEvent,
-  useCallback,
-  useEffect,
-  useReducer,
-  useState,
-} from "react";
+import { BaseSyntheticEvent, useCallback, useEffect, useReducer } from "react";
 import {
   addAttendeesToSession,
   findAttendeeById,
@@ -29,7 +23,7 @@ import {
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { formatFullDate, formatHours } from "../../utils/date";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Attendance, Attendee, Session } from "../../features/domain/session";
+import { Attendee, Session } from "../../features/domain/session";
 import { CreditBox } from "../CreditBox";
 import { useAppDispatch } from "../../hooks/redux";
 import { useSnackbar } from "../../hooks/useSnackbar";
@@ -38,15 +32,21 @@ import { Client } from "../../features/domain/client";
 import { useSelector } from "react-redux";
 import { selectAllClients } from "../../features/clientsSlice";
 import {
-    addAttendees,
-    addAttendeesFailed,
-    addAttendeesForm,
-    attendeeCheckedIn,
-    attendeeCheckedOut, attendeeCheckin, attendeeCheckout,
-    initializeSessionDetailsReducer,
-    sessionAttendeeReducer,
-    sessionCancelled,
-    sessionDetailsReducer,
+  addAttendees,
+  addAttendeesFailed,
+  addAttendeesForm,
+  attendeeCheckedIn,
+  attendeeCheckedOut,
+  attendeeCheckin,
+  attendeeCheckout,
+  cancelAttendee,
+  closeOptions,
+  initializeSessionAttendeeState,
+  initializeSessionDetailsReducer,
+  openOptions,
+  sessionAttendeeReducer,
+  sessionCancelled,
+  sessionDetailsReducer,
 } from "./reducers/reducers";
 import { useRefreshSessions } from "../../hooks/useRefreshSessions";
 
@@ -75,34 +75,28 @@ type CancelAttendee = {
 };
 
 const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-
-
-    const [state, dispatchReducer] = useReducer(sessionAttendeeReducer, {
-    attendee: sessionAttendeeProps.attendee,
-    attendeeLabelColor:
-      sessionAttendeeProps.attendee.attendance === Attendance.REGISTERED
-        ? "primary"
-        : "success",
-    attendeeLabelStatus:
-      sessionAttendeeProps.attendee.attendance === Attendance.REGISTERED
-        ? "R"
-        : "C",
-    session: sessionAttendeeProps.session,
-        checkin: false,
-        checkout: false
-  });
-
   const { display } = useSnackbar();
+  const dispatch = useAppDispatch();
+
+  const [state, dispatchReducer] = useReducer(
+    sessionAttendeeReducer,
+    initializeSessionAttendeeState(
+      sessionAttendeeProps.attendee,
+      sessionAttendeeProps.session
+    )
+  );
 
   const options = ["Cancel"];
 
-  const dispatch = useAppDispatch();
-
   useEffect(() => {
     if (state.checkin) {
-      dispatch(sessionCheckin({attendeeId: state.attendee.id, start: state.session.schedule.start, classroomId: state.session.classroomId}))
+      dispatch(
+        sessionCheckin({
+          attendeeId: state.attendee.id,
+          start: state.session.schedule.start,
+          classroomId: state.session.classroomId,
+        })
+      )
         .unwrap()
         .then((result) => {
           const attendee = findAttendeeById(result, state.attendee.id);
@@ -113,7 +107,12 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
         .catch((err) => display(err, "error"));
     }
     if (state.checkout) {
-      dispatch(sessionCheckout({attendeeId: state.attendee.id, sessionId: state.session.id!}))
+      dispatch(
+        sessionCheckout({
+          attendeeId: state.attendee.id,
+          sessionId: state.session.id!,
+        })
+      )
         .unwrap()
         .then((result) => {
           const attendee = findAttendeeById(result, state.attendee.id);
@@ -124,15 +123,6 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
         .catch((err) => display(err, "error"));
     }
   }, [dispatch, state, display]);
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const handleAction = (_: React.MouseEvent<HTMLElement>) => {
     const cancel = {
       classroomId: state.session.classroomId,
@@ -140,13 +130,13 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
       attendeeId: state.attendee.id,
     };
     sessionAttendeeProps.onCancel(cancel);
-    setAnchorEl(null);
+    dispatchReducer(cancelAttendee());
   };
   const onSessionCheckin = async (e: BaseSyntheticEvent) => {
     if (e.target.checked) {
-        dispatchReducer(attendeeCheckin())
+      dispatchReducer(attendeeCheckin());
     } else {
-        dispatchReducer(attendeeCheckout())
+      dispatchReducer(attendeeCheckout());
     }
   };
 
@@ -241,9 +231,9 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
               aria-label="more"
               id="actions-button"
               aria-controls="attendee-actions"
-              aria-expanded={open ? "true" : undefined}
+              aria-expanded={state.optionsAnchor ? "true" : undefined}
               aria-haspopup="true"
-              onClick={handleClick}
+              onClick={(e) => dispatchReducer(openOptions(e.currentTarget))}
               size="small"
             >
               <MoreVertIcon />
@@ -253,9 +243,9 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
               MenuListProps={{
                 "aria-labelledby": "actions-button",
               }}
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
+              anchorEl={state.optionsAnchor}
+              open={Boolean(state.optionsAnchor)}
+              onClose={() => dispatchReducer(closeOptions())}
               PaperProps={{
                 style: {
                   width: "20ch",
