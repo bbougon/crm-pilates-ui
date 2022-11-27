@@ -9,7 +9,7 @@ import { Client } from "../../../features/domain/client";
 import { Button, Grid } from "@mui/material";
 import { AttendeeSelector } from "../../scheduling/AttendeeSelector";
 
-export type SessionDetailsState = {
+type SessionDetailsState = {
   session: Session;
   form: ReactElement | undefined;
   addAttendeeButtonDisabled: boolean;
@@ -377,3 +377,5 @@ export {
   sessionCancelled,
   initializeSessionDetailsReducer,
 };
+
+export type { SessionAttendeeState, SessionDetailsState };

@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  SessionAttendeeState,
   SessionDetailsState,
   addAttendees,
   addAttendeesFailed,
+  closeOptions,
+  initializeSessionAttendeeState,
   initializeSessionDetailsReducer,
+  sessionAttendeeReducer,
   sessionDetailsReducer,
 } from "../reducers";
 import {
@@ -110,5 +114,18 @@ describe("Add attendees", () => {
     expect(receivedAttendees).toMatchObject(
       session.attendees.concat(addedAttendees) as unknown as Attendee[]
     );
+  });
+
+  it("should close options", () => {
+    const attendee = new AttendeeBuilder().build();
+    const session = new SessionBuilder().withAttendee(attendee).build();
+    const state: SessionAttendeeState = initializeSessionAttendeeState(
+      attendee,
+      session
+    );
+
+    const sessionDetailsState = sessionAttendeeReducer(state, closeOptions());
+
+    expect(sessionDetailsState.optionsAnchor).toBeNull();
   });
 });
