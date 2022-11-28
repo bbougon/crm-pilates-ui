@@ -11,6 +11,8 @@ export enum ClientStatus {
   SUCCEEDED = "succeeded",
   FAILED = "failed",
   CREATION_FAILED = "creationFailed",
+  DELETION_SUCCEED = "DELETION_SUCCEED",
+  DELETION_FAILED = "DELETION_FAILED",
 }
 
 export interface ClientState {
@@ -20,7 +22,9 @@ export interface ClientState {
     | ClientStatus.LOADING
     | ClientStatus.SUCCEEDED
     | ClientStatus.FAILED
-    | ClientStatus.CREATION_FAILED;
+    | ClientStatus.CREATION_FAILED
+    | ClientStatus.DELETION_SUCCEED
+    | ClientStatus.DELETION_FAILED;
   error: ErrorMessage[];
 }
 
@@ -57,6 +61,30 @@ export const createClient = createAsyncThunk<
   } catch (e) {
     return thunkAPI.rejectWithValue(
       map_action_thunk_error("Client creation", e as ApiError)
+    );
+  }
+});
+
+const deleteClient = createAsyncThunk<
+  undefined,
+  string,
+  { rejectValue: ErrorMessage[] }
+>("clients/delete", async (id, thunkAPI) => {
+  try {
+    const { login } = thunkAPI.getState() as unknown as RootState;
+    await api(`/clients/${id}`, {
+      customConfig: {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${login.token.token}`,
+        },
+      },
+    });
+    return undefined;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(
+      map_action_thunk_error("Deleting client", e as ApiError)
     );
   }
 });
@@ -186,6 +214,13 @@ const clientsSlice = createSlice({
           "Add credits",
           action.payload as ApiError
         );
+      })
+      .addCase(deleteClient.fulfilled, (state, action) => {
+        state.status = ClientStatus.DELETION_SUCCEED;
+      })
+      .addCase(deleteClient.rejected, (state, action) => {
+        state.status = ClientStatus.DELETION_FAILED;
+        state.error = action.payload as ErrorMessage[];
       });
   },
 });
@@ -200,3 +235,5 @@ export const getClientById = (clientId: string) => (state: RootState) =>
   state.clients.clients.find((client) => client.id === clientId);
 
 export default clientsSlice.reducer;
+
+export { deleteClient };

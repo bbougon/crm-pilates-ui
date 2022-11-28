@@ -10,10 +10,7 @@ interface Props {
 
 export const Container: React.FC<Props> = ({ className, children }: Props) => (
   <DrawProvider>
-    <div className={className}>
-      <div id="portal"></div>
-      {children}
-    </div>
+    <div className={className}>{children}</div>
   </DrawProvider>
 );
 

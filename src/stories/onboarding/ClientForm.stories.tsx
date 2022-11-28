@@ -25,7 +25,7 @@ import {
   ApiClientBuilder,
   ClientCreditsBuilder,
 } from "../../test-utils/clients/clients";
-import { AddClientForm } from "../../component/clients/ClientForm";
+import { AddClientForm } from "../../component/onboarding/ClientForm";
 import { Subjects } from "../../features/domain/subjects";
 
 const error = { detail: [{ msg: "Error occurred", type: "Error" }] };

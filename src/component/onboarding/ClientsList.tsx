@@ -22,6 +22,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   addCredits,
+  deleteClient,
   fetchClients,
   getClientById,
   getClientCredits,
@@ -29,6 +30,7 @@ import {
 } from "../../features/clientsSlice";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonIcon from "@mui/icons-material/Person";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Client, Credits } from "../../features/domain/client";
 import { subjects } from "../../utils/translation";
 import styled from "styled-components";
@@ -38,6 +40,8 @@ import { CreditItem } from "./CreditItem";
 import { useAppDispatch } from "../../hooks/redux";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { AddElementButton } from "../button/AddElementButton";
+import { useDialog } from "../../hooks/useDialog";
+import { useRefreshClients } from "../../hooks/useRefreshClients";
 
 const Wrapper = styled.div`
   display: flex;
@@ -51,42 +55,6 @@ const boxStyle = {
   justifyContent: "flex-start",
   alignItems: "center",
   padding: "6px 6px 6px 6px",
-};
-
-const ClientDetailsAccordionSummary = ({
-  client,
-}: {
-  client: Client | undefined;
-}) => {
-  const props = {
-    expandIcon: <ExpandMoreIcon />,
-    sx: { textAlign: "center" },
-    id: "panel1c-"
-      .concat(client?.id || Math.random().toString())
-      .concat("-header"),
-  };
-  return (
-    <AccordionSummary
-      {...props}
-      aria-controls={"panel1c-"
-        .concat(client?.id || Math.random().toString())
-        .concat("-content")}
-    >
-      <Grid container direction="row">
-        <Box sx={boxStyle}>
-          <Avatar sx={{ width: 24, height: 24 }}>
-            <PersonIcon />
-          </Avatar>
-        </Box>
-        <Box sx={boxStyle}>
-          <Typography variant="h6">{client?.lastname}</Typography>
-        </Box>
-        <Box sx={boxStyle}>
-          <Typography>{client?.firstname}</Typography>
-        </Box>
-      </Grid>
-    </AccordionSummary>
-  );
 };
 
 type CreditItemFormProps = {
@@ -183,10 +151,13 @@ type ClientItemProps = {
   clientId: string;
 };
 
-const ClientItem = ({ clientId }: ClientItemProps) => {
+const SingleClient = ({ clientId }: ClientItemProps) => {
   const client: Client | undefined = useSelector(getClientById(clientId));
   const [addForm, setAddForm] = useState<ReactElement | undefined>(undefined);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { display } = useDialog();
+  const { display: displaySnackBar } = useSnackbar();
+  const { refresh } = useRefreshClients();
 
   const onAddCredits = (creditsAmount: number, subject: Subjects) => {
     if (creditsAmount && client) {
@@ -197,7 +168,6 @@ const ClientItem = ({ clientId }: ClientItemProps) => {
       setAddForm(undefined);
     }
   };
-
   const onAddCreditButton = () => {
     setAddForm(
       <AddCreditForm
@@ -213,9 +183,71 @@ const ClientItem = ({ clientId }: ClientItemProps) => {
     );
   };
 
+  const confirmDeleteClient = (event: BaseSyntheticEvent) => {
+    event.stopPropagation();
+    display({
+      element: (
+        <Grid>
+          <Box>
+            You are about to delete the following client account:{" "}
+            <Typography variant="h6">
+              {client?.lastname} {client?.firstname}
+            </Typography>
+            .
+          </Box>
+          <Box>Do you want to proceed?</Box>
+        </Grid>
+      ),
+      title: `Delete ${client?.lastname} ${client?.firstname}'s account`,
+      okAction: () => {
+        dispatch(deleteClient(client?.id as string))
+          .unwrap()
+          .catch((err) => {
+            displaySnackBar(err, "error");
+          })
+          .then(() => {
+            refresh();
+          });
+      },
+      severity: "warning",
+    });
+  };
+
+  const props = {
+    expandIcon: <ExpandMoreIcon />,
+    sx: { textAlign: "center" },
+    id: "panel1c-"
+      .concat(client?.id || Math.random().toString())
+      .concat("-header"),
+  };
+
   return (
     <Accordion>
-      <ClientDetailsAccordionSummary client={client} />
+      <AccordionSummary
+        {...props}
+        aria-controls={"panel1c-"
+          .concat(client?.id || Math.random().toString())
+          .concat("-content")}
+      >
+        <Grid container direction="row">
+          <Box sx={boxStyle}>
+            <Avatar sx={{ width: 24, height: 24 }}>
+              <PersonIcon />
+            </Avatar>
+          </Box>
+          <Box sx={boxStyle}>
+            <Typography variant="h6">{client?.lastname}</Typography>
+          </Box>
+          <Box sx={boxStyle}>
+            <Typography>{client?.firstname}</Typography>
+          </Box>
+        </Grid>
+        <Box sx={boxStyle}>
+          <Button onClick={confirmDeleteClient}>
+            <DeleteIcon color="action" />
+          </Button>
+        </Box>
+      </AccordionSummary>
       <AccordionDetails>
         <Wrapper>
           {client?.credits?.map((credit) => (
@@ -260,7 +292,7 @@ export const ClientsList = () => {
   return (
     <Grid container direction="column" sx={{ paddingTop: "10px" }}>
       {clients.map((client) => (
-        <ClientItem key={client.id} clientId={client.id} />
+        <SingleClient key={client.id} clientId={client.id} />
       ))}
     </Grid>
   );

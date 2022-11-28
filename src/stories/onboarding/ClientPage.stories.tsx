@@ -27,7 +27,7 @@ import {
   ClientsBuilder,
 } from "../../test-utils/clients/clients";
 import { Subjects } from "../../features/domain/subjects";
-import ClientPage from "../../component/clients/ClientPage";
+import ClientPage from "../../component/onboarding/ClientPage";
 import { translate } from "../../utils/translation";
 
 const error = { detail: [{ msg: "Error occurred", type: "Error" }] };

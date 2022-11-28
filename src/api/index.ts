@@ -4,7 +4,7 @@ import { Login } from "../features/auth";
 type Request = {
   customConfig: {
     body?: null | undefined | string | URLSearchParams;
-    method: string | "GET" | "POST";
+    method: string | "GET" | "POST" | "DELETE";
     headers: {
       "Content-type"?: string;
       "Content-Type"?: string;

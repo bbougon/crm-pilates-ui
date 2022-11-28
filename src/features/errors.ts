@@ -20,7 +20,7 @@ const map_action_thunk_error = (
   request: string,
   payload: ApiError
 ): ErrorMessage[] => {
-  if (payload?.detail) {
+  if (payload?.detail && typeof payload.detail === "object") {
     return payload.detail.map((detail) => {
       return { message: detail.msg, type: detail.type, origin: request };
     });
