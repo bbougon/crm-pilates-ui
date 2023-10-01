@@ -68,7 +68,7 @@ export const ClassroomScheduling = ({ date }: { date: Date }) => {
       { duration: 105, human: "1h45" },
       { duration: 120, human: "2h00" },
     ],
-    availablePositions: [1, 2, 3, 4, 5, 6],
+    availablePositions: [1, 2, 3, 4, 5, 6, 7, 8],
     fieldsAreFilled: (state: SchedulingState) => {
       return (
         state.classroomName !== "" &&

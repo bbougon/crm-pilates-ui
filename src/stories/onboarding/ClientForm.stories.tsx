@@ -217,6 +217,7 @@ function translate(subject: string): string {
     { subject: Subjects.MAT, display: "Mat" },
     { subject: Subjects.MACHINE_DUO, display: "Machine Duo" },
     { subject: Subjects.MACHINE_TRIO, display: "Machine Trio" },
+    { subject: Subjects.MACHINE_QUATUOR, display: "Machine Quatuor" },
     { subject: Subjects.MACHINE_PRIVATE, display: "Machine private" },
   ];
   return translations.find((translation) => translation.subject === subject)!

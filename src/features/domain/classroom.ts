@@ -7,6 +7,7 @@ export interface Classroom {
     | Subjects.MAT
     | Subjects.MACHINE_DUO
     | Subjects.MACHINE_TRIO
+    | Subjects.MACHINE_QUATUOR
     | Subjects.MACHINE_PRIVATE;
   position: number;
   startDate: string;

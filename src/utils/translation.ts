@@ -7,6 +7,10 @@ export const subjects = [
     subject: Subjects.MACHINE_TRIO,
     title: "Machine Trio",
   },
+  {
+    subject: Subjects.MACHINE_QUATUOR,
+    title: "Machine Quatuor",
+  },
   { subject: Subjects.MACHINE_PRIVATE, title: "Machine private" },
 ];
 
