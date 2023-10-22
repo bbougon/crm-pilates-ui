@@ -118,5 +118,3 @@ export interface ApiSession {
   };
   attendees: ApiAttendee[];
 }
-
-export class ApiToken {}

@@ -213,6 +213,7 @@ enum SessionAttendeeActionType {
   CANCEL_ATTENDEE = "CANCEL_ATTENDEE",
   CLOSE_OPTIONS = "CLOSE_OPTIONS",
   OPEN_OPTIONS = "OPEN_OPTIONS",
+  RESET_CHECKIN_CHECKOUT = "RESET_CHECKIN_CHECKOUT",
 }
 
 type SessionAttendeeState = {
@@ -241,6 +242,9 @@ type SessionAttendeeAction =
       type: SessionAttendeeActionType.CHECK_OUT;
     }
   | {
+      type: SessionAttendeeActionType.RESET_CHECKIN_CHECKOUT;
+    }
+  | {
       type: SessionAttendeeActionType.CANCEL_ATTENDEE;
     }
   | {
@@ -256,6 +260,12 @@ const sessionAttendeeReducer = (
   action: SessionAttendeeAction
 ): SessionAttendeeState => {
   switch (action.type) {
+    case SessionAttendeeActionType.RESET_CHECKIN_CHECKOUT:
+      return {
+        ...state,
+        checkin: false,
+        checkout: false,
+      };
     case SessionAttendeeActionType.OPEN_OPTIONS:
       return {
         ...state,
@@ -343,6 +353,12 @@ const openOptions = (element: HTMLElement): SessionAttendeeAction => {
   };
 };
 
+const resetCheckinCheckout = (): SessionAttendeeAction => {
+  return {
+    type: SessionAttendeeActionType.RESET_CHECKIN_CHECKOUT,
+  };
+};
+
 const initializeSessionAttendeeState = (
   attendee: Attendee,
   session: Session
@@ -368,6 +384,7 @@ export {
   attendeeCheckin,
   attendeeCheckedOut,
   attendeeCheckedIn,
+  resetCheckinCheckout,
   closeOptions,
   openOptions,
   initializeSessionAttendeeState,

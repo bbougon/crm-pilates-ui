@@ -44,6 +44,7 @@ import {
   initializeSessionAttendeeState,
   initializeSessionDetailsReducer,
   openOptions,
+  resetCheckinCheckout,
   sessionAttendeeReducer,
   sessionCancelled,
   sessionDetailsReducer,
@@ -104,7 +105,10 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
             dispatchReducer(attendeeCheckedIn(attendee));
           }
         })
-        .catch((err) => display(err, "error"));
+        .catch((err) => {
+          dispatchReducer(resetCheckinCheckout());
+          display(err, "error");
+        });
     }
     if (state.checkout) {
       dispatch(
@@ -120,7 +124,10 @@ const SessionAttendee = (sessionAttendeeProps: SessionAttendeeProps) => {
             dispatchReducer(attendeeCheckedOut(attendee));
           }
         })
-        .catch((err) => display(err, "error"));
+        .catch((err) => {
+          dispatchReducer(resetCheckinCheckout());
+          display(err, "error");
+        });
     }
   }, [dispatch, state, display]);
   const handleAction = (_: React.MouseEvent<HTMLElement>) => {
